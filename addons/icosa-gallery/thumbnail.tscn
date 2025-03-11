@@ -1,0 +1,96 @@
+[gd_scene load_steps=7 format=3 uid="uid://cwtkch4nvo5vl"]
+
+[ext_resource type="Script" uid="uid://bfo63iypgjoyl" path="res://addons/icosa-gallery/thumbnail.gd" id="1_g5xud"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_85ftl"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ehe4b"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_akitm"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_de8tt"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nmc6a"]
+
+[node name="Thumbnail" type="Button"]
+custom_minimum_size = Vector2(0, 150)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_85ftl")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_ehe4b")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_akitm")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_de8tt")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_nmc6a")
+action_mode = 0
+script = ExtResource("1_g5xud")
+
+[node name="Split" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Image" type="Panel" parent="Split"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Split/Image"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Image" type="TextureRect" parent="Split/Image/MarginContainer"]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 2
+
+[node name="Info" type="Panel" parent="Split"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="Labels" type="VBoxContainer" parent="Split/Info"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Name" type="Label" parent="Split/Info/Labels"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_font_sizes/font_size = 19
+
+[node name="Author" type="Label" parent="Split/Info/Labels"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0.580643, 0.580643, 0.580643, 1)
+theme_override_font_sizes/font_size = 15
+
+[node name="Description" type="Label" parent="Split/Info/Labels"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_font_sizes/font_size = 17
+
+[node name="AssetTags" type="FlowContainer" parent="Split/Info/Labels"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]
