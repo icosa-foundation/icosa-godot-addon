@@ -135,7 +135,7 @@ class Asset:
 	var author_id: String = ""
 	var author_name: String = ""
 	# urls to download gltf, fbx, usd
-	var formats: Dictionary = {}
+	var formats: Dictionary[String, Array] = {}
 	# id of the asset known as "name"
 	var id: String = ""
 
@@ -185,9 +185,23 @@ func get_asset_objects_from_response(response) -> Array[Asset]:
 		if "authorName" in asset_data: asset.author_name = asset_data["authorName"]
 		if "name" in asset_data: asset.id = asset_data["name"]
 		if "formats" in asset_data:
+			var formats : Dictionary[String, Array] = {}
+			
 			for format in asset_data["formats"]:
-				for data in format["resources"]:
-						asset.formats.get_or_add(format["formatType"], data["url"])
+				var format_type = format["formatType"]
+				var urls = []
+				
+				var root = format["root"]
+				var resources = format["resources"]
+				if "url" in root:
+					urls.append(root["url"])
+				for resource in resources:
+					if "url" in resource:
+						urls.append(resource["url"])
+						
+				formats.get_or_add(format_type, urls)
+			asset.formats = formats
+			
 		assets.append(asset)
 	return assets
 

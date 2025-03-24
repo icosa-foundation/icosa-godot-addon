@@ -31,7 +31,12 @@ func _on_api_request_completed(result, response_code, headers, body):
 	json.parse(body.get_string_from_utf8())
 	var response = json.get_data()
 	
+	if api.total_size == 0:
+		%NoAssetsLabel.show()
+		%AssetsFound.hide()
+		
 	if api.current_request == IcosaGalleryAPI.RequestType.SEARCH:
+		%AssetsFound.show()
 		%NoAssetsLabel.hide()
 		var assets = api.get_asset_objects_from_response(response)
 		for child in %AssetGrid.get_children(): child.queue_free()
@@ -42,21 +47,21 @@ func _on_api_request_completed(result, response_code, headers, body):
 			asset_thumbnail.author_name = asset.author_name
 			asset_thumbnail.thumbnail_url = asset.thumbnail
 			%AssetGrid.add_child(asset_thumbnail)
-			
-			
 			var format_index = 0
 			for format_type in asset.formats:
 				var download_url = asset.formats[format_type]
 				asset_thumbnail.formats.get_popup().add_item(format_type, format_index)
-				asset_thumbnail.formats.get_popup().id_pressed.connect(asset_thumbnail.download.start_download)
 				format_index += 1
-
-
-				
+			asset_thumbnail.formats.get_popup().id_pressed.connect(download_asset.bind(asset, asset_thumbnail))
+			
 		_on_asset_columns_value_changed(%AssetColumns.value)
-	if api.total_size == 0:
-		## TODO MAKE A MESSAGE!
-		%NoAssetsLabel.show()
+		%AssetsFound.text = "Total assets found:" + str(int(response["totalSize"])) ## oof, maybe something else?
+		
+func download_asset(index, asset : IcosaGalleryAPI.Asset, thumbnail : IcosaGalleryThumbnail):
+	for format in asset.formats:
+		print(format)
+	var download = DownloadAsset.new()
+	download.progress_updated.connect(thumbnail.update_progress.bind(download))
 
 
 
