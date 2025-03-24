@@ -11,9 +11,8 @@ config_version=5
 [application]
 
 config/name="icosa-gallery"
-run/main_scene="res://addons/icosa-gallery/browser.tscn"
+run/main_scene="uid://dxh5b6t8axr8q"
 config/features=PackedStringArray("4.4", "Forward Plus")
-config/icon="res://icon.svg"
 
 [editor_plugins]
 

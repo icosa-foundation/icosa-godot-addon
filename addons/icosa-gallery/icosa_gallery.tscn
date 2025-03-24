@@ -1,0 +1,200 @@
+[gd_scene load_steps=10 format=3 uid="uid://dxh5b6t8axr8q"]
+
+[ext_resource type="Script" uid="uid://bfhugarupk7sl" path="res://addons/icosa-gallery/icosa_gallery.gd" id="1_whk8d"]
+[ext_resource type="Texture2D" uid="uid://4ova4wsdy5x8" path="res://addons/icosa-gallery/icons/magnify.svg" id="2_qi2sv"]
+[ext_resource type="Script" uid="uid://brj0vspyeddhk" path="res://addons/icosa-gallery/icosa_gallery_api.gd" id="3_4yiif"]
+[ext_resource type="Texture2D" uid="uid://kvgeirr0rdvn" path="res://addons/icosa-gallery/logo/Icosa_Gallery_logo.png" id="3_6mgym"]
+
+[sub_resource type="SystemFont" id="SystemFont_6qgpy"]
+font_names = PackedStringArray("Arial")
+
+[sub_resource type="FontVariation" id="FontVariation_4yiif"]
+base_font = SubResource("SystemFont_6qgpy")
+
+[sub_resource type="Theme" id="Theme_xcyys"]
+default_font = SubResource("FontVariation_4yiif")
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6qgpy"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6qgpy"]
+bg_color = Color(0.391317, 0.391317, 0.391317, 1)
+
+[node name="IcosaGallery" type="Control" node_paths=PackedStringArray("api")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = SubResource("Theme_xcyys")
+script = ExtResource("1_whk8d")
+api = NodePath("API")
+
+[node name="API" type="HTTPRequest" parent="."]
+script = ExtResource("3_4yiif")
+metadata/_custom_type_script = "uid://brj0vspyeddhk"
+
+[node name="Logo" type="TextureButton" parent="."]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+z_index = 1
+custom_minimum_size = Vector2(300, 200)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+texture_normal = ExtResource("3_6mgym")
+ignore_texture_size = true
+stretch_mode = 4
+
+[node name="InterfaceMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="Interface" type="VBoxContainer" parent="InterfaceMargin"]
+layout_mode = 2
+
+[node name="Search" type="PanelContainer" parent="InterfaceMargin/Interface"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+
+[node name="Controls" type="HBoxContainer" parent="InterfaceMargin/Interface/Search"]
+layout_mode = 2
+
+[node name="SearchBar" type="LineEdit" parent="InterfaceMargin/Interface/Search/Controls"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/focus = SubResource("StyleBoxEmpty_6qgpy")
+placeholder_text = "Search for assets on Icosa Gallery.."
+clear_button_enabled = true
+right_icon = ExtResource("2_qi2sv")
+
+[node name="Assets" type="PanelContainer" parent="InterfaceMargin/Interface"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_6qgpy")
+
+[node name="ShowMessage" type="CenterContainer" parent="InterfaceMargin/Interface/Assets"]
+layout_mode = 2
+
+[node name="NoAssetsLabel" type="Label" parent="InterfaceMargin/Interface/Assets/ShowMessage"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "No assets found."
+horizontal_alignment = 1
+
+[node name="AssetBrowser" type="VBoxContainer" parent="InterfaceMargin/Interface/Assets"]
+layout_mode = 2
+
+[node name="AssetsFound" type="Label" parent="InterfaceMargin/Interface/Assets/AssetBrowser"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 10
+
+[node name="Pagination" type="HBoxContainer" parent="InterfaceMargin/Interface/Assets/AssetBrowser"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="PreviousPage" type="Button" parent="InterfaceMargin/Interface/Assets/AssetBrowser/Pagination"]
+layout_mode = 2
+text = "Previous"
+
+[node name="PageNumbers" type="HBoxContainer" parent="InterfaceMargin/Interface/Assets/AssetBrowser/Pagination"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="NextPage" type="Button" parent="InterfaceMargin/Interface/Assets/AssetBrowser/Pagination"]
+layout_mode = 2
+text = "Next"
+
+[node name="Scroll" type="ScrollContainer" parent="InterfaceMargin/Interface/Assets/AssetBrowser"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="AssetGrid" type="HFlowContainer" parent="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="GoBack" type="Button" parent="InterfaceMargin/Interface/Assets/AssetBrowser"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "back"
+
+[node name="Pad" type="VBoxContainer" parent="InterfaceMargin/Interface/Assets/AssetBrowser"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="InterfaceMargin/Interface/Assets/AssetBrowser/Pad"]
+layout_mode = 2
+
+[node name="BottomBar" type="PanelContainer" parent="InterfaceMargin/Interface"]
+layout_mode = 2
+
+[node name="Settings" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar"]
+layout_mode = 2
+
+[node name="Options" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/Settings"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Formats" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/Settings/Options"]
+visible = false
+layout_mode = 2
+
+[node name="GLTF" type="Button" parent="InterfaceMargin/Interface/BottomBar/Settings/Options/Formats"]
+layout_mode = 2
+toggle_mode = true
+text = "gltf"
+
+[node name="FBX" type="Button" parent="InterfaceMargin/Interface/BottomBar/Settings/Options/Formats"]
+layout_mode = 2
+toggle_mode = true
+text = "fbx"
+
+[node name="Button" type="Button" parent="InterfaceMargin/Interface/BottomBar/Settings/Options"]
+layout_mode = 2
+
+[node name="AssetColumns" type="SpinBox" parent="InterfaceMargin/Interface/BottomBar/Settings"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+min_value = 1.0
+max_value = 10.0
+value = 5.0
+prefix = "columns"
+
+[connection signal="resized" from="." to="." method="_on_resized"]
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
+[connection signal="request_completed" from="API" to="." method="_on_api_request_completed"]
+[connection signal="text_submitted" from="InterfaceMargin/Interface/Search/Controls/SearchBar" to="." method="_on_search_bar_text_submitted"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Pagination/PreviousPage" to="." method="_on_previous_page_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Pagination/NextPage" to="." method="_on_next_page_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/GoBack" to="." method="_on_go_back_pressed"]
+[connection signal="value_changed" from="InterfaceMargin/Interface/BottomBar/Settings/AssetColumns" to="." method="_on_asset_columns_value_changed"]
