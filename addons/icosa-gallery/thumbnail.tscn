@@ -39,17 +39,17 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Padding/Info"]
+[node name="Asset" type="HBoxContainer" parent="Padding/Info"]
 layout_mode = 2
 
-[node name="AssetName" type="Label" parent="Padding/Info/HBoxContainer"]
+[node name="AssetName" type="Label" parent="Padding/Info/Asset"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "AssetName"
 text_overrun_behavior = 3
 
-[node name="Formats" type="MenuButton" parent="Padding/Info/HBoxContainer"]
+[node name="Formats" type="MenuButton" parent="Padding/Info/Asset"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 10

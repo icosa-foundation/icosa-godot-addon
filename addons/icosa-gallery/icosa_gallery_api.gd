@@ -2,6 +2,14 @@
 class_name IcosaGalleryAPI
 extends HTTPRequest
 
+
+var web_safe_headers : Array[String] = [
+		"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+		"Referer: https://web.archive.org/",
+		"Accept: */*",
+		"Connection: keep-alive"
+	]
+
 var headers = [
 	"Content-Type: application/json",
 	"User-Agent: Godot Icosa Browser"
@@ -215,7 +223,9 @@ static func create_default_search() -> Search:
 	return search
 
 
-
+func get_pages_from_total_assets(page_size : int, total_assets : int):
+	var page_amount = total_assets/page_size
+	return page_amount
 
 
 

@@ -7,6 +7,7 @@
 
 [sub_resource type="SystemFont" id="SystemFont_6qgpy"]
 font_names = PackedStringArray("Arial")
+subpixel_positioning = 0
 
 [sub_resource type="FontVariation" id="FontVariation_4yiif"]
 base_font = SubResource("SystemFont_6qgpy")
@@ -38,7 +39,7 @@ metadata/_custom_type_script = "uid://brj0vspyeddhk"
 
 [node name="Logo" type="TextureButton" parent="."]
 unique_name_in_owner = true
-modulate = Color(1, 1, 1, 0)
+modulate = Color(0, 0, 0, 0)
 z_index = 1
 custom_minimum_size = Vector2(300, 200)
 layout_mode = 1
@@ -127,6 +128,7 @@ alignment = 1
 
 [node name="NextPage" type="Button" parent="InterfaceMargin/Interface/Assets/AssetBrowser/Pagination"]
 layout_mode = 2
+size_flags_horizontal = 8
 text = "Next"
 
 [node name="Scroll" type="ScrollContainer" parent="InterfaceMargin/Interface/Assets/AssetBrowser"]

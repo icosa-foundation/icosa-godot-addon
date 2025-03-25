@@ -4,7 +4,6 @@ extends Button
 
 @onready var progress = %Progress
 @onready var formats : MenuButton = %Formats 
-var download_asset_request := DownloadAsset.new()
 var thumbnail_request := HTTPRequest.new()
 
 var display_name : String : set = set_display_name
@@ -28,7 +27,6 @@ func fade_in():
 	tween.finished.connect(kill_tween.bind(tween))
 
 func _ready():
-	add_child(download_asset_request)
 	add_child(thumbnail_request)
 	thumbnail_request.request_completed.connect(thumbnail_request_completed)
 	var error = thumbnail_request.request(thumbnail_url)
@@ -43,22 +41,27 @@ func thumbnail_request_completed(result, response_code, headers, body):
 	var error = image.load_png_from_buffer(body)
 	if error != OK:
 		push_error("Couldn't load the image.")
-		
-	
 	var texture = ImageTexture.create_from_image(image)
 	%ThumbnailImage.texture = texture
-	
 	fade_in()
 	thumbnail_request.queue_free()
 
-func _on_pressed():
-	pass
+#func _on_pressed():
+	#pass
 
-func update_progress(bytes_downloaded: int, bytes_total: int):
-	if bytes_total > 0:
-		%Progress.show()
-		var progress = float(bytes_downloaded) / float(bytes_total)
-		%Progress/ProgressLabel/DownloadProgress.value = progress * 100
-		%Progress/ProgressLabel.text = "Downloading... %d%%\n%d/%d bytes" % [progress * 100, bytes_downloaded, bytes_total]
-		if bytes_downloaded == bytes_total:
-			%Progress.hide()
+func update_progress(bytes, total_bytes = 1):
+	%Progress.show()
+	%Progress/ProgressLabel/DownloadProgress.value = bytes
+	%Progress/ProgressLabel/DownloadProgress.max_value = total_bytes
+	if total_bytes > 0:
+		var size_text = ""
+		if total_bytes < 1024:
+			size_text = "%d bytes" % total_bytes
+		elif total_bytes < 1024 * 1024:
+			total_bytes = "%.1f KB" % (total_bytes / 1024.0)
+		else:
+			total_bytes = "%.1f MB" % (total_bytes / (1024.0 * 1024.0))
+		
+		%Progress/ProgressLabel.text = "Downloading... %d%%\n%s" % [bytes, size_text]
+	else:
+		%Progress/ProgressLabel.text = "Downloading... %d%%" % bytes

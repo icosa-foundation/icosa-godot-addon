@@ -13,7 +13,3 @@ config_version=5
 config/name="icosa-gallery"
 run/main_scene="uid://dxh5b6t8axr8q"
 config/features=PackedStringArray("4.4", "Forward Plus")
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/icosa-gallery/plugin.cfg")
