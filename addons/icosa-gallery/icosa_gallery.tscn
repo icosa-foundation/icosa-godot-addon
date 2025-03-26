@@ -39,7 +39,7 @@ metadata/_custom_type_script = "uid://brj0vspyeddhk"
 
 [node name="Logo" type="TextureButton" parent="."]
 unique_name_in_owner = true
-modulate = Color(0, 0, 0, 0)
+modulate = Color(0.718133, 0.718133, 0.718133, 0.718133)
 z_index = 1
 custom_minimum_size = Vector2(300, 200)
 layout_mode = 1

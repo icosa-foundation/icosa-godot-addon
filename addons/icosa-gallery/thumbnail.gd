@@ -46,22 +46,10 @@ func thumbnail_request_completed(result, response_code, headers, body):
 	fade_in()
 	thumbnail_request.queue_free()
 
-#func _on_pressed():
-	#pass
-
-func update_progress(bytes, total_bytes = 1):
+func update_progress(file, total_files):
 	%Progress.show()
-	%Progress/ProgressLabel/DownloadProgress.value = bytes
-	%Progress/ProgressLabel/DownloadProgress.max_value = total_bytes
-	if total_bytes > 0:
-		var size_text = ""
-		if total_bytes < 1024:
-			size_text = "%d bytes" % total_bytes
-		elif total_bytes < 1024 * 1024:
-			total_bytes = "%.1f KB" % (total_bytes / 1024.0)
-		else:
-			total_bytes = "%.1f MB" % (total_bytes / (1024.0 * 1024.0))
-		
-		%Progress/ProgressLabel.text = "Downloading... %d%%\n%s" % [bytes, size_text]
-	else:
-		%Progress/ProgressLabel.text = "Downloading... %d%%" % bytes
+	%Formats.hide()
+	%BufferingIcon.show()
+	%Progress/ProgressLabel/DownloadProgress.value = file
+	%Progress/ProgressLabel/DownloadProgress.max_value = total_files
+	%Progress/ProgressLabel.text = "%s/%s" % [file, total_files]

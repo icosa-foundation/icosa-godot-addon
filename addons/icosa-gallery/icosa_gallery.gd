@@ -79,8 +79,10 @@ func download_asset(index, asset : IcosaGalleryAPI.Asset, thumbnail : IcosaGalle
 	# Get the format type (e.g., "GLTF2", "OBJ", etc.)
 	var format_type = asset.formats.keys()[index]
 	
-	# Create a sanitized asset name for the file prefix
-	var asset_name_sanitized = asset.display_name.validate_filename()
+	# Create a sanitized asset name for the directory and file prefix
+	# Convert to lowercase for consistent file naming
+	var asset_name_sanitized = asset.display_name.validate_filename().to_lower()
+	
 	# Get the URLs for the selected format
 	var download_queue = []
 	for urls in asset.formats.values()[index]:
@@ -89,20 +91,37 @@ func download_asset(index, asset : IcosaGalleryAPI.Asset, thumbnail : IcosaGalle
 	# Show the progress bar before starting downloads
 	thumbnail.update_progress(0)
 	
-	# Download each file
+	# Create a single HTTPDownload instance for all files
+	var download = HTTPDownload.new()
+	download.name = "AssetDownload"
+	add_child(download)
+	
+	# Connect signals to the thumbnail's handler methods
+	download.download_started.connect(thumbnail._on_download_started)
+	download.download_completed.connect(thumbnail._on_download_completed)
+	download.queue_completed.connect(thumbnail._on_download_queue_completed)
+	download.download_failed.connect(thumbnail._on_download_failed)
+	
+	# Add each file to the download queue
 	var file_index = 0
 	for url in download_queue:
-		# Create a unique filename
-		var filename = "%s" % [asset_name_sanitized]
+		# Create a unique filename with appropriate extension
+		var extension = url.get_file().get_extension()
+		
+		# Determine if this is the main file or a resource file
+		var filename
+		if file_index == 0 and download_queue.size() > 1:
+			# For the main file, use the asset name
+			filename = "%s.%s" % [asset_name_sanitized, extension if extension else "bin"]
+		else:
+			# For resource files, use a more descriptive name to avoid conflicts
+			var file_basename = url.get_file().get_basename().to_lower()
+			filename = "%s_%s.%s" % [asset_name_sanitized, file_basename, extension if extension else "bin"]
 		
 		print("Downloading: " + url + " to " + filename)
 		
-		# Create download request
-		var download = HTTPDownload.new(url, api.web_safe_headers, filename, filename.split(".")[0])
-		
-		# Connect signals
-		download.bytes_received.connect(thumbnail.update_progress)
-		#download.download_completed.connect()
+		# Add this file to the download queue
+		download.add_to_queue(url, api.web_safe_headers, filename, asset_name_sanitized)
 		file_index += 1
 
 func select_asset(selected_thumbnail : Control):

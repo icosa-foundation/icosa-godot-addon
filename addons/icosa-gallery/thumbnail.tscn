@@ -1,10 +1,43 @@
-[gd_scene load_steps=3 format=3 uid="uid://cagka4k0eskfi"]
+[gd_scene load_steps=9 format=3 uid="uid://cagka4k0eskfi"]
 
 [ext_resource type="Script" uid="uid://ds6v28bagkc5a" path="res://addons/icosa-gallery/thumbnail.gd" id="1_trr3q"]
 [ext_resource type="Texture2D" uid="uid://b7qrs5qju2ois" path="res://addons/icosa-gallery/icons/download.svg" id="2_0msik"]
+[ext_resource type="Script" uid="uid://banbdiengwmgk" path="res://addons/icosa-gallery/buffering_icon.gd" id="3_3qkbe"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3qkbe"]
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="Gradient" id="Gradient_hjirf"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0.196822, 0.379025, 0.544279, 0.616313)
+colors = PackedColorArray(0.572549, 0.572549, 0.572549, 0, 0.572549, 0.572549, 0.572549, 0.733333, 0.572549, 0.572549, 0.572549, 0.486275, 0.572549, 0.572549, 0.572549, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_8oa6n"]
+gradient = SubResource("Gradient_hjirf")
+width = 24
+height = 24
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+metadata/_snap_enabled = true
+
+[sub_resource type="Gradient" id="Gradient_3qkbe"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0.196822, 0.412924, 0.548517, 0.620551)
+colors = PackedColorArray(0.572549, 0.572549, 0.572549, 0, 1, 1, 1, 0.666667, 1, 1, 1, 0.466667, 0.572549, 0.572549, 0.572549, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_hjirf"]
+gradient = SubResource("Gradient_3qkbe")
+width = 24
+height = 24
+use_hdr = true
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+metadata/_snap_enabled = true
 
 [node name="Thumbnail" type="Button"]
-modulate = Color(1, 1, 1, 0.172549)
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 246.0
@@ -29,15 +62,20 @@ layout_mode = 2
 mouse_filter = 2
 alignment = 2
 
-[node name="ThumbnailImage" type="TextureRect" parent="Padding/Info"]
+[node name="PanelContainer" type="PanelContainer" parent="Padding/Info"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_3qkbe")
+
+[node name="ThumbnailImage" type="TextureRect" parent="Padding/Info/PanelContainer"]
 unique_name_in_owner = true
 z_index = 2
 z_as_relative = false
+clip_contents = true
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 5
 
 [node name="Asset" type="HBoxContainer" parent="Padding/Info"]
 layout_mode = 2
@@ -57,6 +95,23 @@ theme_override_font_sizes/font_size = 14
 icon = ExtResource("2_0msik")
 alignment = 0
 icon_alignment = 2
+
+[node name="BufferingIcon" type="TextureProgressBar" parent="Padding/Info/Asset"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 10
+max_value = 33.0
+fill_mode = 4
+texture_under = SubResource("GradientTexture2D_8oa6n")
+texture_progress = SubResource("GradientTexture2D_hjirf")
+script = ExtResource("3_3qkbe")
+
+[node name="DownloadFinished" type="Label" parent="Padding/Info/Asset"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "✔️"
 
 [node name="AuthorName" type="Label" parent="Padding/Info"]
 unique_name_in_owner = true
