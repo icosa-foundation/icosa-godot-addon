@@ -215,8 +215,8 @@ func get_asset_objects_from_response(response) -> Array[Asset]:
 static func create_default_search() -> Search:
 	var search = Search.new()
 	search.order = ["BEST"]
-	search.formats = ["-TILT"]
-	search.license = ["REMIXABLE"]
+	#search.formats = ["-TILT"]
+	#search.license = ["REMIXABLE"]
 	search.curated = true
 	search.page_size = PAGE_SIZE_DEFAULT
 	return search

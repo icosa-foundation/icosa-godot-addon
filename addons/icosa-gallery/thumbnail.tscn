@@ -1,8 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://cagka4k0eskfi"]
+[gd_scene load_steps=11 format=3 uid="uid://cagka4k0eskfi"]
 
 [ext_resource type="Script" uid="uid://ds6v28bagkc5a" path="res://addons/icosa-gallery/thumbnail.gd" id="1_trr3q"]
 [ext_resource type="Texture2D" uid="uid://b7qrs5qju2ois" path="res://addons/icosa-gallery/icons/download.svg" id="2_0msik"]
-[ext_resource type="Script" uid="uid://banbdiengwmgk" path="res://addons/icosa-gallery/buffering_icon.gd" id="3_3qkbe"]
+[ext_resource type="Script" path="res://addons/icosa-gallery/buffering_icon.gd" id="3_3qkbe"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3qkbe"]
 corner_radius_top_left = 4
@@ -10,32 +10,37 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
+[sub_resource type="FontVariation" id="FontVariation_3qkbe"]
+
 [sub_resource type="Gradient" id="Gradient_hjirf"]
-interpolation_mode = 1
-offsets = PackedFloat32Array(0.196822, 0.379025, 0.544279, 0.616313)
-colors = PackedColorArray(0.572549, 0.572549, 0.572549, 0, 0.572549, 0.572549, 0.572549, 0.733333, 0.572549, 0.572549, 0.572549, 0.486275, 0.572549, 0.572549, 0.572549, 0)
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.308167, 0.4815, 0.5515)
+colors = PackedColorArray(0.392157, 0.392157, 0.392157, 0, 0.391317, 0.391317, 0.391317, 1, 0.392157, 0.392157, 0.392157, 0)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_8oa6n"]
 gradient = SubResource("Gradient_hjirf")
-width = 24
-height = 24
+width = 32
+height = 32
 fill = 1
 fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.9, 0.1)
 metadata/_snap_enabled = true
 
-[sub_resource type="Gradient" id="Gradient_3qkbe"]
-interpolation_mode = 1
-offsets = PackedFloat32Array(0.196822, 0.412924, 0.548517, 0.620551)
-colors = PackedColorArray(0.572549, 0.572549, 0.572549, 0, 1, 1, 1, 0.666667, 1, 1, 1, 0.466667, 0.572549, 0.572549, 0.572549, 0)
+[sub_resource type="Gradient" id="Gradient_dytcp"]
+offsets = PackedFloat32Array(0.3015, 0.434833, 0.558167)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_hjirf"]
-gradient = SubResource("Gradient_3qkbe")
-width = 24
-height = 24
-use_hdr = true
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_e2td2"]
+gradient = SubResource("Gradient_dytcp")
+width = 32
+height = 32
 fill = 1
 fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.9, 0.1)
 metadata/_snap_enabled = true
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hjirf"]
+bg_color = Color(0.148922, 0.574047, 0.258045, 1)
 
 [node name="Thumbnail" type="Button"]
 offset_left = 4.0
@@ -52,10 +57,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
 
 [node name="Info" type="VBoxContainer" parent="Padding"]
 layout_mode = 2
@@ -63,8 +68,10 @@ mouse_filter = 2
 alignment = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="Padding/Info"]
+clip_contents = true
 layout_mode = 2
 size_flags_vertical = 3
+mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_3qkbe")
 
 [node name="ThumbnailImage" type="TextureRect" parent="Padding/Info/PanelContainer"]
@@ -96,22 +103,14 @@ icon = ExtResource("2_0msik")
 alignment = 0
 icon_alignment = 2
 
-[node name="BufferingIcon" type="TextureProgressBar" parent="Padding/Info/Asset"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_horizontal = 10
-max_value = 33.0
-fill_mode = 4
-texture_under = SubResource("GradientTexture2D_8oa6n")
-texture_progress = SubResource("GradientTexture2D_hjirf")
-script = ExtResource("3_3qkbe")
-
 [node name="DownloadFinished" type="Label" parent="Padding/Info/Asset"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+theme_override_fonts/font = SubResource("FontVariation_3qkbe")
+theme_override_font_sizes/font_size = 18
 text = "✔️"
+vertical_alignment = 1
 
 [node name="AuthorName" type="Label" parent="Padding/Info"]
 unique_name_in_owner = true
@@ -124,19 +123,45 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="ProgressLabel" type="Label" parent="Padding/Info/Progress"]
+[node name="BufferingIcon" type="TextureProgressBar" parent="Padding/Info/Progress"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 33.0
+value = 23.0
+fill_mode = 4
+texture_under = SubResource("GradientTexture2D_8oa6n")
+texture_progress = SubResource("GradientTexture2D_e2td2")
+script = ExtResource("3_3qkbe")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Padding/Info/Progress"]
 layout_mode = 2
 size_flags_horizontal = 3
-horizontal_alignment = 1
 
-[node name="DownloadProgress" type="ProgressBar" parent="Padding/Info/Progress/ProgressLabel"]
+[node name="DownloadProgress" type="ProgressBar" parent="Padding/Info/Progress/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_hjirf")
+show_percentage = false
+
+[node name="FilesDownloaded" type="ProgressBar" parent="Padding/Info/Progress/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+show_percentage = false
+
+[node name="ProgressLabel" type="Label" parent="Padding/Info/Progress/VBoxContainer/FilesDownloaded"]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
-show_percentage = false
+size_flags_horizontal = 3
+horizontal_alignment = 1
 
 [connection signal="pressed" from="." to="." method="_on_pressed"]

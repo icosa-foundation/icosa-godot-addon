@@ -27,6 +27,8 @@ func fade_in():
 	tween.finished.connect(kill_tween.bind(tween))
 
 func _ready():
+	var popup = %Formats.get_popup() as PopupMenu
+	popup.index_pressed.connect(download_popup_pressed)
 	add_child(thumbnail_request)
 	thumbnail_request.request_completed.connect(thumbnail_request_completed)
 	var error = thumbnail_request.request(thumbnail_url)
@@ -46,10 +48,21 @@ func thumbnail_request_completed(result, response_code, headers, body):
 	fade_in()
 	thumbnail_request.queue_free()
 
-func update_progress(file, total_files):
+func _on_download_queue_completed():
+	%Progress.hide()
+	%BufferingIcon.hide()
+	%DownloadFinished.show()
+
+func update_progress(current_file: int, total_files: int):
+	%FilesDownloaded.value = current_file
+	%FilesDownloaded.max_value = total_files
+	%ProgressLabel.text = "%s/%s" % [current_file, total_files]
+
+func download_popup_pressed(index_pressed):
 	%Progress.show()
-	%Formats.hide()
-	%BufferingIcon.show()
-	%Progress/ProgressLabel/DownloadProgress.value = file
-	%Progress/ProgressLabel/DownloadProgress.max_value = total_files
-	%Progress/ProgressLabel.text = "%s/%s" % [file, total_files]
+	%Formats.hide() # hide the download button.
+
+func update_bytes_progress(current_bytes: int, total_bytes: int):
+	%DownloadProgress.show()
+	%DownloadProgress.value = current_bytes
+	%DownloadProgress.max_value = total_bytes

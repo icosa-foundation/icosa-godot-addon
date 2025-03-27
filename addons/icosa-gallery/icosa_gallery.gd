@@ -89,40 +89,36 @@ func download_asset(index, asset : IcosaGalleryAPI.Asset, thumbnail : IcosaGalle
 		download_queue.append(urls)
 	
 	# Show the progress bar before starting downloads
-	thumbnail.update_progress(0)
 	
 	# Create a single HTTPDownload instance for all files
 	var download = HTTPDownload.new()
-	download.name = "AssetDownload"
+
+	
 	add_child(download)
-	
-	# Connect signals to the thumbnail's handler methods
-	download.download_started.connect(thumbnail._on_download_started)
-	download.download_completed.connect(thumbnail._on_download_completed)
-	download.queue_completed.connect(thumbnail._on_download_queue_completed)
-	download.download_failed.connect(thumbnail._on_download_failed)
-	
-	# Add each file to the download queue
-	var file_index = 0
+	var processed_queue = []
 	for url in download_queue:
-		# Create a unique filename with appropriate extension
-		var extension = url.get_file().get_extension()
-		
-		# Determine if this is the main file or a resource file
-		var filename
-		if file_index == 0 and download_queue.size() > 1:
-			# For the main file, use the asset name
-			filename = "%s.%s" % [asset_name_sanitized, extension if extension else "bin"]
-		else:
-			# For resource files, use a more descriptive name to avoid conflicts
-			var file_basename = url.get_file().get_basename().to_lower()
-			filename = "%s_%s.%s" % [asset_name_sanitized, file_basename, extension if extension else "bin"]
-		
-		print("Downloading: " + url + " to " + filename)
-		
-		# Add this file to the download queue
-		download.add_to_queue(url, api.web_safe_headers, filename, asset_name_sanitized)
-		file_index += 1
+		url = url as String
+		var address = url.split("https://")
+		if address.size() > 2:
+			url = "https://" + address[1] + address[2].uri_encode() ## format webarchive link
+			processed_queue.append(url)
+	#print(processed_queue)
+	
+	# Set the asset name for the download directory
+	download.asset_name = asset_name_sanitized
+	download.url_queue = processed_queue
+	
+	# Connect signals for progress tracking
+	download.files_downloaded.connect(thumbnail.update_progress)
+	download.download_progress.connect(thumbnail.update_bytes_progress)
+	download.download_queue_completed.connect(thumbnail._on_download_queue_completed)
+	download.host_offline.connect(show_host_offline_popup)
+	# Start the download process
+	download.start()
+
+	
+
+
 
 func select_asset(selected_thumbnail : Control):
 	# Hide all other thumbnails and enlarge the selected one
@@ -239,3 +235,7 @@ func request_new_page():
 	var error = api.request(url)
 	if error != OK:
 		push_error("Failed to load new page.")
+
+
+func show_host_offline_popup():
+	%HostOffline.show()
