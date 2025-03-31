@@ -8,7 +8,7 @@ const DEFAULT_COLUMN_SIZE = 5
 @onready var thumbnail_scene := preload("res://addons/icosa-gallery/thumbnail.tscn")
 
 var viewing_single_asset = false
-var current_search : IcosaGalleryAPI.Search
+var current_search : IcosaGalleryAPI.Search = IcosaGalleryAPI.create_default_search()
 var chosen_thumbnail : Control
 var asset_size = 250
 
@@ -18,9 +18,8 @@ func _ready():
 func _on_search_bar_text_submitted(new_text):
 	api.fade_out(%Logo)
 	
-	var search = api.create_default_search()
+	var search = current_search
 	search.keywords = new_text
-	current_search = search
 	current_page = 1
 	current_search.page_token = current_page
 	
@@ -34,6 +33,7 @@ func _on_api_request_completed(result, response_code, headers, body):
 	var json = JSON.new()
 	json.parse(body.get_string_from_utf8())
 	var response = json.get_data()
+	print(response)
 	var total_assets = response["totalSize"]
 
 	# Update asset found / not found labels
@@ -65,11 +65,19 @@ func _on_api_request_completed(result, response_code, headers, body):
 			asset_thumbnail.pressed.connect(select_asset.bind(asset_thumbnail))
 			asset_thumbnail.display_name = asset.display_name
 			asset_thumbnail.author_name = asset.author_name
+			asset_thumbnail.description = asset.description
+			asset_thumbnail.license = asset.license
 			asset_thumbnail.thumbnail_url = asset.thumbnail
 			%AssetGrid.add_child(asset_thumbnail)
 			var format_index = 0
 			for format_type in asset.formats:
-				asset_thumbnail.formats.get_popup().add_item(format_type, format_index)
+				if format_type == "GLTF2":
+					var svg_code = '<svg width="16" height="16"><circle cx="12" cy="6" r="12" fill="green"/></svg>'
+					var image = Image.new()
+					var icon = image.load_svg_from_string(svg_code, 1.0)
+					asset_thumbnail.formats.get_popup().add_icon_item(image, format_type)
+				else:
+					asset_thumbnail.formats.get_popup().add_item(format_type, format_index)
 				format_index += 1
 			asset_thumbnail.formats.get_popup().id_pressed.connect(download_asset.bind(asset, asset_thumbnail))
 			
@@ -125,7 +133,7 @@ func select_asset(selected_thumbnail : Control):
 	for thumbnail in selected_thumbnail.get_parent().get_children():
 		thumbnail.hide()
 	selected_thumbnail.show()
-	selected_thumbnail.custom_minimum_size = size / 1.25
+	selected_thumbnail.custom_minimum_size = Vector2(size.x/1.2, size.y/1.4)
 	selected_thumbnail.disabled = true
 	%AssetGrid.alignment = FlowContainer.AlignmentMode.ALIGNMENT_CENTER
 	chosen_thumbnail = selected_thumbnail
@@ -134,6 +142,7 @@ func select_asset(selected_thumbnail : Control):
 	viewing_single_asset = true
 
 func _on_go_back_pressed():
+	chosen_thumbnail.get_node("%Description").hide()
 	viewing_single_asset = false
 	%GoBack.hide()
 	%Pagination.show()
@@ -239,3 +248,85 @@ func request_new_page():
 
 func show_host_offline_popup():
 	%HostOffline.show()
+
+## Help menu, also about.
+func _on_help_pressed():
+	%Help.show()
+
+func _on_search_options_toggled(toggled_on):
+	if toggled_on:
+		%BottomBar.size_flags_vertical = SIZE_EXPAND_FILL
+		%SearchOptionsMenu.show()
+	else:
+		%BottomBar.size_flags_vertical = SIZE_SHRINK_END
+		%SearchOptionsMenu.hide()
+
+
+##### search gui options.
+
+func _on_search_author_text_changed(new_text):
+	current_search.author_name = new_text
+
+
+func _on_search_description_text_changed(new_text):
+	current_search.description = new_text
+
+
+func _on_gltf_2_toggled(toggled_on):
+	if toggled_on:
+		current_search.formats.append("GLTF2")
+		current_search.formats.erase("-GLTF2")
+	else:
+		current_search.formats.append("-GLTF2")
+		current_search.formats.erase("GLTF2")
+		
+
+func _on_obj_toggled(toggled_on):
+	if toggled_on:
+		current_search.formats.append("OBJ")
+		current_search.formats.erase("-OBJ")
+	else:
+		current_search.formats.append("-OBJ")
+		current_search.formats.erase("OBJ")
+
+
+func _on_fbx_toggled(toggled_on):
+	if toggled_on:
+		current_search.formats.append("FBX")
+		current_search.formats.erase("-FBX")
+	else:
+		current_search.formats.append("-FBX")
+		current_search.formats.erase("FBX")
+
+## other model formats. no support for these yet. (TILT, BLOCKS, etc)
+func _on_other_toggled(toggled_on):
+	pass # Replace with function body.
+
+
+func _on_remixable_toggled(toggled_on):
+	current_search.license.append("REMIXABLE")
+
+## non derivative works are off by default. not really the idea here.
+func _on_nd_toggled(toggled_on):
+	current_search.license.append("ALL_CC")
+
+
+
+func _on_min_triangles_value_changed(value):
+	current_search.triangle_count_min = value
+
+
+func _on_max_triangles_value_changed(value):
+	current_search.triangle_count_max = value
+
+
+## the array `IcosaGalleryAPI.order_by` handles ordering. will make GUI later. 
+func _on_best_toggled(toggled_on):
+	#current_search. ?? no api for this yet.
+	pass 
+
+func _on_curated_toggled(toggled_on):
+	current_search.curated = toggled_on
+
+func _on_page_size_value_changed(value):
+	current_search.page_size = value

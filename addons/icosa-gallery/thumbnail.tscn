@@ -2,13 +2,9 @@
 
 [ext_resource type="Script" uid="uid://ds6v28bagkc5a" path="res://addons/icosa-gallery/thumbnail.gd" id="1_trr3q"]
 [ext_resource type="Texture2D" uid="uid://b7qrs5qju2ois" path="res://addons/icosa-gallery/icons/download.svg" id="2_0msik"]
-[ext_resource type="Script" path="res://addons/icosa-gallery/buffering_icon.gd" id="3_3qkbe"]
+[ext_resource type="Script" uid="uid://banbdiengwmgk" path="res://addons/icosa-gallery/buffering_icon.gd" id="3_3qkbe"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3qkbe"]
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8oa6n"]
 
 [sub_resource type="FontVariation" id="FontVariation_3qkbe"]
 
@@ -43,6 +39,7 @@ metadata/_snap_enabled = true
 bg_color = Color(0.148922, 0.574047, 0.258045, 1)
 
 [node name="Thumbnail" type="Button"]
+clip_contents = true
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 246.0
@@ -67,14 +64,26 @@ layout_mode = 2
 mouse_filter = 2
 alignment = 2
 
+[node name="Description" type="Label" parent="Padding/Info"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Description"
+
 [node name="PanelContainer" type="PanelContainer" parent="Padding/Info"]
 clip_contents = true
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 1
-theme_override_styles/panel = SubResource("StyleBoxFlat_3qkbe")
+theme_override_styles/panel = SubResource("StyleBoxFlat_8oa6n")
 
-[node name="ThumbnailImage" type="TextureRect" parent="Padding/Info/PanelContainer"]
+[node name="PanelContainer2" type="PanelContainer" parent="Padding/Info/PanelContainer"]
+clip_children = 1
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+
+[node name="ThumbnailImage" type="TextureRect" parent="Padding/Info/PanelContainer/PanelContainer2"]
 unique_name_in_owner = true
 z_index = 2
 z_as_relative = false
@@ -92,9 +101,29 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "AssetName"
-text_overrun_behavior = 3
+vertical_alignment = 2
 
-[node name="Formats" type="MenuButton" parent="Padding/Info/Asset"]
+[node name="AuthorName" type="Label" parent="Padding/Info"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_font_sizes/font_size = 11
+text = "AuthorName"
+horizontal_alignment = 2
+
+[node name="Details" type="HBoxContainer" parent="Padding/Info"]
+layout_mode = 2
+
+[node name="License" type="Label" parent="Padding/Info/Details"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 9
+text = "License"
+vertical_alignment = 2
+
+[node name="Formats" type="MenuButton" parent="Padding/Info/Details"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 10
@@ -103,7 +132,7 @@ icon = ExtResource("2_0msik")
 alignment = 0
 icon_alignment = 2
 
-[node name="DownloadFinished" type="Label" parent="Padding/Info/Asset"]
+[node name="DownloadFinished" type="Label" parent="Padding/Info/Details"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -111,12 +140,6 @@ theme_override_fonts/font = SubResource("FontVariation_3qkbe")
 theme_override_font_sizes/font_size = 18
 text = "✔️"
 vertical_alignment = 1
-
-[node name="AuthorName" type="Label" parent="Padding/Info"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 11
-text = "AuthorName"
 
 [node name="Progress" type="HBoxContainer" parent="Padding/Info"]
 unique_name_in_owner = true
@@ -127,7 +150,7 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 max_value = 33.0
-value = 23.0
+value = 18.0
 fill_mode = 4
 texture_under = SubResource("GradientTexture2D_8oa6n")
 texture_progress = SubResource("GradientTexture2D_e2td2")

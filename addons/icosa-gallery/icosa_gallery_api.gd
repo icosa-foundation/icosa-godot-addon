@@ -141,6 +141,7 @@ class Asset:
 	var description: String = ""
 	var author_id: String = ""
 	var author_name: String = ""
+	var license: String = ""
 	# urls to download gltf, fbx, usd
 	var formats: Dictionary[String, Array] = {}
 	# id of the asset known as "name"
@@ -191,18 +192,21 @@ func get_asset_objects_from_response(response) -> Array[Asset]:
 		if "description" in asset_data: asset.description = asset_data["description"]
 		if "authorName" in asset_data: asset.author_name = asset_data["authorName"]
 		if "name" in asset_data: asset.id = asset_data["name"]
+		if "license" in asset_data: asset.license = asset_data["license"]
 		if "formats" in asset_data:
 			var formats : Dictionary[String, Array] = {}
 			
 			for format in asset_data["formats"]:
 				var format_type = format["formatType"]
 				var urls = []
-				
 				var root = format["root"]
 				var resources = format["resources"]
+				# get the model file
 				if "url" in root:
 					urls.append(root["url"])
+				# get any resources. textures, bin, etc
 				for resource in resources:
+					# there may be multiple
 					if "url" in resource:
 						urls.append(resource["url"])
 						
@@ -212,9 +216,10 @@ func get_asset_objects_from_response(response) -> Array[Asset]:
 		assets.append(asset)
 	return assets
 
+## a basic helper function
 static func create_default_search() -> Search:
 	var search = Search.new()
-	search.order = ["BEST"]
+	#search.order = ["BEST"]
 	#search.formats = ["-TILT"]
 	#search.license = ["REMIXABLE"]
 	search.curated = true
@@ -248,7 +253,7 @@ func get_pages_from_total_assets(page_size : int, total_assets : int):
 
 
 
-
+## why here?
 func fade_in(node):
 	node.show()
 	node.modulate = 0

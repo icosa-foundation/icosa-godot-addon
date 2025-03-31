@@ -10,11 +10,23 @@ var display_name : String : set = set_display_name
 func set_display_name(new_name):
 	display_name = new_name
 	%AssetName.text = display_name
-	
+
 var author_name : String : set = set_author_name
 func set_author_name(new_name):
 	author_name = new_name
 	%AuthorName.text = author_name
+
+var license : String : set = set_license
+func set_license(new_license):
+	license = new_license
+	%License.text = new_license
+
+var description : String : set = set_description
+func set_description(new_description):
+	description = new_description
+	%Description.text = new_description
+
+
 
 var thumbnail_url = ""
 
@@ -57,12 +69,18 @@ func update_progress(current_file: int, total_files: int):
 	%FilesDownloaded.value = current_file
 	%FilesDownloaded.max_value = total_files
 	%ProgressLabel.text = "%s/%s" % [current_file, total_files]
-
+	
 func download_popup_pressed(index_pressed):
 	%Progress.show()
 	%Formats.hide() # hide the download button.
-
+	%ProgressLabel.text = "Downloading.."
+	
 func update_bytes_progress(current_bytes: int, total_bytes: int):
 	%DownloadProgress.show()
 	%DownloadProgress.value = current_bytes
 	%DownloadProgress.max_value = total_bytes
+
+
+func _on_pressed():
+	%Description.show()
+	disabled = true

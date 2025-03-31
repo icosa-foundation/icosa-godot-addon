@@ -1,3 +1,4 @@
+@tool
 # throbber
 extends TextureProgressBar
 
