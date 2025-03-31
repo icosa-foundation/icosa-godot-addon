@@ -78,7 +78,7 @@ const formats = [
 	"-FBX",
 ]
 
-var order_by = [
+static var order_by = [
 	"NEWEST",
 	"OLDEST",
 	"BEST",
@@ -124,11 +124,11 @@ class Search:
 	var asset_name: String = ""
 	var description: String = ""
 	var page_token: int = 1
-	var page_size: int = IcosaGalleryAPI.PAGE_SIZE_DEFAULT
+	var page_size: int 
 	var order: Array = []
 	var curated: bool = false
 	var categories: Array = []
-	var formats: Array = ["-TILT"]
+	var formats: Array
 	var complexity = IcosaGalleryAPI.MaxComplexity.NONE
 	var triangle_count_min: int = -1
 	var triangle_count_max: int = -1
@@ -219,7 +219,7 @@ func get_asset_objects_from_response(response) -> Array[Asset]:
 ## a basic helper function
 static func create_default_search() -> Search:
 	var search = Search.new()
-	#search.order = ["BEST"]
+	search.order = ["BEST"]
 	#search.formats = ["-TILT"]
 	#search.license = ["REMIXABLE"]
 	search.curated = true

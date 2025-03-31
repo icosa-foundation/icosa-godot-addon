@@ -17,13 +17,13 @@ func _ready():
 
 func _on_search_bar_text_submitted(new_text):
 	api.fade_out(%Logo)
-	
-	var search = current_search
-	search.keywords = new_text
+	_on_go_back_pressed()
+	current_search.keywords = new_text
 	current_page = 1
 	current_search.page_token = current_page
 	
-	var url = api.build_query_url_from_search_object(search)
+	var url = api.build_query_url_from_search_object(current_search)
+	print(url)
 	api.current_request = IcosaGalleryAPI.RequestType.SEARCH
 	var error = api.request(url)
 	if error != OK:
@@ -34,8 +34,9 @@ func _on_api_request_completed(result, response_code, headers, body):
 	json.parse(body.get_string_from_utf8())
 	var response = json.get_data()
 	print(response)
-	var total_assets = response["totalSize"]
-
+	var total_assets
+	if "totalSize" in response:
+		total_assets = response["totalSize"]
 	# Update asset found / not found labels
 	if total_assets == 0:
 		%NoAssetsLabel.show()
@@ -324,9 +325,32 @@ func _on_max_triangles_value_changed(value):
 func _on_best_toggled(toggled_on):
 	#current_search. ?? no api for this yet.
 	pass 
+	refresh_search()
 
 func _on_curated_toggled(toggled_on):
 	current_search.curated = toggled_on
+	refresh_search()
 
 func _on_page_size_value_changed(value):
 	current_search.page_size = value
+
+
+func _on_search_author_text_submitted(new_text):
+	refresh_search()
+
+func _on_search_description_text_submitted(new_text):
+	refresh_search()
+
+
+func refresh_search():
+	_on_search_bar_text_submitted(current_search.keywords)
+
+
+## FIXME, do this more gracefully.
+func _on_order_pressed():
+	if %ORDER.item_count < 1:
+		for ordering in IcosaGalleryAPI.order_by:
+			%ORDER.add_item(ordering)
+
+func _on_order_item_selected(index):
+	current_search.order.append(%ORDER.get_item_text(index))

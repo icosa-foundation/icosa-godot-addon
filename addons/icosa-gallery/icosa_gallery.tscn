@@ -39,6 +39,7 @@ metadata/_custom_type_script = "uid://brj0vspyeddhk"
 
 [node name="Logo" type="TextureButton" parent="."]
 unique_name_in_owner = true
+modulate = Color(0, 0, 0, 0)
 z_index = 1
 custom_minimum_size = Vector2(300, 200)
 layout_mode = 1
@@ -390,6 +391,13 @@ layout_mode = 2
 value = 20.0
 suffix = "assets per page"
 
+[node name="ORDER" type="OptionButton" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+
 [node name="HostOffline" type="AcceptDialog" parent="."]
 unique_name_in_owner = true
 title = ""
@@ -474,7 +482,9 @@ alignment = 1
 [connection signal="value_changed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/Settings/AssetColumns" to="." method="_on_asset_columns_value_changed"]
 [connection signal="pressed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/Settings/HelpButton" to="." method="_on_help_pressed"]
 [connection signal="text_changed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchAuthor" to="." method="_on_search_author_text_changed"]
+[connection signal="text_submitted" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchAuthor" to="." method="_on_search_author_text_submitted"]
 [connection signal="text_changed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchDescription" to="." method="_on_search_description_text_changed"]
+[connection signal="text_submitted" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchDescription" to="." method="_on_search_description_text_submitted"]
 [connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/GLTF2/GLTF2" to="." method="_on_gltf_2_toggled"]
 [connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/OBJ/OBJ" to="." method="_on_obj_toggled"]
 [connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/FBX/FBX" to="." method="_on_fbx_toggled"]
@@ -486,3 +496,5 @@ alignment = 1
 [connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/BEST/BEST" to="." method="_on_best_toggled"]
 [connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/CURATED/CURATED" to="." method="_on_curated_toggled"]
 [connection signal="value_changed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchPageOptions/page_size" to="." method="_on_page_size_value_changed"]
+[connection signal="item_selected" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/ORDER" to="." method="_on_order_item_selected"]
+[connection signal="pressed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/ORDER" to="." method="_on_order_pressed"]

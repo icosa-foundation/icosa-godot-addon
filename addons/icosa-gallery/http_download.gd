@@ -62,58 +62,59 @@ func start_next_download():
 		
 		# First, check if the filename contains a real file extension
 		var extension = filename.get_extension()
-		var simple_filename = ""
+		var final_filename = ""
 		
 		# If we have a valid extension, extract just the base filename
 		if extension != "":
 			# Look for the actual filename at the end of the path (after last slash or %2F)
 			var parts = filename.split("/")
 			if parts.size() > 0:
-				simple_filename = parts[-1]
+				final_filename = parts[-1]
 			else:
 				# Try with URL encoded slash
 				parts = filename.split("%2F")
 				if parts.size() > 0:
-					simple_filename = parts[-1]
+					final_filename = parts[-1]
 				else:
-					simple_filename = filename
+					final_filename = filename
 			
-			# If the filename is still complex, extract just the base name
-			if "%" in simple_filename:
+			# If the filename still contains URL encoding, decode it properly
+			if "%" in final_filename:
 				# Try to get just the actual filename (like model.bin)
-				var base_parts = simple_filename.split("%2F")
+				var base_parts = final_filename.split("%2F")
 				if base_parts.size() > 0 and base_parts[-1].get_extension() != "":
-					simple_filename = base_parts[-1]
-				else:
-					# Last resort: check if it ends with a known extension pattern
-					var known_extensions = [".gltf", ".bin", ".glb", ".obj", ".fbx", ".png", ".jpg"]
-					for ext in known_extensions:
-						if simple_filename.ends_with(ext):
-							var ext_pos = simple_filename.rfind(ext)
-							var name_start = simple_filename.rfind("%2F", ext_pos)
-							if name_start != -1:
-								simple_filename = simple_filename.substr(name_start + 3)
-							break
+					final_filename = base_parts[-1].uri_decode()
+				# else:
+				# 	# Last resort: check if it ends with a known extension pattern
+				# 	var known_extensions = [".gltf", ".bin", ".glb", ".obj", ".fbx", ".png", ".jpg"]
+				# 	for ext in known_extensions:
+				# 		if final_filename.ends_with(ext):
+				# 			var ext_pos = final_filename.rfind(ext)
+				# 			var name_start = final_filename.rfind("%2F", ext_pos)
+				# 			if name_start != -1:
+				# 				final_filename = final_filename.substr(name_start + 3)
+				# 			break
 			
-			# If we still have URL encoding in the filename, try to decode it
-			if "%" in simple_filename:
-				# If it's a common file type, use just the extension name
-				if extension in ["gltf", "bin", "glb", "obj", "fbx", "png", "jpg"]:
-					simple_filename = "model." + extension
+			# Decode URL-encoded characters in the filename
+			# For GLTF and related files, we must preserve the original filename
+			# because GLTF files reference their resources by filename
+			if "%" in final_filename:
+				# Replace common URL encodings with their character equivalents
+				final_filename = final_filename.uri_decode()
 		else:
 			# No extension found, use the original filename
-			simple_filename = filename
+			final_filename = filename
 		
 		print("Original filename: ", filename)
-		print("Simplified to: ", simple_filename)
+		print("Final filename: ", final_filename)
 		
 		# Create asset directory if it doesn't exist
 		var dir = DirAccess.open("res://downloads")
 		if not dir.dir_exists(asset_name):
 			dir.make_dir(asset_name)
 		
-		# Set the download file path with simplified filename
-		download_file = "res://downloads/" + asset_name + "/" + simple_filename
+		# Set the download file path with the properly decoded filename
+		download_file = "res://downloads/" + asset_name + "/" + final_filename
 		
 		# Request the URL
 		var error = request(url)
@@ -175,7 +176,8 @@ func on_request_completed(result, response_code, headers : Array[String], body):
 				add_child(redirect_request)
 				
 				# Configure the redirect request
-				# Make sure we're using a simplified filename for redirects too
+				# Make sure we're preserving the original filename for redirects
+				# This is especially important for GLTF files which reference resources by filename
 				var redirect_file_path = original_file_path
 				redirect_request.download_file = redirect_file_path
 				redirect_request.request_completed.connect(func(res, code, hdrs, bdy):
