@@ -6,7 +6,7 @@ var bytes_ticker := Timer.new()
 
 signal files_downloaded(files, total_files)
 signal download_progress(current_bytes, total_bytes)
-signal download_queue_completed()
+signal download_queue_completed(model_file)
 signal host_offline
 
 var url_queue = []
@@ -14,6 +14,8 @@ var current_queue_index = 0
 var total_queue_size = 0
 var download_path = ""
 var asset_name = ""
+
+@onready var resroot = "res://" if Engine.is_editor_hint() else "user://"
 
 func _ready():
 	add_child(bytes_ticker)
@@ -24,9 +26,9 @@ func _ready():
 	bytes_ticker.timeout.connect(update_progress)
 	
 	# Create downloads directory if it doesn't exist
-	var dir = DirAccess.open("res://")
-	if not dir.dir_exists("downloads"):
-		dir.make_dir("downloads")
+	var dir = DirAccess.open(resroot)
+	if not dir.dir_exists("icosa_downloads"):
+		dir.make_dir("icosa_downloads")
 
 func start():
 	# Initialize the queue and start downloading
@@ -52,6 +54,63 @@ func update_progress():
 	
 	# Also emit the current file number and total files
 	emit_signal("files_downloaded", current_queue_index, total_queue_size)
+
+
+# quick hack that might be referred elsewhere
+static func file_from_url(url):
+	# Extract filename from URL and simplify it
+	var filename = url.get_file()
+	
+	# First, check if the filename contains a real file extension
+	var extension = filename.get_extension()
+	var final_filename = ""
+	
+	# If we have a valid extension, extract just the base filename
+	if extension != "":
+		# Look for the actual filename at the end of the path (after last slash or %2F)
+		var parts = filename.split("/")
+		if parts.size() > 0:
+			final_filename = parts[-1]
+		else:
+			# Try with URL encoded slash
+			parts = filename.split("%2F")
+			if parts.size() > 0:
+				final_filename = parts[-1]
+			else:
+				final_filename = filename
+		
+		# If the filename still contains URL encoding, decode it properly
+		if "%" in final_filename:
+			# Try to get just the actual filename (like model.bin)
+			var base_parts = final_filename.split("%2F")
+			if base_parts.size() > 0 and base_parts[-1].get_extension() != "":
+				final_filename = base_parts[-1].uri_decode()
+			# else:
+			# 	# Last resort: check if it ends with a known extension pattern
+			# 	var known_extensions = [".gltf", ".bin", ".glb", ".obj", ".fbx", ".png", ".jpg"]
+			# 	for ext in known_extensions:
+			# 		if final_filename.ends_with(ext):
+			# 			var ext_pos = final_filename.rfind(ext)
+			# 			var name_start = final_filename.rfind("%2F", ext_pos)
+			# 			if name_start != -1:
+			# 				final_filename = final_filename.substr(name_start + 3)
+			# 			break
+		
+		# Decode URL-encoded characters in the filename
+		# For GLTF and related files, we must preserve the original filename
+		# because GLTF files reference their resources by filename
+		if "%" in final_filename:
+			# Replace common URL encodings with their character equivalents
+			final_filename = final_filename.uri_decode()
+	
+	else:
+		# No extension found, use the original filename
+		final_filename = filename
+		
+	print("Original filename: ", filename)
+	print("Final filename: ", final_filename)
+	return final_filename
+	
 
 func start_next_download():
 	if current_queue_index < url_queue.size():
@@ -109,12 +168,12 @@ func start_next_download():
 		print("Final filename: ", final_filename)
 		
 		# Create asset directory if it doesn't exist
-		var dir = DirAccess.open("res://downloads")
+		var dir = DirAccess.open(resroot + "icosa_downloads")
 		if not dir.dir_exists(asset_name):
 			dir.make_dir(asset_name)
 		
 		# Set the download file path with the properly decoded filename
-		download_file = "res://downloads/" + asset_name + "/" + final_filename
+		download_file = resroot + "icosa_downloads/" + asset_name + "/" + final_filename
 		
 		# Request the URL
 		var error = request(url)
