@@ -17,13 +17,14 @@ func _ready():
 
 func _on_search_bar_text_submitted(new_text):
 	api.fade_out(%Logo)
-	_on_go_back_pressed()
 	current_search.keywords = new_text
 	current_page = 1
 	current_search.page_token = current_page
+	if not chosen_thumbnail == null:
+		_on_go_back_pressed()
 	
 	var url = api.build_query_url_from_search_object(current_search)
-	print(url)
+	#print(url)
 	api.current_request = IcosaGalleryAPI.RequestType.SEARCH
 	var error = api.request(url)
 	if error != OK:
@@ -33,7 +34,7 @@ func _on_api_request_completed(result, response_code, headers, body):
 	var json = JSON.new()
 	json.parse(body.get_string_from_utf8())
 	var response = json.get_data()
-	print(response)
+	#print(response)
 	var total_assets
 	if "totalSize" in response:
 		total_assets = response["totalSize"]
@@ -44,8 +45,11 @@ func _on_api_request_completed(result, response_code, headers, body):
 	else:
 		%NoAssetsLabel.hide()
 		%AssetsFound.show()
-		%AssetsFound.text = "Total assets found: " + str(int(total_assets))
-		
+		if total_assets is int:
+			print("assets!!!")
+			%AssetsFound.text = "Total assets found: " + str(int(total_assets))
+		else:
+			print(result)
 		# Create/update pagination buttons
 		var total_pages = api.get_pages_from_total_assets(current_search.page_size, total_assets)
 		_refresh_pagination_buttons(current_page, total_pages)
@@ -143,7 +147,7 @@ func select_asset(selected_thumbnail : Control):
 	viewing_single_asset = true
 
 func _on_go_back_pressed():
-	chosen_thumbnail.get_node("%Description").hide()
+	
 	viewing_single_asset = false
 	%GoBack.hide()
 	%Pagination.show()
@@ -256,10 +260,10 @@ func _on_help_pressed():
 
 func _on_search_options_toggled(toggled_on):
 	if toggled_on:
-		%BottomBar.size_flags_vertical = SIZE_EXPAND_FILL
+		#%BottomBar.size_flags_vertical = SIZE_EXPAND_FILL
 		%SearchOptionsMenu.show()
 	else:
-		%BottomBar.size_flags_vertical = SIZE_SHRINK_END
+		#%BottomBar.size_flags_vertical = SIZE_SHRINK_END
 		%SearchOptionsMenu.hide()
 
 

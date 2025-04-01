@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dxh5b6t8axr8q"]
+[gd_scene load_steps=12 format=3 uid="uid://dxh5b6t8axr8q"]
 
 [ext_resource type="Script" uid="uid://bfhugarupk7sl" path="res://addons/icosa-gallery/icosa_gallery.gd" id="1_whk8d"]
 [ext_resource type="Texture2D" uid="uid://4ova4wsdy5x8" path="res://addons/icosa-gallery/icons/magnify.svg" id="2_qi2sv"]
@@ -20,6 +20,11 @@ default_font = SubResource("FontVariation_4yiif")
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6qgpy"]
 bg_color = Color(0.468478, 0.468478, 0.468478, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4yiif"]
+
+[sub_resource type="Theme" id="Theme_jfwl1"]
+VScrollBar/styles/scroll = SubResource("StyleBoxFlat_4yiif")
+
 [node name="IcosaGallery" type="Control" node_paths=PackedStringArray("api")]
 layout_mode = 3
 anchors_preset = 15
@@ -39,7 +44,6 @@ metadata/_custom_type_script = "uid://brj0vspyeddhk"
 
 [node name="Logo" type="TextureButton" parent="."]
 unique_name_in_owner = true
-modulate = Color(0, 0, 0, 0)
 z_index = 1
 custom_minimum_size = Vector2(300, 200)
 layout_mode = 1
@@ -134,6 +138,7 @@ text = "Next"
 [node name="Scroll" type="ScrollContainer" parent="InterfaceMargin/Interface/Assets/AssetBrowser"]
 layout_mode = 2
 size_flags_vertical = 3
+theme = SubResource("Theme_jfwl1")
 horizontal_scroll_mode = 0
 
 [node name="AssetGrid" type="HFlowContainer" parent="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll"]
