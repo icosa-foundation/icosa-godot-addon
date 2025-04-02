@@ -106,7 +106,7 @@ func download_asset(index, asset : IcosaGalleryAPI.Asset, thumbnail : IcosaGalle
 	# Show the progress bar before starting downloads
 	
 	# Create a single HTTPDownload instance for all files
-	var download = HTTPDownload.new()
+	var download = IcosaDownload.new()
 
 	
 	add_child(download)
@@ -117,20 +117,26 @@ func download_asset(index, asset : IcosaGalleryAPI.Asset, thumbnail : IcosaGalle
 		if address.size() > 2:
 			url = "https://" + address[1] + address[2].uri_encode() ## format webarchive link
 			processed_queue.append(url)
-	print(processed_queue)
+	#print(processed_queue)
 	
 	# Set the asset name for the download directory
 	download.asset_name = asset_name_sanitized
+	download.asset_id = asset.id
 	download.url_queue = processed_queue
 	
 	# Connect signals for progress tracking
 	download.files_downloaded.connect(thumbnail.update_progress)
 	download.download_progress.connect(thumbnail.update_bytes_progress)
 	download.download_queue_completed.connect(thumbnail._on_download_queue_completed)
-	var model_file = download.resroot + "icosa_downloads/" + download.asset_name + "/" + HTTPDownload.file_from_url(processed_queue[0])
+	
+	var id = download.asset_id.split("/")[1]
+	### hmm.
+	var model_file = download.root_directory + "icosa_downloads/" + download.asset_name + "_" + id + "/" + IcosaDownload.file_from_url(processed_queue[0])
 	download.download_queue_completed.connect(func():
 		emit_signal("model_downloaded", model_file)
 	)
+	
+	
 	download.host_offline.connect(show_host_offline_popup)
 	# Start the download process
 	download.start()

@@ -8,10 +8,10 @@ var timer = Timer.new()
 func _ready():
 	add_child(timer)
 	timer.wait_time = 0.1
-	timer.timeout.connect(update_throbber)
+	timer.timeout.connect(infinte_throbber)
 	timer.start()
 	
-func update_throbber():
+func infinte_throbber():
 	value += 1
 	if value == max_value:
 		value = min_value

@@ -5,8 +5,8 @@ extends GLTFDocumentExtension
 var has_google_extensions = false
 
 ## fixes a critical error that won't open certain gltf from icosa. 
-## written by aaronfranke. thank you!
 func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> Error:
+## written by aaronfranke. thank you!
 	# HACK: This is workaround for an issue fixed in Godot 4.5.
 	var gltf_json: Dictionary = gltf_state.json
 	if not gltf_json.has("bufferViews"):
@@ -26,7 +26,11 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 	if  "GOOGLE_camera_settings" or "GOOGLE_backgrounds" in extensions:
 		has_google_extensions = true
 	
-	## aaronfranke patch #2
+	
+	
+	
+	
+	## aaronfranke patch #2, removing meshes
 	var asset = gltf_state.json.get("asset")
 	if not asset is Dictionary:
 		return ERR_SKIP
@@ -40,7 +44,6 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 	var ext_used: Array = gltf_state.json["extensionsUsed"]
 	ext_used.append("GODOT_single_root")
 	return OK
-
 
 func _import_post_parse(gltf_state: GLTFState) -> Error:
 	var mesh_node := GLTFNode.new()
