@@ -15,8 +15,8 @@ var asset_size = 250
 signal model_downloaded(model_file)
 
 func _ready():
-	api.fade_in(%Logo)
-
+	_on_search_bar_text_submitted("")
+	
 func _on_search_bar_text_submitted(new_text):
 	api.fade_out(%Logo)
 	current_search.keywords = new_text
@@ -42,9 +42,11 @@ func _on_api_request_completed(result, response_code, headers, body):
 		total_assets = response["totalSize"]
 	# Update asset found / not found labels
 	if total_assets == 0:
+		%Logo.show()
 		%NoAssetsLabel.show()
 		%AssetsFound.hide()
 	else:
+		%Logo.hide()
 		%NoAssetsLabel.hide()
 		%AssetsFound.show()
 		if total_assets is int:
@@ -368,3 +370,7 @@ func _on_order_pressed():
 
 func _on_order_item_selected(index):
 	current_search.order.append(%ORDER.get_item_text(index))
+
+
+func _on_focus_entered():
+	pass # Replace with function body.
