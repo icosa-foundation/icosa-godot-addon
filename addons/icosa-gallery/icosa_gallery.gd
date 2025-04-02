@@ -12,6 +12,8 @@ var current_search : IcosaGalleryAPI.Search = IcosaGalleryAPI.create_default_sea
 var chosen_thumbnail : Control
 var asset_size = 250
 
+signal model_downloaded(model_file)
+
 func _ready():
 	api.fade_in(%Logo)
 
@@ -115,7 +117,7 @@ func download_asset(index, asset : IcosaGalleryAPI.Asset, thumbnail : IcosaGalle
 		if address.size() > 2:
 			url = "https://" + address[1] + address[2].uri_encode() ## format webarchive link
 			processed_queue.append(url)
-	#print(processed_queue)
+	print(processed_queue)
 	
 	# Set the asset name for the download directory
 	download.asset_name = asset_name_sanitized
@@ -125,11 +127,13 @@ func download_asset(index, asset : IcosaGalleryAPI.Asset, thumbnail : IcosaGalle
 	download.files_downloaded.connect(thumbnail.update_progress)
 	download.download_progress.connect(thumbnail.update_bytes_progress)
 	download.download_queue_completed.connect(thumbnail._on_download_queue_completed)
+	var model_file = download.resroot + "icosa_downloads/" + download.asset_name + "/" + HTTPDownload.file_from_url(processed_queue[0])
+	download.download_queue_completed.connect(func():
+		emit_signal("model_downloaded", model_file)
+	)
 	download.host_offline.connect(show_host_offline_popup)
 	# Start the download process
 	download.start()
-
-	
 
 
 
