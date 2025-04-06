@@ -54,10 +54,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
 
 [node name="Info" type="VBoxContainer" parent="Padding"]
 layout_mode = 2
@@ -141,6 +141,15 @@ theme_override_font_sizes/font_size = 18
 text = "✔️"
 vertical_alignment = 1
 
+[node name="DownloadFailed" type="Label" parent="Padding/Info/Details"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_fonts/font = SubResource("FontVariation_3qkbe")
+theme_override_font_sizes/font_size = 18
+text = "❌"
+vertical_alignment = 1
+
 [node name="Progress" type="HBoxContainer" parent="Padding/Info"]
 unique_name_in_owner = true
 visible = false
@@ -150,7 +159,7 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 max_value = 33.0
-value = 16.0
+value = 32.0
 fill_mode = 4
 texture_under = SubResource("GradientTexture2D_8oa6n")
 texture_progress = SubResource("GradientTexture2D_e2td2")

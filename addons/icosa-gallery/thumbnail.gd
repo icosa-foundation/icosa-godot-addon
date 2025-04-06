@@ -65,6 +65,9 @@ func _on_download_queue_completed():
 	%BufferingIcon.hide()
 	%DownloadFinished.show()
 
+func downlad_failed():
+	%DownloadFailed.show()
+
 func update_progress(current_file: int, total_files: int):
 	%FilesDownloaded.value = current_file
 	%FilesDownloaded.max_value = total_files

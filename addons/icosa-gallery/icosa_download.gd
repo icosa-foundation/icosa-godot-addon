@@ -2,6 +2,7 @@
 class_name IcosaDownload
 extends HTTPRequest
 
+## FIXME - dont need this.
 var bytes_ticker := Timer.new()
 
 signal files_downloaded(files, total_files)

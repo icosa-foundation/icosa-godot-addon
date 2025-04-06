@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://dxh5b6t8axr8q"]
+[gd_scene load_steps=11 format=3 uid="uid://dxh5b6t8axr8q"]
 
 [ext_resource type="Script" uid="uid://bfhugarupk7sl" path="res://addons/icosa-gallery/icosa_gallery.gd" id="1_whk8d"]
 [ext_resource type="Texture2D" uid="uid://4ova4wsdy5x8" path="res://addons/icosa-gallery/icons/magnify.svg" id="2_qi2sv"]
@@ -20,10 +20,7 @@ default_font = SubResource("FontVariation_4yiif")
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6qgpy"]
 bg_color = Color(0.468478, 0.468478, 0.468478, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4yiif"]
-
 [sub_resource type="Theme" id="Theme_jfwl1"]
-VScrollBar/styles/scroll = SubResource("StyleBoxFlat_4yiif")
 
 [node name="IcosaGallery" type="Control" node_paths=PackedStringArray("api")]
 layout_mode = 3
@@ -45,6 +42,7 @@ metadata/_custom_type_script = "uid://brj0vspyeddhk"
 [node name="Logo" type="TextureButton" parent="."]
 unique_name_in_owner = true
 visible = false
+modulate = Color(1, 1, 1, 0)
 z_index = 1
 custom_minimum_size = Vector2(300, 200)
 layout_mode = 1
