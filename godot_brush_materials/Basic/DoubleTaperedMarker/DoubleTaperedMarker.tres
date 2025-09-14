@@ -1,0 +1,31 @@
+[gd_resource type="ShaderMaterial" format=3]
+[ext_resource type="Shader" path="res://godot_brush_materials/Basic/DoubleTaperedMarker/DoubleTaperedMarker.gdshader" id="1"]
+[resource]
+resource_name = "DoubleTaperedMarker"
+# Custom: _DisplacementIntensity = 0.2
+# Custom: _EmissionScroll1 = 15
+# Custom: _EmissionScroll2 = -10
+# Custom: _InvFade = 1
+# Custom: _Scroll1 = 20
+# Custom: _Scroll2 = 50
+# Custom: _Scroll3 = 0.05
+# Custom: _SelectAmplifyEdges = 1
+# Custom: _UVTile1 = 1
+# Custom: _UVTile2 = 1
+# Custom: _UVTile3 = 1
+shader = ExtResource("1")
+# Original Unity shader: Assets/Resources/Brushes/Basic/DoubleTaperedMarker/DoubleTaperedMarker.shader
+shader_parameter/Color = Color(1, 1, 1, 1)
+shader_parameter/TintColor = Color(0.99999994, 0.99999994, 0.99999994, 1)
+shader_parameter/DisplacementIntensity = 0.2
+shader_parameter/EmissionGain = 0.5
+shader_parameter/EmissionScroll1 = 15
+shader_parameter/EmissionScroll2 = -10
+shader_parameter/InvFade = 1
+shader_parameter/Scroll1 = 20
+shader_parameter/Scroll2 = 50
+shader_parameter/Scroll3 = 0.05
+shader_parameter/SelectAmplifyEdges = 1
+shader_parameter/UVTile1 = 1
+shader_parameter/UVTile2 = 1
+shader_parameter/UVTile3 = 1

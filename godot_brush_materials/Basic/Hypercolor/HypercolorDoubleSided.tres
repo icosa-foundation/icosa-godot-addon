@@ -1,0 +1,42 @@
+[gd_resource type="ShaderMaterial" format=3]
+[ext_resource type="Texture2D" path="res://godot_brush_materials/Basic/Hypercolor/normal.png" id="1"]
+[ext_resource type="Texture2D" path="res://godot_brush_materials/Basic/Hypercolor/main.png" id="2"]
+[ext_resource type="Shader" path="res://godot_brush_materials/Basic/Hypercolor/HypercolorDoubleSided.gdshader" id="3"]
+[resource]
+resource_name = "HypercolorDoubleSided"
+# Custom: _ClipEnd = -1
+# Custom: _ClipStart = 0
+# Custom: _DisplacementIntensity = 0.1
+# Custom: _EmissionScroll1 = 0
+# Custom: _EmissionScroll2 = 0
+# Custom: _InvFade = 1
+# Custom: _Opacity = 1
+# Custom: _OverrideTime = 0
+# Custom: _Scroll1 = 20
+# Custom: _Scroll2 = 0
+# Custom: _Shininess = 0.5
+# Custom: _TimeBlend = 0
+# Custom: _TimeSpeed = 1
+shader = ExtResource("3")
+# Original Unity shader: Assets/Resources/Brushes/Basic/Hypercolor/HypercolorDoubleSided.shader
+shader_parameter/Color = Color(1, 1, 1, 1)
+shader_parameter/SpecColor = Color(0.27450982, 0.27450982, 0.27450982, 1)
+shader_parameter/TimeOverrideValue = Color(0, 0, 0, 0)
+shader_parameter/TintColor = Color(0.61764705, 0.61764705, 0.61764705, 1)
+shader_parameter/ClipEnd = -1
+shader_parameter/ClipStart = 0
+shader_parameter/Cutoff = 0.5
+shader_parameter/DisplacementIntensity = 0.1
+shader_parameter/EmissionGain = 0.5
+shader_parameter/EmissionScroll1 = 0
+shader_parameter/EmissionScroll2 = 0
+shader_parameter/InvFade = 1
+shader_parameter/Opacity = 1
+shader_parameter/OverrideTime = 0
+shader_parameter/Scroll1 = 20
+shader_parameter/Scroll2 = 0
+shader_parameter/Shininess = 0.5
+shader_parameter/TimeBlend = 0
+shader_parameter/TimeSpeed = 1
+shader_parameter/BumpMap = ExtResource("1")
+shader_parameter/MainTex = ExtResource("2")

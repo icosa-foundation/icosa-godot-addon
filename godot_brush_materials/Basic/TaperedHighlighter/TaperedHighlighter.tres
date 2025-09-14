@@ -1,0 +1,31 @@
+[gd_resource type="StandardMaterial3D" format=3]
+[ext_resource type="Texture2D" path="res://godot_brush_materials/Basic/TaperedHighlighter/maintexture.png" id="1"]
+[resource]
+resource_name = "TaperedHighlighter"
+albedo_color = Color(1, 1, 1, 1)
+emission_enabled = true
+emission_color = Color(0, 0, 0, 1.0)
+metallic = 0
+roughness = 0.5
+normal_scale = 1
+ao_light_affect = 1
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+transparency = 0
+double_sided = true
+flags_transparent = true
+blend_mode = 2
+# TODO: ColorMask RGBA
+cull_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = false
+# Custom: _DetailNormalMapScale = 1
+# Custom: _GlossMapScale = 1
+# Custom: _GlossyReflections = 1
+# Custom: _SelectionEdging = 1
+# Custom: _SmoothnessTextureChannel = 0
+# Custom: _SpecularHighlights = 1
+# Custom: _UVSec = 0
+albedo_texture = ExtResource("1")
+
+# Replaced Unity shader with StandardMaterial3D: Assets/Resources/Brushes/Shared/Shaders/Additive.shader

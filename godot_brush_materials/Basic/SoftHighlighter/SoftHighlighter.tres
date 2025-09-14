@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" format=3]
+[ext_resource type="Texture2D" path="res://godot_brush_materials/Basic/SoftHighlighter/maintexture.png" id="1"]
+[ext_resource type="Shader" path="res://godot_brush_materials/Basic/SoftHighlighter/SoftHighlighter.gdshader" id="2"]
+[resource]
+resource_name = "SoftHighlighter"
+# Custom: _InvFade = 1
+shader = ExtResource("2")
+# Original Unity shader: Assets/Resources/Brushes/Basic/SoftHighlighter/SoftHighlighter.shader
+shader_parameter/Color = Color(1, 1, 1, 1)
+shader_parameter/TintColor = Color(0.61764705, 0.61764705, 0.61764705, 1)
+shader_parameter/InvFade = 1
+shader_parameter/MainTex = ExtResource("1")

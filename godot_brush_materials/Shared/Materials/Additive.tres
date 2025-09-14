@@ -1,0 +1,15 @@
+[gd_resource type="StandardMaterial3D" format=3]
+[resource]
+resource_name = "Additive"
+albedo_color = Color(1, 1, 1, 1)
+double_sided = true
+flags_transparent = true
+blend_mode = 2
+# TODO: ColorMask RGBA
+cull_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = false
+# Custom: _InvFade = 1
+# Custom: _SelectionEdging = 1
+
+# Replaced Unity shader with StandardMaterial3D: Assets/Resources/Brushes/Shared/Shaders/Additive.shader

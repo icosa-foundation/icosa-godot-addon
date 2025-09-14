@@ -1,0 +1,35 @@
+[gd_resource type="ShaderMaterial" format=3]
+[ext_resource type="Shader" path="res://godot_brush_materials/Blocks/BlocksGlass/BlocksGlass.gdshader" id="1"]
+[resource]
+resource_name = "BlocksGlass"
+# Custom: _DetailNormalMapScale = 1
+# Custom: _GlossMapScale = 1
+# Custom: _GlossyReflections = 1
+# Custom: _RimIntensity = 0.7
+# Custom: _RimPower = 4
+# Custom: _Shininess = 0.8
+# Custom: _SmoothnessTextureChannel = 0
+# Custom: _SpecularHighlights = 1
+# Custom: _Transmission = 0.5
+# Custom: _UVSec = 0
+shader = ExtResource("1")
+# Original Unity shader: Assets/Resources/Brushes/Blocks/BlocksGlass/BlocksGlass.shader
+shader_parameter/Color = Color(1, 1, 1, 1)
+shader_parameter/EmissionColor = Color(0, 0, 0, 1)
+shader_parameter/SpecColor = Color(0.5, 0.5, 0.5, 0)
+shader_parameter/BumpScale = 1
+shader_parameter/Cutoff = 0.5
+shader_parameter/DetailNormalMapScale = 1
+shader_parameter/GlossMapScale = 1
+shader_parameter/Glossiness = 0.8
+shader_parameter/GlossyReflections = 1
+shader_parameter/Metallic = 0
+shader_parameter/OcclusionStrength = 1
+shader_parameter/Parallax = 0.02
+shader_parameter/RimIntensity = 0.7
+shader_parameter/RimPower = 4
+shader_parameter/Shininess = 0.8
+shader_parameter/SmoothnessTextureChannel = 0
+shader_parameter/SpecularHighlights = 1
+shader_parameter/Transmission = 0.5
+shader_parameter/UVSec = 0

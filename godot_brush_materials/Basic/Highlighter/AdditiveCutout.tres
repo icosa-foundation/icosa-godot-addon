@@ -1,0 +1,27 @@
+[gd_resource type="ShaderMaterial" format=3]
+[ext_resource type="Texture2D" path="res://godot_brush_materials/Basic/Highlighter/maintexture.png" id="1"]
+[ext_resource type="Shader" path="res://godot_brush_materials/Basic/Highlighter/AdditiveCutout.gdshader" id="2"]
+[resource]
+resource_name = "AdditiveCutout"
+# Custom: _DisplacementIntensity = 0.1
+# Custom: _InvFade = 1
+# Custom: _Scroll1 = 2
+# Custom: _Scroll2 = -2
+# Custom: _SelectionEdging = 1
+# Custom: _Smoothness = 0.078125
+# Custom: _Strength = 0.5
+shader = ExtResource("2")
+# Original Unity shader: Assets/Resources/Brushes/Basic/Highlighter/AdditiveCutout.shader
+shader_parameter/Color = Color(1, 1, 1, 1)
+shader_parameter/TintColor = Color(0.61764705, 0.61764705, 0.61764705, 1)
+shader_parameter/SelectAmplifyEdges = 1
+shader_parameter/Cutoff = 0.12
+shader_parameter/DisplacementIntensity = 0.1
+shader_parameter/EmissionGain = 0.25
+shader_parameter/InvFade = 1
+shader_parameter/Scroll1 = 2
+shader_parameter/Scroll2 = -2
+shader_parameter/SelectionEdging = 1
+shader_parameter/Smoothness = 0.078125
+shader_parameter/Strength = 0.5
+shader_parameter/MainTex = ExtResource("1")

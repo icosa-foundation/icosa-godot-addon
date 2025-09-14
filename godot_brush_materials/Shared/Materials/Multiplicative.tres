@@ -1,0 +1,13 @@
+[gd_resource type="StandardMaterial3D" format=3]
+[resource]
+resource_name = "Multiplicative"
+albedo_color = Color(1, 1, 1, 1)
+double_sided = true
+flags_transparent = true
+blend_mode = 3
+# TODO: ColorMask RGBA
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = false
+# Custom: _InvFade = 1
+
+# Replaced Unity shader with StandardMaterial3D: Assets/Resources/Brushes/Shared/Shaders/Multiplicative.shader

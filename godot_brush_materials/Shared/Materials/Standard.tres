@@ -1,0 +1,26 @@
+[gd_resource type="StandardMaterial3D" format=3]
+[resource]
+resource_name = "Standard"
+albedo_color = Color(1, 1, 1, 1)
+metallic = 0.204
+roughness = 0.356
+normal_scale = 1.12
+ao_light_affect = 1
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+transparency = 2
+cull_mode = 2
+emission_enabled = true
+emission_energy = 0.5
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = false
+# Custom: _AlphaTestRef = 0.541
+# Custom: _DetailNormalMapScale = 1
+# Custom: _EmissionLM = 0
+# Custom: _EmissionScaleUI = 0
+# Custom: _InvFade = 1
+# Custom: _Lightmapping = 1
+# Custom: _Shininess = 0.1
+# Custom: _UVSec = 0
+
+# Replaced Unity shader with StandardMaterial3D: Assets/Resources/Brushes/Shared/Shaders/StandardSingleSided.shader
