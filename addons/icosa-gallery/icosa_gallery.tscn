@@ -115,7 +115,6 @@ theme_override_font_sizes/font_size = 14
 
 [node name="Pagination" type="HBoxContainer" parent="InterfaceMargin/Interface/Assets/AssetBrowser"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 alignment = 1
@@ -481,6 +480,26 @@ alignment = 1
 [connection signal="text_submitted" from="InterfaceMargin/Interface/Search/Controls/SearchBar" to="." method="_on_search_bar_text_submitted"]
 [connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Pagination/PreviousPage" to="." method="_on_previous_page_pressed"]
 [connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Pagination/NextPage" to="." method="_on_next_page_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/Thumbnail" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/Thumbnail" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25675" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25675" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25685" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25685" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25695" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25695" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25705" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25705" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25715" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25715" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25725" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25725" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25735" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25735" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25745" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25745" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25755" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25755" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25765" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25765" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25775" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25775" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25785" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25785" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25795" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25795" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25805" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25805" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25815" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25815" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25825" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25825" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25835" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25835" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25845" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25845" method="_on_pressed"]
+[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25855" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25855" method="_on_pressed"]
 [connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/GoBack" to="." method="_on_go_back_pressed"]
 [connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/Settings/SearchOptions" to="." method="_on_search_options_toggled"]
 [connection signal="value_changed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/Settings/AssetColumns" to="." method="_on_asset_columns_value_changed"]

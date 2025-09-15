@@ -12,6 +12,7 @@ func _enter_tree():
 	get_editor_interface().get_editor_main_screen().add_child(main_panel_instance)
 	gltf = IcosaGLTF.new()
 	GLTFDocument.register_gltf_document_extension(gltf)
+	main_panel_instance.visible = false
 	
 func _exit_tree():
 	if main_panel_instance:
