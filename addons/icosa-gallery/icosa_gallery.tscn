@@ -1,9 +1,8 @@
-[gd_scene load_steps=11 format=3 uid="uid://dxh5b6t8axr8q"]
+[gd_scene load_steps=7 format=3 uid="uid://dxh5b6t8axr8q"]
 
-[ext_resource type="Script" uid="uid://bfhugarupk7sl" path="res://addons/icosa-gallery/icosa_gallery.gd" id="1_whk8d"]
-[ext_resource type="Texture2D" uid="uid://4ova4wsdy5x8" path="res://addons/icosa-gallery/icons/magnify.svg" id="2_qi2sv"]
-[ext_resource type="Script" uid="uid://brj0vspyeddhk" path="res://addons/icosa-gallery/icosa_gallery_api.gd" id="3_4yiif"]
-[ext_resource type="Texture2D" uid="uid://kvgeirr0rdvn" path="res://addons/icosa-gallery/logo/Icosa_Gallery_logo.png" id="3_6mgym"]
+[ext_resource type="Script" uid="uid://bfhugarupk7sl" path="res://addons/icosa-gallery/icosa_gallery_browser.gd" id="1_whk8d"]
+[ext_resource type="Script" uid="uid://brj0vspyeddhk" path="res://addons/icosa-gallery/icosa_api.gd" id="3_4yiif"]
+[ext_resource type="Texture2D" uid="uid://kvgeirr0rdvn" path="res://addons/icosa/logo/Icosa_Gallery_logo.png" id="3_6mgym"]
 
 [sub_resource type="SystemFont" id="SystemFont_6qgpy"]
 font_names = PackedStringArray("Arial")
@@ -15,15 +14,7 @@ base_font = SubResource("SystemFont_6qgpy")
 [sub_resource type="Theme" id="Theme_xcyys"]
 default_font = SubResource("FontVariation_4yiif")
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6qgpy"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6qgpy"]
-bg_color = Color(0.468478, 0.468478, 0.468478, 1)
-
-[sub_resource type="Theme" id="Theme_jfwl1"]
-
-[node name="IcosaGallery" type="Control" node_paths=PackedStringArray("api")]
-layout_mode = 3
+[node name="IcosaBrowser" type="VBoxContainer" node_paths=PackedStringArray("api")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -35,374 +26,66 @@ theme = SubResource("Theme_xcyys")
 script = ExtResource("1_whk8d")
 api = NodePath("API")
 
-[node name="API" type="HTTPRequest" parent="."]
-script = ExtResource("3_4yiif")
-metadata/_custom_type_script = "uid://brj0vspyeddhk"
-
-[node name="Logo" type="TextureButton" parent="."]
-unique_name_in_owner = true
-visible = false
-modulate = Color(1, 1, 1, 0)
-z_index = 1
-custom_minimum_size = Vector2(300, 200)
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-texture_normal = ExtResource("3_6mgym")
-ignore_texture_size = true
-stretch_mode = 4
-
-[node name="InterfaceMargin" type="MarginContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 4
-
-[node name="Interface" type="VBoxContainer" parent="InterfaceMargin"]
-layout_mode = 2
-
-[node name="Search" type="PanelContainer" parent="InterfaceMargin/Interface"]
-custom_minimum_size = Vector2(0, 28)
-layout_mode = 2
-
-[node name="Controls" type="HBoxContainer" parent="InterfaceMargin/Interface/Search"]
-layout_mode = 2
-
-[node name="SearchBar" type="LineEdit" parent="InterfaceMargin/Interface/Search/Controls"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/focus = SubResource("StyleBoxEmpty_6qgpy")
-placeholder_text = "Search for assets on Icosa Gallery.."
-clear_button_enabled = true
-right_icon = ExtResource("2_qi2sv")
-
-[node name="Assets" type="PanelContainer" parent="InterfaceMargin/Interface"]
+[node name="Tabs" type="TabContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_6qgpy")
+current_tab = 0
 
-[node name="ShowMessage" type="CenterContainer" parent="InterfaceMargin/Interface/Assets"]
+[node name="Login" type="MarginContainer" parent="Tabs"]
+visible = false
 layout_mode = 2
+metadata/_tab_index = 1
 
-[node name="NoAssetsLabel" type="Label" parent="InterfaceMargin/Interface/Assets/ShowMessage"]
+[node name="User" type="VBoxContainer" parent="Tabs/Login"]
+layout_mode = 2
+alignment = 1
+
+[node name="UserInfo" type="RichTextLabel" parent="Tabs/Login/User"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-text = "No assets found."
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "Logged in as: [b]nil[/b]
+Email: postmaster@nil00.com"
+fit_content = true
 horizontal_alignment = 1
 
-[node name="AssetBrowser" type="VBoxContainer" parent="InterfaceMargin/Interface/Assets"]
-layout_mode = 2
-
-[node name="AssetsFound" type="Label" parent="InterfaceMargin/Interface/Assets/AssetBrowser"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 0
-theme_override_font_sizes/font_size = 14
-
-[node name="Pagination" type="HBoxContainer" parent="InterfaceMargin/Interface/Assets/AssetBrowser"]
+[node name="LoginStatus" type="RichTextLabel" parent="Tabs/Login/User"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-alignment = 1
+theme_override_constants/paragraph_separation = 15
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "You are not logged in. [url=https://icosa.gallery/device]Login Here.[/url]"
+fit_content = true
+horizontal_alignment = 1
 
-[node name="PreviousPage" type="Button" parent="InterfaceMargin/Interface/Assets/AssetBrowser/Pagination"]
-layout_mode = 2
-text = "Previous"
-
-[node name="PageNumbers" type="HBoxContainer" parent="InterfaceMargin/Interface/Assets/AssetBrowser/Pagination"]
+[node name="LoginCode" type="LineEdit" parent="Tabs/Login/User"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 100)
 layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 36
+placeholder_text = "Enter Code.."
 alignment = 1
 
-[node name="NextPage" type="Button" parent="InterfaceMargin/Interface/Assets/AssetBrowser/Pagination"]
-layout_mode = 2
-size_flags_horizontal = 8
-text = "Next"
-
-[node name="Scroll" type="ScrollContainer" parent="InterfaceMargin/Interface/Assets/AssetBrowser"]
-layout_mode = 2
-size_flags_vertical = 3
-theme = SubResource("Theme_jfwl1")
-horizontal_scroll_mode = 0
-
-[node name="AssetGrid" type="HFlowContainer" parent="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-alignment = 1
-last_wrap_alignment = 1
-
-[node name="GoBack" type="Button" parent="InterfaceMargin/Interface/Assets/AssetBrowser"]
+[node name="LogoutButton" type="Button" parent="Tabs/Login/User"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_horizontal = 4
-text = "back"
+text = "Logout"
 
-[node name="Pad" type="VBoxContainer" parent="InterfaceMargin/Interface/Assets/AssetBrowser"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="InterfaceMargin/Interface/Assets/AssetBrowser/Pad"]
-layout_mode = 2
-
-[node name="BottomBar" type="PanelContainer" parent="InterfaceMargin/Interface"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="InterfaceMargin/Interface/BottomBar"]
-layout_mode = 2
-
-[node name="Settings" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 0
-
-[node name="SearchOptions" type="Button" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/Settings"]
-unique_name_in_owner = true
-layout_mode = 2
-toggle_mode = true
-text = "search options.."
-
-[node name="AssetColumns" type="SpinBox" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/Settings"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-size_flags_horizontal = 10
-min_value = 1.0
-max_value = 10.0
-value = 5.0
-prefix = "columns"
-
-[node name="HelpButton" type="Button" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/Settings"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "?"
-
-[node name="SearchOptionsMenu" type="VBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-
-[node name="SearchAuthor" type="LineEdit" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-placeholder_text = "author"
-
-[node name="SearchDescription" type="LineEdit" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-placeholder_text = "description"
-
-[node name="SearchFormats" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Label" type="Label" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats"]
-layout_mode = 2
-text = "Formats:    "
-
-[node name="GLTF2" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats"]
-layout_mode = 2
-size_flags_horizontal = 2
-
-[node name="Label" type="Label" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/GLTF2"]
-layout_mode = 2
-text = "GLTF2"
-
-[node name="GLTF2" type="CheckButton" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/GLTF2"]
-unique_name_in_owner = true
-layout_mode = 2
-button_pressed = true
-
-[node name="OBJ" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats"]
-layout_mode = 2
-size_flags_horizontal = 2
-
-[node name="Label" type="Label" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/OBJ"]
-layout_mode = 2
-text = "OBJ"
-
-[node name="OBJ" type="CheckButton" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/OBJ"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="FBX" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats"]
-layout_mode = 2
-size_flags_horizontal = 2
-
-[node name="Label" type="Label" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/FBX"]
-layout_mode = 2
-text = "FBX"
-
-[node name="FBX" type="CheckButton" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/FBX"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="OTHER" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats"]
-layout_mode = 2
-size_flags_horizontal = 2
-
-[node name="Label" type="Label" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/OTHER"]
-layout_mode = 2
-text = "OTHER"
-
-[node name="OTHER" type="CheckButton" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/OTHER"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="SearchLicence" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence"]
-layout_mode = 2
-text = "License:    "
-
-[node name="REMIXABLE" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence"]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Label" type="Label" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/REMIXABLE"]
-layout_mode = 2
-text = "REMIXABLE"
-
-[node name="REMIXABLE" type="CheckButton" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/REMIXABLE"]
-unique_name_in_owner = true
-layout_mode = 2
-button_pressed = true
-
-[node name="ND" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence"]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Label" type="Label" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/ND"]
-layout_mode = 2
-text = "NON-DERIVATIVE"
-
-[node name="ND" type="CheckButton" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/ND"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="Option3" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence"]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Label" type="Label" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/Option3"]
-layout_mode = 2
-text = "OPTN"
-
-[node name="Option" type="CheckButton" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/Option3"]
-layout_mode = 2
-
-[node name="Option4" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence"]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Label" type="Label" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/Option4"]
-layout_mode = 2
-text = "OPTN"
-
-[node name="Option" type="CheckButton" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/Option4"]
-layout_mode = 2
-
-[node name="SearchSort" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
-layout_mode = 2
-
-[node name="TRICOUNT" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="min_triangles" type="SpinBox" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/TRICOUNT"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-max_value = 1e+09
-prefix = "min_triangles"
-
-[node name="max_triangles" type="SpinBox" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/TRICOUNT"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-max_value = 1e+09
-prefix = "max_triangles"
-
-[node name="BEST" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort"]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Label" type="Label" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/BEST"]
-layout_mode = 2
-text = "BEST"
-
-[node name="BEST" type="CheckButton" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/BEST"]
-unique_name_in_owner = true
-layout_mode = 2
-button_pressed = true
-
-[node name="CURATED" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort"]
-layout_mode = 2
-size_flags_horizontal = 2
-
-[node name="Label" type="Label" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/CURATED"]
-layout_mode = 2
-text = "CURATED"
-
-[node name="CURATED" type="CheckButton" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/CURATED"]
-unique_name_in_owner = true
-layout_mode = 2
-button_pressed = true
-
-[node name="COMPLEXITY" type="OptionButton" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort"]
-unique_name_in_owner = true
-layout_mode = 2
-selected = 0
-item_count = 4
-popup/item_0/text = "complexity"
-popup/item_0/id = 0
-popup/item_1/text = "COMPLEX"
-popup/item_1/id = 1
-popup/item_2/text = "MEDIUM"
-popup/item_2/id = 2
-popup/item_3/text = "SIMPLE"
-popup/item_3/id = 3
-
-[node name="SearchPageOptions" type="HBoxContainer" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
-layout_mode = 2
-
-[node name="page_size" type="SpinBox" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchPageOptions"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-value = 20.0
-suffix = "assets per page"
-
-[node name="ORDER" type="OptionButton" parent="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-size_flags_horizontal = 0
+[node name="API" type="HTTPRequest" parent="."]
+script = ExtResource("3_4yiif")
+metadata/_custom_type_script = "uid://brj0vspyeddhk"
 
 [node name="HostOffline" type="AcceptDialog" parent="."]
 unique_name_in_owner = true
+oversampling_override = 1.0
 title = ""
 initial_position = 1
 size = Vector2i(277, 100)
@@ -413,6 +96,7 @@ Please check back later."
 [node name="Help" type="AcceptDialog" parent="."]
 unique_name_in_owner = true
 auto_translate_mode = 1
+oversampling_override = 1.0
 title = "Help & About"
 initial_position = 1
 size = Vector2i(455, 270)
@@ -430,6 +114,7 @@ The other formats may be unsupported or not work correctly.
 [node name="HelpOtherFormats" type="AcceptDialog" parent="."]
 unique_name_in_owner = true
 auto_translate_mode = 1
+oversampling_override = 1.0
 title = "Help & About"
 initial_position = 1
 size = Vector2i(455, 270)
@@ -447,6 +132,7 @@ The other formats may be unsupported or not work correctly.
 [node name="Login" type="ConfirmationDialog" parent="."]
 unique_name_in_owner = true
 auto_translate_mode = 1
+oversampling_override = 1.0
 title = "Login"
 initial_position = 2
 size = Vector2i(277, 111)
@@ -474,50 +160,23 @@ layout_mode = 2
 placeholder_text = "Password"
 alignment = 1
 
+[node name="Logo" type="TextureButton" parent="."]
+unique_name_in_owner = true
+visible = false
+modulate = Color(1, 1, 1, 0)
+z_index = 1
+custom_minimum_size = Vector2(300, 200)
+layout_mode = 2
+texture_normal = ExtResource("3_6mgym")
+ignore_texture_size = true
+stretch_mode = 4
+
 [connection signal="resized" from="." to="." method="_on_resized"]
-[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
+[connection signal="tab_button_pressed" from="Tabs" to="." method="_on_tabs_tab_button_pressed"]
+[connection signal="tab_changed" from="Tabs" to="." method="_on_tabs_tab_changed"]
+[connection signal="meta_clicked" from="Tabs/Login/User/UserInfo" to="." method="_on_user_info_meta_clicked"]
+[connection signal="meta_clicked" from="Tabs/Login/User/LoginStatus" to="." method="_on_user_info_meta_clicked"]
+[connection signal="text_changed" from="Tabs/Login/User/LoginCode" to="." method="_on_login_code_text_changed"]
+[connection signal="text_submitted" from="Tabs/Login/User/LoginCode" to="." method="_on_login_code_text_submitted"]
+[connection signal="pressed" from="Tabs/Login/User/LogoutButton" to="." method="_on_logout_button_pressed"]
 [connection signal="request_completed" from="API" to="." method="_on_api_request_completed"]
-[connection signal="text_submitted" from="InterfaceMargin/Interface/Search/Controls/SearchBar" to="." method="_on_search_bar_text_submitted"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Pagination/PreviousPage" to="." method="_on_previous_page_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Pagination/NextPage" to="." method="_on_next_page_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/Thumbnail" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/Thumbnail" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25675" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25675" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25685" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25685" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25695" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25695" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25705" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25705" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25715" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25715" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25725" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25725" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25735" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25735" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25745" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25745" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25755" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25755" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25765" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25765" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25775" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25775" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25785" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25785" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25795" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25795" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25805" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25805" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25815" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25815" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25825" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25825" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25835" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25835" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25845" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25845" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25855" to="InterfaceMargin/Interface/Assets/AssetBrowser/Scroll/AssetGrid/@Button@25855" method="_on_pressed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/Assets/AssetBrowser/GoBack" to="." method="_on_go_back_pressed"]
-[connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/Settings/SearchOptions" to="." method="_on_search_options_toggled"]
-[connection signal="value_changed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/Settings/AssetColumns" to="." method="_on_asset_columns_value_changed"]
-[connection signal="pressed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/Settings/HelpButton" to="." method="_on_help_pressed"]
-[connection signal="text_changed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchAuthor" to="." method="_on_search_author_text_changed"]
-[connection signal="text_submitted" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchAuthor" to="." method="_on_search_author_text_submitted"]
-[connection signal="text_changed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchDescription" to="." method="_on_search_description_text_changed"]
-[connection signal="text_submitted" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchDescription" to="." method="_on_search_description_text_submitted"]
-[connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/GLTF2/GLTF2" to="." method="_on_gltf_2_toggled"]
-[connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/OBJ/OBJ" to="." method="_on_obj_toggled"]
-[connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/FBX/FBX" to="." method="_on_fbx_toggled"]
-[connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/OTHER/OTHER" to="." method="_on_other_toggled"]
-[connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/REMIXABLE/REMIXABLE" to="." method="_on_remixable_toggled"]
-[connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/ND/ND" to="." method="_on_nd_toggled"]
-[connection signal="value_changed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/TRICOUNT/min_triangles" to="." method="_on_min_triangles_value_changed"]
-[connection signal="value_changed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/TRICOUNT/max_triangles" to="." method="_on_max_triangles_value_changed"]
-[connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/BEST/BEST" to="." method="_on_best_toggled"]
-[connection signal="toggled" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/CURATED/CURATED" to="." method="_on_curated_toggled"]
-[connection signal="value_changed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchPageOptions/page_size" to="." method="_on_page_size_value_changed"]
-[connection signal="item_selected" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/ORDER" to="." method="_on_order_item_selected"]
-[connection signal="pressed" from="InterfaceMargin/Interface/BottomBar/VBoxContainer/SearchOptionsMenu/ORDER" to="." method="_on_order_pressed"]

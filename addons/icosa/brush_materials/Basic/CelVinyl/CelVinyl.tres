@@ -1,0 +1,33 @@
+[gd_resource type="ShaderMaterial" load_steps=0 format=3]
+
+[ext_resource type="Texture2D" uid="uid://b07732a6a08" path="res://addons/icosa/brush_materials/Basic/CelVinyl/main.png" id="1"]
+[ext_resource type="Shader" uid="uid://crbojsn4whx4u" path="res://addons/icosa/brush_materials/Basic/CelVinyl/CelVinyl.gdshader" id="2"]
+[resource]
+resource_name = "CelVinyl"
+# Custom: _CelThreshold = 7
+# Custom: _DetailNormalMapScale = 1
+# Custom: _GlossMapScale = 1
+# Custom: _GlossyReflections = 1
+# Custom: _OutlineWidth = 0.3
+# Custom: _SmoothnessTextureChannel = 0
+# Custom: _SpecularHighlights = 1
+# Custom: _UVSec = 0
+shader = ExtResource("2")
+# Original Unity shader: Assets/Resources/Brushes/Basic/CelVinyl/CelVinyl.shader
+shader_parameter/Color = Color(1, 1, 1, 1)
+shader_parameter/EmissionColor = Color(0, 0, 0, 1)
+shader_parameter/BumpScale = 1
+shader_parameter/CelThreshold = 7
+shader_parameter/Cutoff = 0.554
+shader_parameter/DetailNormalMapScale = 1
+shader_parameter/GlossMapScale = 1
+shader_parameter/Glossiness = 0.5
+shader_parameter/GlossyReflections = 1
+shader_parameter/Metallic = 0
+shader_parameter/OcclusionStrength = 1
+shader_parameter/OutlineWidth = 0.3
+shader_parameter/Parallax = 0.02
+shader_parameter/SmoothnessTextureChannel = 0
+shader_parameter/SpecularHighlights = 1
+shader_parameter/UVSec = 0
+shader_parameter/MainTex = ExtResource("1")

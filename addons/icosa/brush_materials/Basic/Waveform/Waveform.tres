@@ -1,0 +1,18 @@
+[gd_resource type="ShaderMaterial" load_steps=0 format=3]
+
+[ext_resource type="Texture2D" uid="uid://b08805a68a2" path="res://addons/icosa/brush_materials/Basic/Waveform/waveform.png" id="1"]
+[ext_resource type="Shader" uid="uid://dlq05wx64412b" path="res://addons/icosa/brush_materials/Basic/Waveform/Waveform.gdshader" id="2"]
+[resource]
+resource_name = "Waveform"
+# Custom: _InvFade = 1
+# Custom: _ScrollSpeed = 0
+# Custom: _VertexDisplacement = 0
+shader = ExtResource("2")
+# Original Unity shader: Assets/Resources/Brushes/Basic/Waveform/Waveform.shader
+shader_parameter/Color = Color(1, 1, 1, 1)
+shader_parameter/TintColor = Color(0.99999994, 0.99999994, 0.99999994, 1)
+shader_parameter/EmissionGain = 0.51785713
+shader_parameter/InvFade = 1
+shader_parameter/ScrollSpeed = 0
+shader_parameter/VertexDisplacement = 0
+shader_parameter/MainTex = ExtResource("1")

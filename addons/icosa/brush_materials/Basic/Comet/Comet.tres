@@ -1,0 +1,34 @@
+[gd_resource type="ShaderMaterial" load_steps=0 format=3]
+
+[ext_resource type="Texture2D" uid="uid://b1ba1126666" path="res://addons/icosa/brush_materials/Basic/Comet/gradient.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://b0616aa4472" path="res://addons/icosa/brush_materials/Basic/Comet/main.png" id="2"]
+[ext_resource type="Shader" uid="uid://bk8yxh1fmup5f" path="res://addons/icosa/brush_materials/Basic/Comet/Comet.gdshader" id="3"]
+[resource]
+resource_name = "Comet"
+# Custom: _DetailNormalMapScale = 1
+# Custom: _GlossMapScale = 1
+# Custom: _GlossyReflections = 1
+# Custom: _SmoothnessTextureChannel = 0
+# Custom: _SpecularHighlights = 1
+# Custom: _Speed = 1
+# Custom: _UVSec = 0
+shader = ExtResource("3")
+# Original Unity shader: Assets/Resources/Brushes/Basic/Comet/Comet.shader
+shader_parameter/Color = Color(1, 1, 1, 1)
+shader_parameter/EmissionColor = Color(0, 0, 0, 1)
+shader_parameter/BumpScale = 1
+shader_parameter/Cutoff = 0.5
+shader_parameter/DetailNormalMapScale = 1
+shader_parameter/EmissionGain = 0.5
+shader_parameter/GlossMapScale = 1
+shader_parameter/Glossiness = 0.5
+shader_parameter/GlossyReflections = 1
+shader_parameter/Metallic = 0
+shader_parameter/OcclusionStrength = 1
+shader_parameter/Parallax = 0.02
+shader_parameter/SmoothnessTextureChannel = 0
+shader_parameter/SpecularHighlights = 1
+shader_parameter/Speed = 1
+shader_parameter/UVSec = 0
+shader_parameter/AlphaMask = ExtResource("1")
+shader_parameter/MainTex = ExtResource("2")

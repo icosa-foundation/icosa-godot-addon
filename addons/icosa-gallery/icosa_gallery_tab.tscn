@@ -1,0 +1,403 @@
+[gd_scene load_steps=7 format=3 uid="uid://5h3kml03bieg"]
+
+[ext_resource type="Script" uid="uid://byglfmxh42v2y" path="res://addons/icosa-gallery/icosa_gallery_tab.gd" id="1_o7ddl"]
+[ext_resource type="Texture2D" uid="uid://4ova4wsdy5x8" path="res://addons/icosa/icons/magnify.svg" id="2_cnj0t"]
+
+[sub_resource type="Theme" id="Theme_6qgpy"]
+default_font_size = 28
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6qgpy"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6qgpy"]
+bg_color = Color(0.468478, 0.468478, 0.468478, 1)
+
+[sub_resource type="Theme" id="Theme_jfwl1"]
+
+[node name="Search" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+script = ExtResource("1_o7ddl")
+metadata/_tab_index = 0
+
+[node name="Interface" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Search" type="PanelContainer" parent="Interface"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+
+[node name="Controls" type="HBoxContainer" parent="Interface/Search"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme = SubResource("Theme_6qgpy")
+
+[node name="SearchBar" type="LineEdit" parent="Interface/Search/Controls"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/focus = SubResource("StyleBoxEmpty_6qgpy")
+placeholder_text = "Search for assets on Icosa Gallery.."
+clear_button_enabled = true
+right_icon = ExtResource("2_cnj0t")
+
+[node name="Assets" type="PanelContainer" parent="Interface"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_6qgpy")
+
+[node name="ShowMessage" type="CenterContainer" parent="Interface/Assets"]
+layout_mode = 2
+
+[node name="NoAssetsLabel" type="Label" parent="Interface/Assets/ShowMessage"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "No assets found."
+horizontal_alignment = 1
+
+[node name="AssetBrowser" type="VBoxContainer" parent="Interface/Assets"]
+layout_mode = 2
+
+[node name="AssetsFound" type="Label" parent="Interface/Assets/AssetBrowser"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 14
+
+[node name="Pagination" type="HBoxContainer" parent="Interface/Assets/AssetBrowser"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="PreviousPage" type="Button" parent="Interface/Assets/AssetBrowser/Pagination"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Previous"
+
+[node name="PageNumbers" type="HBoxContainer" parent="Interface/Assets/AssetBrowser/Pagination"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="NextPage" type="Button" parent="Interface/Assets/AssetBrowser/Pagination"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Next"
+
+[node name="Scroll" type="ScrollContainer" parent="Interface/Assets/AssetBrowser"]
+layout_mode = 2
+size_flags_vertical = 3
+theme = SubResource("Theme_jfwl1")
+horizontal_scroll_mode = 0
+
+[node name="AssetGrid" type="HFlowContainer" parent="Interface/Assets/AssetBrowser/Scroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
+last_wrap_alignment = 1
+
+[node name="GoBack" type="Button" parent="Interface/Assets/AssetBrowser"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "back"
+
+[node name="Pad" type="VBoxContainer" parent="Interface/Assets/AssetBrowser"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Interface/Assets/AssetBrowser/Pad"]
+layout_mode = 2
+
+[node name="BottomBar" type="PanelContainer" parent="Interface"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Interface/BottomBar"]
+layout_mode = 2
+
+[node name="Settings" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="SearchOptions" type="Button" parent="Interface/BottomBar/VBoxContainer/Settings"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+text = "search options.."
+
+[node name="AssetColumns" type="SpinBox" parent="Interface/BottomBar/VBoxContainer/Settings"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+min_value = 1.0
+max_value = 10.0
+value = 5.0
+prefix = "columns"
+
+[node name="HelpButton" type="Button" parent="Interface/BottomBar/VBoxContainer/Settings"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "?"
+
+[node name="SearchOptionsMenu" type="VBoxContainer" parent="Interface/BottomBar/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="SearchAuthor" type="LineEdit" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+placeholder_text = "author"
+
+[node name="SearchDescription" type="LineEdit" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+placeholder_text = "description"
+
+[node name="SearchFormats" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats"]
+layout_mode = 2
+text = "Formats:    "
+
+[node name="GLTF2" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats"]
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="Label" type="Label" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/GLTF2"]
+layout_mode = 2
+text = "GLTF2"
+
+[node name="GLTF2" type="CheckButton" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/GLTF2"]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+
+[node name="OBJ" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats"]
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="Label" type="Label" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/OBJ"]
+layout_mode = 2
+text = "OBJ"
+
+[node name="OBJ" type="CheckButton" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/OBJ"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="FBX" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats"]
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="Label" type="Label" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/FBX"]
+layout_mode = 2
+text = "FBX"
+
+[node name="FBX" type="CheckButton" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/FBX"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="OTHER" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats"]
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="Label" type="Label" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/OTHER"]
+layout_mode = 2
+text = "OTHER"
+
+[node name="OTHER" type="CheckButton" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchFormats/OTHER"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SearchLicence" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence"]
+layout_mode = 2
+text = "License:    "
+
+[node name="REMIXABLE" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/REMIXABLE"]
+layout_mode = 2
+text = "REMIXABLE"
+
+[node name="REMIXABLE" type="CheckButton" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/REMIXABLE"]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+
+[node name="ND" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/ND"]
+layout_mode = 2
+text = "NON-DERIVATIVE"
+
+[node name="ND" type="CheckButton" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/ND"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Option3" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/Option3"]
+layout_mode = 2
+text = "OPTN"
+
+[node name="Option" type="CheckButton" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/Option3"]
+layout_mode = 2
+
+[node name="Option4" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/Option4"]
+layout_mode = 2
+text = "OPTN"
+
+[node name="Option" type="CheckButton" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchLicence/Option4"]
+layout_mode = 2
+
+[node name="SearchSort" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
+layout_mode = 2
+
+[node name="TRICOUNT" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MinTriangles" type="SpinBox" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/TRICOUNT"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1000000000.0
+prefix = "min_triangles"
+
+[node name="MaxTriangles" type="SpinBox" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/TRICOUNT"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1000000000.0
+prefix = "max_triangles"
+
+[node name="BEST" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/BEST"]
+layout_mode = 2
+text = "BEST"
+
+[node name="BEST" type="CheckButton" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/BEST"]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+
+[node name="CURATED" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort"]
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="Label" type="Label" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/CURATED"]
+layout_mode = 2
+text = "CURATED"
+
+[node name="CURATED" type="CheckButton" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort/CURATED"]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+
+[node name="COMPLEXITY" type="OptionButton" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchSort"]
+unique_name_in_owner = true
+layout_mode = 2
+selected = 0
+item_count = 4
+popup/item_0/text = "complexity"
+popup/item_0/id = 0
+popup/item_1/text = "COMPLEX"
+popup/item_1/id = 1
+popup/item_2/text = "MEDIUM"
+popup/item_2/id = 2
+popup/item_3/text = "SIMPLE"
+popup/item_3/id = 3
+
+[node name="SearchPageOptions" type="HBoxContainer" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
+layout_mode = 2
+
+[node name="PageSize" type="SpinBox" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu/SearchPageOptions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+value = 20.0
+suffix = "assets per page"
+
+[node name="ORDER" type="OptionButton" parent="Interface/BottomBar/VBoxContainer/SearchOptionsMenu"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+selected = 0
+item_count = 19
+popup/item_0/text = "NEWEST"
+popup/item_0/id = 0
+popup/item_1/text = "OLDEST"
+popup/item_1/id = 1
+popup/item_2/text = "BEST"
+popup/item_2/id = 2
+popup/item_3/text = "CREATE_TIME"
+popup/item_3/id = 3
+popup/item_4/text = "-CREATE_TIME"
+popup/item_4/id = 4
+popup/item_5/text = "UPDATE_TIME"
+popup/item_5/id = 5
+popup/item_6/text = "-UPDATE_TIME"
+popup/item_6/id = 6
+popup/item_7/text = "TRIANGLE_COUNT"
+popup/item_7/id = 7
+popup/item_8/text = "-TRIANGLE_COUNT"
+popup/item_8/id = 8
+popup/item_9/text = "LIKED_TIME"
+popup/item_9/id = 9
+popup/item_10/text = "-LIKED_TIME"
+popup/item_10/id = 10
+popup/item_11/text = "LIKES"
+popup/item_11/id = 11
+popup/item_12/text = "-LIKES"
+popup/item_12/id = 12
+popup/item_13/text = "DOWNLOADS"
+popup/item_13/id = 13
+popup/item_14/text = "-DOWNLOADS"
+popup/item_14/id = 14
+popup/item_15/text = "DISPLAY_NAME"
+popup/item_15/id = 15
+popup/item_16/text = "-DISPLAY_NAME"
+popup/item_16/id = 16
+popup/item_17/text = "AUTHOR_NAME"
+popup/item_17/id = 17
+popup/item_18/text = "-AUTHOR_NAME"
+popup/item_18/id = 18

@@ -1,0 +1,35 @@
+[gd_scene load_steps=6 format=3 uid="uid://c7yig47a2sqmr"]
+
+[ext_resource type="Script" uid="uid://banbdiengwmgk" path="res://addons/icosa/misc/throbber.gd" id="1_v0nh6"]
+
+[sub_resource type="Gradient" id="Gradient_v0nh6"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.3, 0.5, 0.7)
+colors = PackedColorArray(0.24696359, 0.24696359, 0.24696359, 0, 0.24696359, 0.24696359, 0.24696359, 1, 0.24696359, 0.24696359, 0.24696359, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_fs7et"]
+gradient = SubResource("Gradient_v0nh6")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_t8gtn"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.3, 0.5, 0.7)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_t042c"]
+gradient = SubResource("Gradient_t8gtn")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="BufferingIcon" type="TextureProgressBar"]
+custom_minimum_size = Vector2(64, 64)
+value = 63.0
+fill_mode = 4
+texture_under = SubResource("GradientTexture2D_fs7et")
+texture_progress = SubResource("GradientTexture2D_t042c")
+script = ExtResource("1_v0nh6")
+loop_time = 0.485
+background_color = Color(0.24696359, 0.24696359, 0.24696359, 0.101960786)

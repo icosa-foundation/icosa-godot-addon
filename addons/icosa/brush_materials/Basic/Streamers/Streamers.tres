@@ -1,0 +1,20 @@
+[gd_resource type="ShaderMaterial" load_steps=0 format=3]
+
+[ext_resource type="Texture2D" uid="uid://b0580640575" path="res://addons/icosa/brush_materials/Basic/Streamers/main.png" id="1"]
+[ext_resource type="Shader" uid="uid://bhxwwa3rvtd3s" path="res://addons/icosa/brush_materials/Basic/Streamers/Streamers.gdshader" id="2"]
+[resource]
+resource_name = "Streamers"
+# Custom: _DisplacementIntensity = 0.02
+# Custom: _InvFade = 1
+# Custom: _Scroll1 = 1
+# Custom: _Scroll2 = 3
+shader = ExtResource("2")
+# Original Unity shader: Assets/Resources/Brushes/Basic/Streamers/Streamers.shader
+shader_parameter/Color = Color(1, 1, 1, 1)
+shader_parameter/TintColor = Color(0.61764705, 0.61764705, 0.61764705, 1)
+shader_parameter/DisplacementIntensity = 0.02
+shader_parameter/EmissionGain = 0.4
+shader_parameter/InvFade = 1
+shader_parameter/Scroll1 = 1
+shader_parameter/Scroll2 = 3
+shader_parameter/MainTex = ExtResource("1")
