@@ -3,3 +3,6 @@
 /android/
 # icosa gallery
 /icosa_downloads/
+
+# Ignore specific config file for icosa addon
+/addons/icosa/token.cfg
