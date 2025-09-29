@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bm22v3o2u7lln" path="res://addons/icosa/thumbnail.gd" id="1_8pxhf"]
 [ext_resource type="Script" uid="uid://cm4iu7i07qryo" path="res://addons/icosa/misc/description_urls.gd" id="2_prrh0"]
 [ext_resource type="Script" uid="uid://cbxuo7ms12d55" path="res://addons/icosa/misc/3d_preview.gd" id="2_yfmvu"]
-[ext_resource type="Script" uid="uid://btidima0j4673" path="res://addons/orbit-controls/orbit-controls.gd" id="3_3vp83"]
+[ext_resource type="Script" uid="uid://btidima0j4673" path="res://addons/icosa/misc/orbit-controls/orbit-controls.gd" id="3_3vp83"]
 [ext_resource type="PackedScene" uid="uid://c7yig47a2sqmr" path="res://addons/icosa/loading_icon.tscn" id="3_8pxhf"]
 [ext_resource type="Texture2D" uid="uid://b7qrs5qju2ois" path="res://addons/icosa/icons/download.svg" id="3_yfmvu"]
 [ext_resource type="Texture2D" uid="uid://dh8rcfcws5n78" path="res://addons/icosa/icons/cc/cc.svg" id="6_3vp83"]
@@ -157,7 +157,7 @@ layout_mode = 2
 [node name="BufferingIcon" parent="Padding/Info/Progress" instance=ExtResource("3_8pxhf")]
 unique_name_in_owner = true
 layout_mode = 2
-value = 98.0
+value = 0.0
 texture_under = SubResource("GradientTexture2D_rs5q6")
 texture_progress = SubResource("GradientTexture2D_g4njl")
 
@@ -282,7 +282,7 @@ vertical_alignment = 1
 visible = false
 layout_mode = 2
 size_flags_horizontal = 0
-value = 98.0
+value = 0.0
 texture_under = SubResource("GradientTexture2D_xx4vk")
 texture_progress = SubResource("GradientTexture2D_dhxrd")
 
