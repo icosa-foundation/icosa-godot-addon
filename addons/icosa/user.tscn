@@ -68,7 +68,7 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-value = 53.0
+value = 45.0
 texture_under = SubResource("GradientTexture2D_xqmv5")
 texture_progress = SubResource("GradientTexture2D_gpenq")
 
@@ -197,6 +197,46 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 1
 
+[node name="UploadAssetWindow" type="FileDialog" parent="."]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "Open a File"
+file_mode = 0
+display_mode = 1
+filters = PackedStringArray("*.zip")
+use_native_dialog = true
+
+[node name="DeleteAssetWindow" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "Delete Asset"
+initial_position = 1
+size = Vector2i(347, 115)
+ok_button_text = "Delete"
+dialog_autowrap = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DeleteAssetWindow"]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 339.0
+offset_bottom = 66.0
+
+[node name="Label" type="Label" parent="DeleteAssetWindow/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Are you sure you want to delete this asset?"
+
+[node name="DoNotShowDeleteConfirmWindow" type="CheckBox" parent="DeleteAssetWindow/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 12
+text = "do not show again"
+
 [connection signal="meta_clicked" from="LoginDetails/LoginStatus" to="." method="_on_login_status_meta_clicked"]
 [connection signal="text_changed" from="LoginDetails/LoginCode" to="." method="_on_login_code_text_changed"]
+[connection signal="pressed" from="UserDetails/Assets/DisplayAssets/HBoxContainer/Upload" to="." method="_on_upload_pressed"]
 [connection signal="pressed" from="UserDetails/Assets/DisplayAssets/HBoxContainer/Logout" to="." method="_on_logout_pressed"]
+[connection signal="file_selected" from="UploadAssetWindow" to="." method="_on_upload_asset_file_selected"]
+[connection signal="confirmed" from="DeleteAssetWindow" to="." method="_on_delete_asset_window_confirmed"]
+[connection signal="toggled" from="DeleteAssetWindow/VBoxContainer/DoNotShowDeleteConfirmWindow" to="." method="_on_do_not_show_delete_confirm_window_toggled"]

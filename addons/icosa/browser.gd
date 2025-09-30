@@ -41,6 +41,9 @@ func clear_saved_token():
 	
 	
 func _ready():
+	if Engine.is_editor_hint():
+		tabs_position = TabContainer.POSITION_BOTTOM
+	
 	setup_tabs()
 	load_token()
 	print("token: ", access_token)

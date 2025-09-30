@@ -10,10 +10,12 @@ var is_preview = false
 
 var download_urls: Array
 signal download_requested(urls : Array[String])
+signal delete_requested(asset_url)
+
 
 var is_downloaded = false
 var preview_scene_path = ""
-
+var no_thumbnail_image = false
 
 
 func init(chosen_asset : IcosaAsset):
@@ -26,11 +28,15 @@ func _ready():
 	%AssetName.text = asset.display_name
 	%AuthorName.text = asset.author_name
 	%Description.text = asset.description
-		
+	
+	if asset.user_asset:
+		%DeleteAsset.show()
+	
 	if is_preview:
 		disabled = true
 		%Description.show()
-		_on_download_pressed()
+		%ThumbnailImage.expand_mode = TextureRect.ExpandMode.EXPAND_FIT_WIDTH_PROPORTIONAL
+		%ThumbnailImage.stretch_mode = TextureRect.StretchMode.STRETCH_KEEP_ASPECT_CENTERED
 		
 		if is_downloaded:
 			%ThumbnailImage.hide()
@@ -39,6 +45,8 @@ func _ready():
 	add_child(thumbnail_request)
 	thumbnail_request.request_completed.connect(thumbnail_request_completed)
 	if !asset.thumbnail_url.is_empty():
+		disabled = false
+		
 		var error = thumbnail_request.request(asset.thumbnail_url)
 		if error != OK:
 			push_error("An error occurred in the HTTP request.")
@@ -100,8 +108,8 @@ func _on_file_downloaded(path : String):
 	print(path)
 
 func load_license_sticker():
-	
 	var sticker_table = {
+		"UNKNOWN"                         : "cc",#"unknown",
 		"REMIXABLE"                       : "remix",   
 		"ALL_CC"                          : "cc",
 		"ALL_RIGHTS_RESERVED"             : "cc",  
@@ -150,3 +158,7 @@ func _on_queue_downloaded(model_file):
 		#%Orbit.camera = cam2
 		#cam2.current = true
 	
+
+
+func _on_delete_asset_pressed():
+	delete_requested.emit(asset.id)

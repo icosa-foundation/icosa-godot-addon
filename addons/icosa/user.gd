@@ -5,6 +5,7 @@ extends Control
 const DEFAULT_MESSAGE := "You are not logged in. [url=https://icosa.gallery/device]Login Here.[/url]"
 const INCORRECT_MESSAGE := "Code is incorrect, please check your web browser or [url=https://icosa.gallery/device]get a new code[/url]"
 
+const UPLOAD_ENDPOINT := "https://api.icosa.gallery/v1/users/me/assets"
 const LOGIN_ENDPOINT := "https://api.icosa.gallery/v1/login/device_login"
 const USER_INFO_ENDPOINT := "https://api.icosa.gallery/v1/users/me"
 const USER_ASSETS_ENDPOINT := "https://api.icosa.gallery/v1/users/me/assets"
@@ -27,6 +28,8 @@ var http_liked_assets = HTTPRequest.new()
 var token: String
 var is_logged_in := false
 
+var user_do_not_show_delete_prompt = false
+
 func _ready() -> void:
 	add_child(http_login)
 	add_child(http_user)
@@ -37,13 +40,18 @@ func _ready() -> void:
 
 
 func load_thumbnails(assets_data: Array, add_to: Control, user = false) -> void:
+	await get_tree().process_frame
 	for asset_data in assets_data:
+		await get_tree().process_frame
 		var asset = IcosaAsset.new(asset_data)
 		var thumbnail = load("res://addons/icosa/thumbnail.tscn").instantiate() as IcosaThumbnail
 		if user:
 			asset.user_asset = true
+			thumbnail.delete_requested.connect(_on_delete_request)
 		thumbnail.asset = asset
 		add_to.add_child(thumbnail)
+
+
 
 
 func _on_login_code_text_changed(new_text: String) -> void:
@@ -182,7 +190,7 @@ func _on_user_liked_assets_request(result: int, response_code: int, headers: Pac
 	if json.parse(body.get_string_from_utf8()) == OK:
 		if !json.data["assets"].is_empty():
 			%NoLikedAssets.hide()
-		load_thumbnails(json.data["assets"], %UserLikedAssets, true)
+		load_thumbnails(json.data["assets"], %UserLikedAssets, false)
 
 
 func _on_login_status_meta_clicked(meta: Variant) -> void:
@@ -199,3 +207,103 @@ func _on_logout_pressed():
 	_reset_login_ui()
 	%LoginDetails.show()
 	logged_out.emit()
+
+func _on_upload_pressed():
+	%UploadAssetWindow.show()
+
+func _on_upload_asset_file_selected(path):
+	var file = FileAccess.open(path, FileAccess.READ)
+	if not file:
+		push_error("Could not open file: %s" % path)
+		return
+
+	# Read entire file as bytes
+	var file_bytes: PackedByteArray = file.get_buffer(file.get_length())
+	file.close()
+
+	# Create HTTPRequest node (must be in the scene tree!)
+	var upload_http := HTTPRequest.new()
+	add_child(upload_http)  # Important: needs to be inside the tree
+
+	print(
+		UPLOAD_ENDPOINT,
+		[HEADER_AGENT, HEADER_APP, HEADER_AUTH % token, "Content-Type: application/zip"],
+	)
+	"""
+	
+	https://api.icosa.gallery/v1/users/me/assets
+	[
+curl -X POST 
+-H "Content-Type: multipart/form-data" 
+-H "Authorization: Bearer <token>" 
+-F "files=@teapot.zip" https://api.icosa.gallery/v1/users/me/assets
+	]
+
+	"""
+	var err = upload_http.request_raw(
+		UPLOAD_ENDPOINT,
+		[HEADER_AGENT, HEADER_APP, HEADER_AUTH % token, "Content-Type: application/zip"],
+		HTTPClient.METHOD_POST,
+		file_bytes
+	)
+	
+	
+	var reply = await upload_http.request_completed
+	var result = reply[0]
+	var response_code = reply[1]
+	var headers = reply[2]
+	var body = reply[3]
+
+	if response_code != 200: printerr("error: ", response_code," ", result)
+	else: print(body)
+	##   ERROR: error: 201 0
+
+
+func _on_delete_request(asset_id):
+	if !user_do_not_show_delete_prompt:
+		%DeleteAssetWindow.show()
+		%DeleteAssetWindow.set_meta("id", asset_id)
+	else:
+		# Delete immediately without confirmation
+		_delete_asset(asset_id)
+
+func _delete_asset(asset_id: String):
+	var id = asset_id.replace("assets/", "")
+	
+	# Make sure we have a proper URL - add "/" if USER_ASSETS_ENDPOINT doesn't end with one
+	var delete_url = USER_ASSETS_ENDPOINT
+	if not delete_url.ends_with("/"):
+		delete_url += "/"
+	delete_url += id
+	
+	var error = http_user.request(
+		delete_url,
+		[HEADER_AGENT, HEADER_APP, HEADER_AUTH % token],
+		HTTPClient.METHOD_DELETE
+	)
+	
+	if error != OK:
+		printerr("Failed to send delete request: ", error)
+		return
+	
+	var response = await http_user.request_completed
+	var result = response[0]
+	var response_code = response[1]
+	
+	if response_code == 200 or response_code == 204:
+		print("Successfully deleted asset: ", id)
+		# Remove the thumbnail from the UI
+		for thumbnail in %UserAssets.get_children():
+			var thumb = thumbnail as IcosaThumbnail
+			if thumb and thumb.asset.id.replace("assets/", "") == id:
+				thumbnail.queue_free()
+				break
+	else:
+		printerr("Failed to delete asset. Response code: ", response_code)
+
+func _on_delete_asset_window_confirmed():
+	var asset_id = %DeleteAssetWindow.get_meta("id") as String
+	_delete_asset(asset_id)
+
+func _on_do_not_show_delete_confirm_window_toggled(toggled_on):
+	user_do_not_show_delete_prompt = toggled_on

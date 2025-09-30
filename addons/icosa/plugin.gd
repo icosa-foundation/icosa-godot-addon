@@ -7,6 +7,7 @@ var main_panel_instance
 
 var gltf : IcosaGLTF
 
+
 func _enter_tree():
 	main_panel_instance = MainPanel.instantiate()
 	get_editor_interface().get_editor_main_screen().add_child(main_panel_instance)
@@ -14,11 +15,17 @@ func _enter_tree():
 	GLTFDocument.register_gltf_document_extension(gltf)
 	main_panel_instance.visible = false
 	
+	var settings = EditorInterface.get_editor_settings()
+	settings.set_setting("docks/filesystem/other_file_extensions", "ico,icns,bin")
+
+	
 func _exit_tree():
 	if main_panel_instance:
 		main_panel_instance.queue_free()
 	GLTFDocument.unregister_gltf_document_extension(gltf)
-
+	
+	var settings = EditorInterface.get_editor_settings()
+	settings.set_setting("docks/filesystem/other_file_extensions", "ico,icns")
 func _has_main_screen():
 	return true
 

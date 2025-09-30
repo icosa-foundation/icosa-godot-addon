@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://kvgeirr0rdvn"
-path="res://.godot/imported/Icosa_Gallery_logo.png-a9a6f5f870cfe7dd7a595ff67b91e6ec.ctex"
+uid="uid://ccq5bibqvbefc"
+path="res://.godot/imported/trash.svg-008ce073b0ee6d904685c375d2af2177.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/icosa/logo/Icosa_Gallery_logo.png"
-dest_files=["res://.godot/imported/Icosa_Gallery_logo.png-a9a6f5f870cfe7dd7a595ff67b91e6ec.ctex"]
+source_file="res://addons/icosa/icons/trash.svg"
+dest_files=["res://.godot/imported/trash.svg-008ce073b0ee6d904685c375d2af2177.ctex"]
 
 [params]
 
@@ -38,3 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

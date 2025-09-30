@@ -13,7 +13,3 @@ config_version=5
 config/name="icosa-gallery"
 run/main_scene="uid://d15wcrmaekds2"
 config/features=PackedStringArray("4.5", "Forward Plus")
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/orbit_camera/plugin.cfg")
