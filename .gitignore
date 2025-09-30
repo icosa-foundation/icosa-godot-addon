@@ -5,4 +5,4 @@
 /icosa_downloads/
 
 # Ignore specific config file for icosa addon
-/addons/icosa/token.cfg
+addons/icosa/token.cfg
