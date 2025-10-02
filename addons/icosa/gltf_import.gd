@@ -5,6 +5,7 @@ extends GLTFDocumentExtension
 var has_google_extensions = false
 var material_cache = {}
 var brush_materials = {}
+var name_mapping = {}
 
 ## fixes a critical error that won't open certain gltf from icosa.
 func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> Error:
@@ -75,9 +76,11 @@ func _import_post_parse(gltf_state: GLTFState) -> Error:
 		gltf_state.set_nodes(nodes)
 		gltf_state.root_nodes = PackedInt32Array([0])
 
-	# Load brush materials if not already loaded
+	# Load brush materials and name mapping if not already loaded
 	if brush_materials.is_empty():
 		_load_brush_materials()
+	if name_mapping.is_empty():
+		_load_name_mapping()
 
 	# Replace materials with brush materials if matches found
 	_replace_materials_with_brush_materials(gltf_state)
@@ -106,14 +109,19 @@ func _scan_directory_for_materials(dir_path: String):
 			# Recursively scan subdirectories
 			_scan_directory_for_materials(full_path + "/")
 		elif file_name.ends_with(".tres") and not found_material_in_dir:
-			# Use directory name as key, take only the first .tres file found
-			var dir_name = dir_path.trim_suffix("/").get_file()
-			# Skip the root brush_materials directory itself
-			if dir_name != "brush_materials":
-				brush_materials[dir_name] = full_path
-				found_material_in_dir = true
+			# Use the .tres filename (without extension) as the key
+			var material_name = file_name.get_basename()
+			brush_materials[material_name] = full_path
+			found_material_in_dir = true
 
 		file_name = dir.get_next()
+
+func _load_name_mapping():
+	var mapping_script = load("res://addons/icosa/name_mapping.gd")
+	if mapping_script != null:
+		var mapping_instance = mapping_script.new()
+		name_mapping = mapping_instance.name_mapping
+		mapping_instance.free()
 
 func _replace_materials_with_brush_materials(gltf_state: GLTFState):
 	# Get all materials from the GLTF
@@ -160,22 +168,29 @@ func _apply_materials_to_importer_scene(node: Node, gltf_state: GLTFState):
 		_apply_materials_to_importer_scene(child, gltf_state)
 
 func _find_matching_brush_material(material_name: String) -> Material:
-	# Remove prefixes if present
-	if material_name.begins_with("brush_"):
+	var original_name = material_name
+
+	# Handle "material_<GUID>" format - look up GUID in name mapping
+	if material_name.begins_with("material_"):
+		var guid = material_name.substr(9)  # Remove "material_" prefix
+		if name_mapping.has(guid):
+			material_name = name_mapping[guid]
+	# Remove other prefixes if present
+	elif material_name.begins_with("brush_"):
 		material_name = material_name.substr(6, material_name.length() - 6)
-	if material_name.begins_with("ob-"):
+	elif material_name.begins_with("ob-"):
 		material_name = material_name.substr(3, material_name.length() - 3)
 
-	# Check cache first
-	if material_cache.has(material_name):
-		return material_cache[material_name]
+	# Check cache first (use original name as cache key to avoid conflicts)
+	if material_cache.has(original_name):
+		return material_cache[original_name]
 
 	# Try exact name matching
 	if brush_materials.has(material_name):
 		var material_path = brush_materials[material_name]
 		var loaded_material = load(material_path) as Material
 		if loaded_material != null:
-			material_cache[material_name] = loaded_material
+			material_cache[original_name] = loaded_material
 			return loaded_material
 
 	# Try case-insensitive matching
@@ -185,9 +200,10 @@ func _find_matching_brush_material(material_name: String) -> Material:
 			var material_path = brush_materials[brush_name]
 			var loaded_material = load(material_path) as Material
 			if loaded_material != null:
-				material_cache[material_name] = loaded_material
+				material_cache[original_name] = loaded_material
 				return loaded_material
 
 	# No match found
-	material_cache[material_name] = null
+	push_warning("No brush material found for: '" + original_name + "' (mapped to: '" + material_name + "')")
+	material_cache[original_name] = null
 	return null
