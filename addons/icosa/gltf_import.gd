@@ -160,9 +160,11 @@ func _apply_materials_to_importer_scene(node: Node, gltf_state: GLTFState):
 		_apply_materials_to_importer_scene(child, gltf_state)
 
 func _find_matching_brush_material(material_name: String) -> Material:
-	# Remove the "brush_" prefix if present
+	# Remove prefixes if present
 	if material_name.begins_with("brush_"):
 		material_name = material_name.substr(6, material_name.length() - 6)
+	if material_name.begins_with("ob-"):
+		material_name = material_name.substr(3, material_name.length() - 3)
 
 	# Check cache first
 	if material_cache.has(material_name):
