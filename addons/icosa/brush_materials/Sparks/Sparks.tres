@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://addons/icosa/brush_materials/Sparks/Sparks.gdshader" id="1"]
+[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/Sparks/Sparks-50e99447-3861-05f4-697d-a1b96e771b98-v10.0-MainTex.png" id="2"]
+
+[resource]
+resource_name = "Sparks"
+shader = ExtResource("1")
+shader_parameter/u_EmissionGain = 0.723
+shader_parameter/u_MainTex = ExtResource("2")

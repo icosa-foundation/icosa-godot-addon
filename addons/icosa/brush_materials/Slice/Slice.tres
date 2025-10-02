@@ -1,0 +1,32 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://addons/icosa/brush_materials/Slice/Slice.gdshader" id="1"]
+[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/Slice/Slice-8d1510b2-1fc5-4c90-8db7-4c07eecfd849-v10.0-MainTex.png" id="2"]
+
+[resource]
+resource_name = "Slice"
+blend_mode = 2
+flags_transparent = true
+cull_disabled = true
+shader = ExtResource("1")
+shader_parameter/u_Cutoff = 0.5
+shader_parameter/EmissionGain = 0.65
+shader_parameter/Opacity = 1.0
+shader_parameter/BumpScale = 1
+shader_parameter/Cutoff = 0.5
+shader_parameter/DetailNormalMapScale = 1
+shader_parameter/EmissionLM = 0
+shader_parameter/EmissionScaleUI = 0
+shader_parameter/Glossiness = 0.38
+shader_parameter/InvFade = 1
+shader_parameter/Lightmapping = 1
+shader_parameter/Metallic = 0
+shader_parameter/OcclusionStrength = 1
+shader_parameter/Parallax = 0.02
+shader_parameter/Scroll1 = 13
+shader_parameter/UVSec = 0
+shader_parameter/Color = Color(1, 1, 1, 1)
+shader_parameter/EmissionColor = Color(0, 0, 0, 0)
+shader_parameter/EmissionColorUI = Color(1, 1, 1, 1)
+shader_parameter/TintColor = Color(1, 1, 1, 0.5)
+shader_parameter/MainTex = ExtResource("2")

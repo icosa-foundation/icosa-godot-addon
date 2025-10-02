@@ -1,9 +1,0 @@
-[gd_resource type="ShaderMaterial" load_steps=0 format=3]
-
-[ext_resource type="Texture2D" uid="uid://b0483173104" path="res://addons/icosa/brush_materials/Basic/VelvetInk/maintexture.png" id="1"]
-[ext_resource type="Shader" uid="uid://du4y72g4die4f" path="res://addons/icosa/brush_materials/Basic/VelvetInk/VelvetInk.gdshader" id="2"]
-[resource]
-resource_name = "VelvetInk"
-shader = ExtResource("2")
-# Original Unity shader: Assets/Resources/Brushes/Basic/VelvetInk/VelvetInk.shader
-shader_parameter/MainTex = ExtResource("1")

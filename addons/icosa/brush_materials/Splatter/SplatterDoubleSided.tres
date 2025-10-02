@@ -1,0 +1,15 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/Splatter/Splatter-7a1c8107-50c5-4b70-9a39-421576d6617e-v10.0-MainTex.png" id="1"]
+
+[resource]
+resource_name = "SplatterDoubleSided"
+transparency = 1
+cull_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = false
+alpha_scissor_threshold = 0.2
+roughness = 0.5
+metallic = 0
+albedo_color = Color(1.0, 1.0, 1.0, 1.0)
+albedo_texture = ExtResource("1")

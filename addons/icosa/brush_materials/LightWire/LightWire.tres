@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://addons/icosa/brush_materials/LightWire/LightWire.gdshader" id="1"]
+[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/LightWire/LightWire-4391aaaa-df81-4396-9e33-31e4e4930b27-v10.0-MainTex.png" id="2"]
+
+[resource]
+resource_name = "LightWire"
+shader = ExtResource("1")
+shader_parameter/u_SpecColor = Vector3(0.3, 0.3, 0.3)
+shader_parameter/u_Shininess = 0.81
+shader_parameter/u_MainTex = ExtResource("2")

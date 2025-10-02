@@ -1,0 +1,11 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "BlocksBasic"
+blend_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = false
+roughness = 0.8
+albedo_color = Color(1.0, 1.0, 1.0, 1.0)
+specular_mode = 1
+specular_color = Color(0.196078435, 0.196078435, 0.196078435, 1.0)

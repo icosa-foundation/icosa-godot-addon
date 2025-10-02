@@ -1,0 +1,13 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "Wire"
+blend_mode = 0
+cull_disabled = true
+flags_unshaded = true
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = false
+alpha_scissor_threshold = 0.067
+roughness = 0.5
+metallic = 0
+albedo_color = Color(1, 1, 1, 1)

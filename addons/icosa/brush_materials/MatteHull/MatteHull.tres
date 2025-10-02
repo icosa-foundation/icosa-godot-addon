@@ -1,0 +1,15 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "MatteHull"
+blend_mode = 0
+cull_disabled = true
+cull_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = false
+alpha_scissor_threshold = 0.5
+roughness = 0.5
+metallic = 0
+emission_enabled = true
+emission_energy = 0.5
+albedo_color = Color(1.0, 1.0, 1.0, 1.0)

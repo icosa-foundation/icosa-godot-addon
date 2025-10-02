@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/TaperedFlat/TaperedFlat-b468c1fb-f254-41ed-8ec9-57030bc5660c-v10.0-MainTex.png" id="1"]
+
+[resource]
+resource_name = "TaperedFlatDoubleSided"
+transparency = 1
+cull_disabled = true
+cull_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = false
+alpha_scissor_threshold = 0.067
+roughness = 0.5
+metallic = 0
+albedo_color = Color(1.0, 1.0, 1.0, 1.0)
+albedo_texture = ExtResource("1")

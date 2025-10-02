@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://addons/icosa/brush_materials/Lacewing/Lacewing.gdshader" id="1"]
+[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/Lacewing/Lacewing-1cf94f63-f57a-4a1a-ad14-295af4f5ab5c-v10.0-MainTex.png" id="2"]
+[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/Lacewing/Lacewing-1cf94f63-f57a-4a1a-ad14-295af4f5ab5c-v10.0-BumpMap.png" id="3"]
+
+[resource]
+resource_name = "Lacewing"
+shader = ExtResource("1")
+shader_parameter/u_SpecColor = Vector3(0.235, 0.235, 0.235)
+shader_parameter/u_Shininess = 0.8
+shader_parameter/u_Cutoff = 0.9
+shader_parameter/u_MainTex = ExtResource("2")
+shader_parameter/u_BumpMap = ExtResource("3")

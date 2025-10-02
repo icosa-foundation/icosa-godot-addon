@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/Marker/Marker-429ed64a-4e97-4466-84d3-145a861ef684-v10.0-MainTex.png" id="1"]
+
+[resource]
+resource_name = "Marker"
+transparency = 1
+cull_disabled = true
+flags_unshaded = true
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = false
+alpha_scissor_threshold = 0.067
+roughness = 0.5
+metallic = 0
+albedo_color = Color(1, 1, 1, 1)
+albedo_texture = ExtResource("1")

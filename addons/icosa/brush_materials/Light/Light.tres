@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://addons/icosa/brush_materials/Light/Light.gdshader" id="1"]
+
+[resource]
+resource_name = "Light"
+blend_mode = 2
+flags_transparent = true
+cull_disabled = true
+shader = ExtResource("1")
+shader_parameter/u_Cutoff = 0.067
