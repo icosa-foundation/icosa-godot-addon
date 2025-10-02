@@ -3,7 +3,7 @@
 [resource]
 resource_name = "SmoothHull"
 blend_mode = 0
-cull_disabled = true
+cull_mode = 2
 cull_mode = 0
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = false

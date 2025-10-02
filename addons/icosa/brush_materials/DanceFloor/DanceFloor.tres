@@ -5,7 +5,7 @@
 [resource]
 resource_name = "DanceFloor"
 blend_mode = 0
-cull_disabled = true
+cull_mode = 2
 shader = ExtResource("1")
 shader_parameter/u_Cutoff = 0.5
 shader_parameter/u_Shininess = 0.4

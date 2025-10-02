@@ -5,7 +5,7 @@
 [resource]
 resource_name = "CoarseBristlesSingleSided"
 transparency = 2
-cull_disabled = true
+cull_mode = 2
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = false
 alpha_scissor_threshold = 0.25

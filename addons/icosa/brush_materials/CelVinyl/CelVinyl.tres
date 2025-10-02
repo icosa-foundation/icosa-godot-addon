@@ -5,6 +5,6 @@
 [resource]
 resource_name = "CelVinyl"
 transparency = 2
-cull_disabled = true
+cull_mode = 2
 shader = ExtResource("1")
 shader_parameter/u_Cutoff = 0.5

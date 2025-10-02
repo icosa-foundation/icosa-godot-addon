@@ -4,6 +4,6 @@
 resource_name = "PbrTransparentTemplate"
 blend_mode = 3
 flags_transparent = true
-cull_disabled = true
+cull_mode = 2
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = false

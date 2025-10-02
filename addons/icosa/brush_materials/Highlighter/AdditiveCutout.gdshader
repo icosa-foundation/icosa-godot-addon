@@ -1,9 +1,10 @@
 shader_type spatial;
-render_mode unshaded, blend_mix, cull_disabled;
+render_mode unshaded, blend_add, cull_disabled;
 
 #include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
+uniform float u_Opacity : hint_range(0.0, 1.0) = 1;
 uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
 
 varying float v_fog_coord;
@@ -24,5 +25,5 @@ void fragment() {
   final_color = apply_fog(final_color, v_fog_coord);
 
   ALBEDO = final_color;
-  ALPHA = 1.0;
+  ALPHA = tex_color.a * u_Opacity;
 }

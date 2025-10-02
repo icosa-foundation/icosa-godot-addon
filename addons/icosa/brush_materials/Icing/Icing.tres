@@ -12,6 +12,6 @@ roughness = 0.5
 metallic = 0
 albedo_color = Color(1.0, 1.0, 1.0, 1.0)
 specular_mode = 1
-specular_color = Color(0.0, 0.0, 0.0, 1.0)
+roughness = 1.0
 normal_enabled = true
 normal_texture = ExtResource("1")
