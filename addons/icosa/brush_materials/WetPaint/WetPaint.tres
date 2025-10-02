@@ -4,9 +4,10 @@
 [ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/WetPaint/WetPaint-b67c0e81-ce6d-40a8-aeb0-ef036b081aa3-v10.0-BumpMap.png" id="2"]
 
 [resource]
-resource_name = "WetPaintSingleSided"
-transparency = 1
+resource_name = "WetPaintDoubleSided"
+transparency = 2
 cull_disabled = true
+cull_mode = 0
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = false
 alpha_scissor_threshold = 0.3

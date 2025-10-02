@@ -1,11 +1,11 @@
 [gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/DuctTape/DuctTape-3ca16e2f-bdcd-4da2-8631-dcef342f40f1-v10.0-MainTex.png" id="1"]
-[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/DuctTape/DuctTape-3ca16e2f-bdcd-4da2-8631-dcef342f40f1-v10.0-BumpMap.png" id="2"]
+[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/DuctTapeGeometry/DuctTapeGeometry-84d5bbb2-6634-8434-f8a7-681b576b4664-v10.0-MainTex.png" id="1"]
+[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/DuctTapeGeometry/DuctTapeGeometry-84d5bbb2-6634-8434-f8a7-681b576b4664-v10.0-BumpMap.png" id="2"]
 
 [resource]
 resource_name = "DuctTapeSingleSided"
-transparency = 1
+transparency = 2
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = false
 alpha_scissor_threshold = 0.2

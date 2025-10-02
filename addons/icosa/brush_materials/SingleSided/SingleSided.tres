@@ -4,7 +4,7 @@
 
 [resource]
 resource_name = "SingleSided"
-transparency = 1
+transparency = 2
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = false
 alpha_scissor_threshold = 0.5

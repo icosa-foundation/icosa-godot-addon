@@ -4,7 +4,7 @@
 
 [resource]
 resource_name = "LeakyPen"
-transparency = 1
+transparency = 2
 shader = ExtResource("1")
 shader_parameter/u_Cutoff = 0.5
 shader_parameter/u_Shininess = 0.4
