@@ -32,8 +32,15 @@ void vertex() {
 }
 
 void fragment() {
-  // Sample textures
-  vec4 tex_color = texture(u_MainTex, UV);
+  // Flipbook animation - scroll UV horizontally
+  vec2 scroll_uv = UV;
+  // Unity's _Time.y = time, so just use TIME
+  float anim = ceil(mod(TIME * 12.0, 6.0));
+  scroll_uv.x += anim;
+  scroll_uv.x *= 1.1;
+
+  // Sample textures with animated UVs
+  vec4 tex_color = texture(u_MainTex, scroll_uv);
   float brush_mask = tex_color.a * COLOR.a;
 
   // Alpha cutoff

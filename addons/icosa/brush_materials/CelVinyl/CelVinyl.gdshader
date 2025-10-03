@@ -13,15 +13,13 @@ void vertex() {
 }
 
 void fragment() {
-  vec4 tex_color = texture(u_MainTex, UV);
-  float brush_mask = tex_color.a * COLOR.a;
+  vec4 tex = texture(u_MainTex, UV) * COLOR;
 
-  if (brush_mask <= u_Cutoff) {
+  if (tex.a <= u_Cutoff) {
     discard;
   }
 
-  vec3 final_color = tex_color.rgb * COLOR.rgb;
-  final_color = apply_fog(final_color, v_fog_coord);
+  vec3 final_color = apply_fog(tex.rgb, v_fog_coord);
 
   ALBEDO = final_color;
   ALPHA = 1.0;
