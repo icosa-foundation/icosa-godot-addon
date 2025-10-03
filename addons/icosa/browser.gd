@@ -17,12 +17,12 @@ var is_setup = false
 
 var access_token = ""
 @onready var root_directory = "res://" if Engine.is_editor_hint() else "user://"
-var token_path = "res://addons/icosa/token.cfg"
+var token_path = "res://addons/icosa/cookie.cfg"
 
 func save_token():
 	if !access_token.is_empty():
 		var file = ConfigFile.new()
-		file.set_value("login", "token", access_token)
+		file.set_value("user", "token", access_token)
 		file.save(token_path)
 
 func load_token():
@@ -30,7 +30,7 @@ func load_token():
 		return
 	var file = ConfigFile.new()
 	file.load(token_path)
-	access_token = file.get_value("login", "token")
+	access_token = file.get_value("user", "token")
 
 func clear_saved_token():
 	if !FileAccess.file_exists(token_path):

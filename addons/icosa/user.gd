@@ -225,39 +225,49 @@ func _on_upload_asset_file_selected(path):
 	var upload_http := HTTPRequest.new()
 	add_child(upload_http)  # Important: needs to be inside the tree
 
-	print(
-		UPLOAD_ENDPOINT,
-		[HEADER_AGENT, HEADER_APP, HEADER_AUTH % token, "Content-Type: application/zip"],
-	)
-	"""
+	# Create multipart/form-data body
+	var boundary := "----GodotFormBoundary" + str(Time.get_ticks_msec())
+	var body := PackedByteArray()
 	
-	https://api.icosa.gallery/v1/users/me/assets
-	[
-curl -X POST 
--H "Content-Type: multipart/form-data" 
--H "Authorization: Bearer <token>" 
--F "files=@teapot.zip" https://api.icosa.gallery/v1/users/me/assets
-	]
+	# Add form field for file
+	body.append_array(("--" + boundary + "\r\n").to_utf8_buffer())
+	body.append_array(("Content-Disposition: form-data; name=\"files\"; filename=\"" + path.get_file() + "\"\r\n").to_utf8_buffer())
+	body.append_array("Content-Type: application/zip\r\n\r\n".to_utf8_buffer())
+	body.append_array(file_bytes)
+	body.append_array("\r\n".to_utf8_buffer())
+	body.append_array(("--" + boundary + "--\r\n").to_utf8_buffer())
 
-	"""
 	var err = upload_http.request_raw(
 		UPLOAD_ENDPOINT,
-		[HEADER_AGENT, HEADER_APP, HEADER_AUTH % token, "Content-Type: application/zip"],
+		[HEADER_AGENT, HEADER_APP, HEADER_AUTH % token, "Content-Type: multipart/form-data; boundary=" + boundary],
 		HTTPClient.METHOD_POST,
-		file_bytes
+		body
 	)
 	
+	if err != OK:
+		printerr("Failed to send upload request: ", err)
+		upload_http.queue_free()
+		return
 	
 	var reply = await upload_http.request_completed
 	var result = reply[0]
 	var response_code = reply[1]
 	var headers = reply[2]
-	var body = reply[3]
+	var response_body = reply[3]
 
-	if response_code != 200: printerr("error: ", response_code," ", result)
-	else: print(body)
-	##   ERROR: error: 201 0
+	upload_http.queue_free()
 
+	if response_code == 200 or response_code == 201:
+		print("Successfully uploaded asset!")
+		# Clear existing thumbnails
+		for child in %UserAssets.get_children():
+			child.queue_free()
+		%NoUserAssets.show()
+		# Reload user assets
+		_user_assets_request(token)
+	else:
+		printerr("Upload error: ", response_code, " ", result)
+		print("Response body: ", response_body.get_string_from_utf8())
 
 func _on_delete_request(asset_id):
 	if !user_do_not_show_delete_prompt:
@@ -305,5 +315,28 @@ func _on_delete_asset_window_confirmed():
 	var asset_id = %DeleteAssetWindow.get_meta("id") as String
 	_delete_asset(asset_id)
 
+
+var cookie_path = "res://addons/icosa/cookie.cfg"
+
 func _on_do_not_show_delete_confirm_window_toggled(toggled_on):
 	user_do_not_show_delete_prompt = toggled_on
+	
+	if !token.is_empty():
+		var cookie = ConfigFile.new()
+		cookie.load(cookie_path)
+		cookie.set_value("user", "delete_confirm", toggled_on)
+		cookie.save(cookie_path)
+
+
+func _on_settings_pressed():
+	var cookie = ConfigFile.new()
+	cookie.load(cookie_path)
+	var delete_confirm_value = cookie.get_value("user", "delete_confirm")
+	%UserSettingsDoNotShowDeleteConfirmWindow.set_pressed_no_signal(delete_confirm_value)
+	%UserSettingsWindow.show()
+
+func _on_settings_window_confirmed():
+	pass # Replace with function body.
+
+func _on_settings_window_canceled():
+	pass # Replace with function body.
