@@ -21,7 +21,7 @@ vec2 dFdy2(vec2 v) {
   return vec2(dFdy(v.x), dFdy(v.y));
 }
 
-vec3 perturb_normal(vec3 position, vec3 normal, vec2 uv, float disp_amount) {
+vec3 perturb_normal(vec3 position, vec3 normal, vec2 uv, float disp_amount, bool front_facing) {
   // Mikkelsen tangent-less normal mapping
   vec3 vSigmaS = dFdx3(position);
   vec3 vSigmaT = dFdy3(position);
@@ -45,9 +45,9 @@ vec3 perturb_normal(vec3 position, vec3 normal, vec2 uv, float disp_amount) {
   float Hul = texture(u_BumpMap, STul).x;
 
   // Front-facing flip for double-sided materials
-  Hll = mix(Hll, 1.0 - Hll, float(!FRONT_FACING)) * disp_amount;
-  Hlr = mix(Hlr, 1.0 - Hlr, float(!FRONT_FACING)) * disp_amount;
-  Hul = mix(Hul, 1.0 - Hul, float(!FRONT_FACING)) * disp_amount;
+  Hll = mix(Hll, 1.0 - Hll, float(!front_facing)) * disp_amount;
+  Hlr = mix(Hlr, 1.0 - Hlr, float(!front_facing)) * disp_amount;
+  Hul = mix(Hul, 1.0 - Hul, float(!front_facing)) * disp_amount;
 
   float dBs = (Hlr - Hll) / d;
   float dBt = (Hul - Hll) / d;

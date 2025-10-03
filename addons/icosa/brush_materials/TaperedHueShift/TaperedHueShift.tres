@@ -1,11 +1,21 @@
-[gd_resource type="ShaderMaterial" format=3]
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://cidabwprx6n7b"]
 
-[ext_resource type="Shader" path="res://addons/icosa/brush_materials/TaperedHueShift/TaperedHueShift.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://cvt6xbpb4slng" path="res://addons/icosa/brush_materials/TaperedHueShift/TaperedHueShift.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://b8bc45ku02xcl" path="res://addons/icosa/brush_materials/TaperedHueShift/TaperedHueShift-3d9755da-56c7-7294-9b1d-5ec349975f52-v10.0-MainTex.png" id="2_i280d"]
 
 [resource]
 resource_name = "TaperedHueShift"
-transparency = 2
-cull_mode = 2
+render_priority = 0
 shader = ExtResource("1")
-shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_BumpMap_TexelSize = Vector4(1, 1, 512, 512)
+shader_parameter/u_MainTex = ExtResource("2_i280d")
+shader_parameter/u_SpecColor = Color(0.235, 0.235, 0.235, 1)
 shader_parameter/u_Shininess = 0.4
+shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_ambient_light_color = Color(0.2, 0.2, 0.2, 1)
+shader_parameter/u_SceneLight_0_color = Color(1, 1, 1, 1)
+shader_parameter/u_SceneLight_1_color = Color(0.5, 0.5, 0.5, 1)
+shader_parameter/u_SceneLight_0_direction = Vector3(0, -1, 0)
+shader_parameter/u_SceneLight_1_direction = Vector3(0, 1, 0)

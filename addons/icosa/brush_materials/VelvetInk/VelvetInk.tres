@@ -1,11 +1,13 @@
-[gd_resource type="ShaderMaterial" format=3]
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://dc42rdmrqtme2"]
 
-[ext_resource type="Shader" path="res://addons/icosa/brush_materials/VelvetInk/VelvetInk.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://c784iqfuy4cqb" path="res://addons/icosa/brush_materials/VelvetInk/VelvetInk.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://b38urw8db6yhx" path="res://addons/icosa/brush_materials/VelvetInk/VelvetInk-d229d335-c334-495a-a801-660ac8a87360-v10.0-MainTex.png" id="2_qmmao"]
 
 [resource]
 resource_name = "VelvetInk"
-blend_mode = 2
-flags_transparent = true
-cull_mode = 2
+render_priority = 0
 shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_MainTex = ExtResource("2_qmmao")
 shader_parameter/u_Cutoff = 0.5

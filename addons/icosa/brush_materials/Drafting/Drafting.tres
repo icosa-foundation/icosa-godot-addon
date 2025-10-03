@@ -1,10 +1,13 @@
-[gd_resource type="ShaderMaterial" format=3]
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://d4hgckb71l4at"]
 
-[ext_resource type="Shader" path="res://addons/icosa/brush_materials/Drafting/Drafting.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://cw26h6dgcj3lf" path="res://addons/icosa/brush_materials/Drafting/Drafting.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://kj8jpxjvja7h" path="res://addons/icosa/brush_materials/Drafting/Drafting-492b36ff-b337-436a-ba5f-1e87ee86747e-v10.0-MainTex.png" id="2_vjhf5"]
 
 [resource]
 resource_name = "Drafting"
-transparency = 2
-cull_mode = 2
+render_priority = 0
 shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_MainTex = ExtResource("2_vjhf5")
 shader_parameter/u_Cutoff = 0.5

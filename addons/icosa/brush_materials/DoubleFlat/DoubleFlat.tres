@@ -1,14 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://dyt41o8qbpif4"]
 
-[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/DoubleFlat/DoubleFlat-f4a0550c-332a-4e1a-9793-b71508f4a454-v10.0-MainTex.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://bc6tafr5t74nl" path="res://addons/icosa/brush_materials/DoubleFlat/DoubleFlat-f4a0550c-332a-4e1a-9793-b71508f4a454-v10.0-MainTex.png" id="1"]
 
 [resource]
 resource_name = "DoubleFlat"
-blend_mode = 0
 vertex_color_use_as_albedo = true
-vertex_color_is_srgb = false
-alpha_scissor_threshold = 0.5
-roughness = 0.5
-metallic = 0
-albedo_color = Color(1.0, 1.0, 1.0, 1.0)
 albedo_texture = ExtResource("1")
+roughness = 0.5

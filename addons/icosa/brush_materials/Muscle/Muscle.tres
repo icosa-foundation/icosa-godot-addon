@@ -1,21 +1,14 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" load_steps=3 format=3 uid="uid://2qldlfcfq82t"]
 
-[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/Muscle/Muscle-f28c395c-a57d-464b-8f0b-558c59478fa3-v10.0-MainTex.png" id="1"]
-[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/Muscle/Muscle-f28c395c-a57d-464b-8f0b-558c59478fa3-v10.0-BumpMap.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://8dm0fps5k7ma" path="res://addons/icosa/brush_materials/Muscle/Muscle-f28c395c-a57d-464b-8f0b-558c59478fa3-v10.0-MainTex.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://dwrkvlt2gvueu" path="res://addons/icosa/brush_materials/Muscle/Muscle-f28c395c-a57d-464b-8f0b-558c59478fa3-v10.0-BumpMap.png" id="2"]
 
 [resource]
 resource_name = "Muscle"
 transparency = 1
-cull_mode = 2
-cull_mode = 0
-vertex_color_use_as_albedo = true
-vertex_color_is_srgb = false
-alpha_scissor_threshold = 0.3
-roughness = 0.6950000000000001
-metallic = 0
-albedo_color = Color(1.0, 1.0, 1.0, 1.0)
 specular_mode = 1
-specular_color = Color(0.08088237, 0.08088237, 0.08088237, 1.0)
+vertex_color_use_as_albedo = true
 albedo_texture = ExtResource("1")
+roughness = 0.695
 normal_enabled = true
 normal_texture = ExtResource("2")

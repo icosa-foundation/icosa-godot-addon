@@ -1,7 +1,6 @@
 // surface_shader.gdshaderinc
 // Disney BRDF lighting (Unity-compatible)
 
-const float PI = 3.141592654;
 const float INV_PI = 0.318309886;
 const vec3 GAMMA_DIELECTRIC_SPEC = vec3(0.220916301);
 const float GAMMA_ONE_MINUS_DIELECTRIC = 0.779083699;

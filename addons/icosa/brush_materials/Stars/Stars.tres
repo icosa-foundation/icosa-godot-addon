@@ -1,11 +1,13 @@
-[gd_resource type="ShaderMaterial" format=3]
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://xsoc3k7n2or2"]
 
-[ext_resource type="Shader" path="res://addons/icosa/brush_materials/Stars/Stars.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://xvymc6t6vy6n" path="res://addons/icosa/brush_materials/Stars/Stars.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://d1jojr2q7j7gn" path="res://addons/icosa/brush_materials/Stars/Stars-0eb4db27-3f82-408d-b5a1-19ebd7d5b711-v10.0-MainTex.png" id="2_65mru"]
 
 [resource]
 resource_name = "Stars"
-blend_mode = 2
-flags_transparent = true
-cull_mode = 2
+render_priority = 0
 shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_MainTex = ExtResource("2_65mru")
 shader_parameter/u_Cutoff = 0.5

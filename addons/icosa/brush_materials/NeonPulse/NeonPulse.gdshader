@@ -8,7 +8,6 @@ render_mode blend_mix, cull_back;
 
 // Material properties
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
-uniform sampler2D u_BumpMap : hint_normal, filter_linear_mipmap;
 uniform vec3 u_SpecColor : source_color = vec3(0.235);
 uniform float u_Shininess : hint_range(0.0, 1.0) = 0.4;
 uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
@@ -43,7 +42,7 @@ void fragment() {
   }
 
   // Compute perturbed normal
-  vec3 perturbed_normal = perturb_normal(v_view_position, v_view_normal, UV, 0.0015);
+  vec3 perturbed_normal = perturb_normal(v_view_position, v_view_normal, UV, 0.0015, FRONT_FACING);
 
   // Always use front-facing normal for double-sided
   perturbed_normal.z *= mix(-1.0, 1.0, float(FRONT_FACING));

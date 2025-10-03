@@ -1,11 +1,13 @@
-[gd_resource type="ShaderMaterial" format=3]
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://dfj415gfod1im"]
 
-[ext_resource type="Shader" path="res://addons/icosa/brush_materials/Streamers/Streamers.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://bwc6a0r3hh2gw" path="res://addons/icosa/brush_materials/Streamers/Streamers.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://cfmk507r1j1lq" path="res://addons/icosa/brush_materials/Streamers/Streamers-44bb800a-fbc3-4592-8426-94ecb05ddec3-v10.0-MainTex.png" id="2_jwcd3"]
 
 [resource]
 resource_name = "Streamers"
-blend_mode = 2
-flags_transparent = true
-cull_mode = 2
+render_priority = 0
 shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_MainTex = ExtResource("2_jwcd3")
 shader_parameter/u_Cutoff = 0.5

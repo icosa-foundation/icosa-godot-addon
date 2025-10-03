@@ -1,16 +1,14 @@
-[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://c7egu4b3ri6ek"]
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://dtemlhq00csxd"]
 
-[ext_resource type="Shader" uid="uid://b7d7fyre1xy7l" path="res://addons/icosa/brush_materials/DiamondHull/DiamondHull.gdshader" id="1"]
-[ext_resource type="Texture2D" uid="uid://fdtw3dd0wh5d" path="res://addons/icosa/brush_materials/DiamondHull/DiamondHull-c8313697-2563-47fc-832e-290f4c04b901-v10.0-MainTex.png" id="2_g26wp"]
+[ext_resource type="Shader" uid="uid://d0q10j4c5j7ql" path="res://addons/icosa/brush_materials/Lofted_Hue_Shift/LoftedHueShift.gdshader" id="1"]
 
 [resource]
-resource_name = "DiamondHull"
+resource_name = "LoftedHueShift"
 render_priority = 0
 shader = ExtResource("1")
 shader_parameter/u_fogColor = Color(1, 1, 1, 1)
 shader_parameter/u_fogDensity = 0.0
 shader_parameter/u_BumpMap_TexelSize = Vector4(1, 1, 512, 512)
-shader_parameter/u_MainTex = ExtResource("2_g26wp")
 shader_parameter/u_SpecColor = Color(0.235, 0.235, 0.235, 1)
 shader_parameter/u_Shininess = 0.4
 shader_parameter/u_Cutoff = 0.5

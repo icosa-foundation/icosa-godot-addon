@@ -1,11 +1,13 @@
-[gd_resource type="ShaderMaterial" format=3]
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://bfi1qs0exih65"]
 
-[ext_resource type="Shader" path="res://addons/icosa/brush_materials/Snow/Snow.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://c4sl1ii86ukqu" path="res://addons/icosa/brush_materials/Snow/Snow.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://bdpv4vflr32d8" path="res://addons/icosa/brush_materials/Snow/Snow-d902ed8b-d0d1-476c-a8de-878a79e3a34c-v10.0-MainTex.png" id="2_jd2fk"]
 
 [resource]
 resource_name = "Snow"
-blend_mode = 2
-flags_transparent = true
-cull_mode = 2
+render_priority = 0
 shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_MainTex = ExtResource("2_jd2fk")
 shader_parameter/u_Cutoff = 0.5

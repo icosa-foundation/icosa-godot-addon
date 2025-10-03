@@ -3,19 +3,20 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b3c5s6j0dknq7"
-path="res://.godot/imported/MylarTube-8e58ceea-7830-49b4-aba9-6215104ab52a-v10.0-MainTex.png-2294ef3bb68910eb7e6770bae3024ffc.ctex"
+path.s3tc="res://.godot/imported/MylarTube-8e58ceea-7830-49b4-aba9-6215104ab52a-v10.0-MainTex.png-2294ef3bb68910eb7e6770bae3024ffc.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 
 [deps]
 
 source_file="res://addons/icosa/brush_materials/MylarTube/MylarTube-8e58ceea-7830-49b4-aba9-6215104ab52a-v10.0-MainTex.png"
-dest_files=["res://.godot/imported/MylarTube-8e58ceea-7830-49b4-aba9-6215104ab52a-v10.0-MainTex.png-2294ef3bb68910eb7e6770bae3024ffc.ctex"]
+dest_files=["res://.godot/imported/MylarTube-8e58ceea-7830-49b4-aba9-6215104ab52a-v10.0-MainTex.png-2294ef3bb68910eb7e6770bae3024ffc.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -23,7 +24,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
@@ -37,4 +38,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0
