@@ -31,11 +31,14 @@ void fragment() {
   // Bloom the vertex color with emission gain
   vec4 bloomed_color = bloom_color(COLOR, u_EmissionGain);
 
+  // Unity's _Time.x = time/20, so we need TIME/20.0 in Godot
+  float time_x = TIME / 20.0;
+
   // Animated scrolling displacement
-  float displacement = texture(u_DisplaceTex, UV + vec2(-TIME * u_Scroll1, 0.0)).a;
+  float displacement = texture(u_DisplaceTex, UV + vec2(-time_x * u_Scroll1, 0.0)).a;
 
   // Sample main texture with scrolling and displacement
-  vec4 tex = texture(u_MainTex, UV + vec2(-TIME * u_Scroll2, 0.0) - displacement * u_DisplacementIntensity);
+  vec4 tex = texture(u_MainTex, UV + vec2(-time_x * u_Scroll2, 0.0) - displacement * u_DisplacementIntensity);
 
   vec4 final_color = bloomed_color * tex;
 

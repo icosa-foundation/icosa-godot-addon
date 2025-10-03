@@ -40,7 +40,8 @@ void fragment() {
   perturbed_normal.z *= mix(-1.0, 1.0, float(FRONT_FACING));
 
   // Hypercolor animation
-  float scroll = TIME;
+  // Unity's _Time.z = time*2, so we need TIME*2.0 in Godot
+  float scroll = TIME * 2.0;
   vec3 animated_color = vec3(0.0);
   animated_color.r = (sin(tex_color.r * 2.0 + scroll * 0.5 - UV.x) + 1.0) * 2.0;
   animated_color.g = (sin(tex_color.r * 3.3 + scroll * 1.0 - UV.x) + 1.0) * 2.0;

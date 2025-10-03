@@ -78,8 +78,9 @@ void fragment() {
     }
 
     // Sequential light animation
+    // Unity's _Time.w = time*3, so we need TIME*3.0 in Godot
     float light_index = mod(v_texcoord0.x * 2.0 + 0.5, 7.0);
-    float time_index = mod(TIME, 7.0);
+    float time_index = mod(TIME * 3.0, 7.0);
     float delta = abs(light_index - time_index);
     float on = 1.0 - clamp(delta * 1.5, 0.0, 1.0);
     color = bloom_color(color * on, 0.7);

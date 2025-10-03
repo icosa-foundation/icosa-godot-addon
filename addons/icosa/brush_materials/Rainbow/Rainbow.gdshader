@@ -40,7 +40,8 @@ void fragment() {
   vec4 color = COLOR;
   color.a = 1.0;
 
-  vec4 tex = get_rainbow_color(UV, TIME);
+  // Unity's _Time.z = time*2, so we need TIME*2.0 in Godot
+  vec4 tex = get_rainbow_color(UV, TIME * 2.0);
   tex = color * tex * exp(u_EmissionGain * 3.0);
 
   ALBEDO = tex.rgb;

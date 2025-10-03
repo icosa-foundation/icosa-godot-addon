@@ -1,10 +1,9 @@
 shader_type spatial;
-render_mode unshaded, blend_mix, cull_disabled;
+render_mode unshaded, blend_add, depth_draw_opaque, cull_disabled;
 
 #include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
-uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
 
 varying float v_fog_coord;
 
@@ -13,14 +12,10 @@ void vertex() {
 }
 
 void fragment() {
-  vec4 tex_color = texture(u_MainTex, UV);
-  float brush_mask = tex_color.a * COLOR.a;
+  vec4 brush_tex = texture(u_MainTex, UV);
 
-  if (brush_mask <= u_Cutoff) {
-    discard;
-  }
-
-  vec3 final_color = tex_color.rgb * COLOR.rgb;
+  // VelvetInk uses texture alpha as a mask for the vertex color
+  vec3 final_color = brush_tex.a * COLOR.rgb;
   final_color = apply_fog(final_color, v_fog_coord);
 
   ALBEDO = final_color;
