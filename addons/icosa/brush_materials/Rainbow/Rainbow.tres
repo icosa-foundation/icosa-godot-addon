@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://dgb2ixa2oa4nr"]
+
+[ext_resource type="Shader" uid="uid://d50oic4uo7o6" path="res://addons/icosa/brush_materials/Rainbow/Rainbow.gdshader" id="1"]
+
+[resource]
+resource_name = "Rainbow"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_EmissionGain = 0.5

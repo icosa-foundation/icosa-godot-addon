@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://bnku6rqw0y6y4"]
+
+[ext_resource type="Texture2D" uid="uid://dh0kld3xwdg2j" path="res://addons/icosa/brush_materials/Icing/Icing-2f212815-f4d3-c1a4-681a-feeaf9c6dc37-v10.0-BumpMap.png" id="1"]
+
+[resource]
+resource_name = "Icing"
+specular_mode = 1
+vertex_color_use_as_albedo = true
+normal_enabled = true
+normal_texture = ExtResource("1")

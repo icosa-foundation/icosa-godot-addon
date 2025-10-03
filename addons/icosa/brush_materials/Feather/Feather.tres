@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://blofqo23bq3cj"]
+
+[ext_resource type="Shader" uid="uid://c5r7k8wx10wom" path="res://addons/icosa/brush_materials/Feather/Feather.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://ckui03ec5bpw1" path="res://addons/icosa/brush_materials/Feather/Feather-a555b809-2017-46cb-ac26-e63173d8f45e-v10.0-MainTex.png" id="2_5yeka"]
+
+[resource]
+resource_name = "Feather"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_MainTex = ExtResource("2_5yeka")
+shader_parameter/u_Cutoff = 0.067

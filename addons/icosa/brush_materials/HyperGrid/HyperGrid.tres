@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://dhqts0gmoalgg"]
+
+[ext_resource type="Shader" uid="uid://c3cbmab2qtfyc" path="res://addons/icosa/brush_materials/HyperGrid/HyperGrid.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://dy5mw5wfchvgh" path="res://addons/icosa/brush_materials/HyperGrid/HyperGrid-6a1cf9f9-032c-45ec-9b6e-a6680bee32e9-v10.0-MainTex.png" id="2_jxovd"]
+
+[resource]
+resource_name = "HyperGrid"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_MainTex = ExtResource("2_jxovd")
+shader_parameter/u_Cutoff = 0.5

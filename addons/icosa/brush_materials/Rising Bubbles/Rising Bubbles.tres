@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://dap6jm0go5huk"]
+
+[ext_resource type="Shader" uid="uid://dxb3tjojl366t" path="res://addons/icosa/brush_materials/Rising Bubbles/Rising Bubbles.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://dygh8g8jok67c" path="res://addons/icosa/brush_materials/Rising Bubbles/Rising Bubbles-a8147ce1-005e-abe4-88e8-09a1eaadcc89-v10.0-MainTex.png" id="2_udm33"]
+
+[resource]
+resource_name = "RisingBubbles"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_MainTex = ExtResource("2_udm33")
+shader_parameter/u_Cutoff = 0.067

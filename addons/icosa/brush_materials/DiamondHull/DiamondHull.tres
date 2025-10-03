@@ -1,0 +1,21 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://c7egu4b3ri6ek"]
+
+[ext_resource type="Shader" uid="uid://b7d7fyre1xy7l" path="res://addons/icosa/brush_materials/DiamondHull/DiamondHull.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://fdtw3dd0wh5d" path="res://addons/icosa/brush_materials/DiamondHull/DiamondHull-c8313697-2563-47fc-832e-290f4c04b901-v10.0-MainTex.png" id="2_g26wp"]
+
+[resource]
+resource_name = "DiamondHull"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_BumpMap_TexelSize = Vector4(1, 1, 512, 512)
+shader_parameter/u_MainTex = ExtResource("2_g26wp")
+shader_parameter/u_SpecColor = Color(0.235, 0.235, 0.235, 1)
+shader_parameter/u_Shininess = 0.4
+shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_ambient_light_color = Color(0.2, 0.2, 0.2, 1)
+shader_parameter/u_SceneLight_0_color = Color(1, 1, 1, 1)
+shader_parameter/u_SceneLight_1_color = Color(0.5, 0.5, 0.5, 1)
+shader_parameter/u_SceneLight_0_direction = Vector3(0, -1, 0)
+shader_parameter/u_SceneLight_1_direction = Vector3(0, 1, 0)

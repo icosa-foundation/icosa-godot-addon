@@ -1,0 +1,23 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=3 uid="uid://wax8lbs5645l"]
+
+[ext_resource type="Shader" uid="uid://d1uciddgtgipe" path="res://addons/icosa/brush_materials/Lacewing/Lacewing.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://cv0cvqqf0prwj" path="res://addons/icosa/brush_materials/Lacewing/Lacewing-1cf94f63-f57a-4a1a-ad14-295af4f5ab5c-v10.0-MainTex.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://o7j6kvlarkh7" path="res://addons/icosa/brush_materials/Lacewing/Lacewing-1cf94f63-f57a-4a1a-ad14-295af4f5ab5c-v10.0-BumpMap.png" id="3"]
+
+[resource]
+resource_name = "Lacewing"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_BumpMap = ExtResource("3")
+shader_parameter/u_BumpMap_TexelSize = Vector4(1, 1, 512, 512)
+shader_parameter/u_MainTex = ExtResource("2")
+shader_parameter/u_SpecColor = Color(0.235, 0.235, 0.235, 1)
+shader_parameter/u_Shininess = 0.8
+shader_parameter/u_Cutoff = 0.9
+shader_parameter/u_ambient_light_color = Color(0.2, 0.2, 0.2, 1)
+shader_parameter/u_SceneLight_0_color = Color(1, 1, 1, 1)
+shader_parameter/u_SceneLight_1_color = Color(0.5, 0.5, 0.5, 1)
+shader_parameter/u_SceneLight_0_direction = Vector3(0, -1, 0)
+shader_parameter/u_SceneLight_1_direction = Vector3(0, 1, 0)

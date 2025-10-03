@@ -1,0 +1,23 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=3 uid="uid://begfqvgd04hoq"]
+
+[ext_resource type="Shader" uid="uid://c1xgdrk0vqnus" path="res://addons/icosa/brush_materials/Marbled_Rainbow/MarbledRainbow.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://c3tutxc2o0k0p" path="res://addons/icosa/brush_materials/Marbled_Rainbow/Marbled Rainbow-c86c058d-1bda-2e94-08db-f3d6a96ac4a1-v10.0-MainTex.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://4ibdbwnq0wcs" path="res://addons/icosa/brush_materials/Marbled_Rainbow/Marbled Rainbow-c86c058d-1bda-2e94-08db-f3d6a96ac4a1-v10.0-BumpMap.png" id="3"]
+
+[resource]
+resource_name = "MarbledRainbow"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_BumpMap = ExtResource("3")
+shader_parameter/u_BumpMap_TexelSize = Vector4(1, 1, 512, 512)
+shader_parameter/u_MainTex = ExtResource("2")
+shader_parameter/u_SpecColor = Color(0.235, 0.235, 0.235, 1)
+shader_parameter/u_Shininess = 0.8
+shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_ambient_light_color = Color(0.2, 0.2, 0.2, 1)
+shader_parameter/u_SceneLight_0_color = Color(1, 1, 1, 1)
+shader_parameter/u_SceneLight_1_color = Color(0.5, 0.5, 0.5, 1)
+shader_parameter/u_SceneLight_0_direction = Vector3(0, -1, 0)
+shader_parameter/u_SceneLight_1_direction = Vector3(0, 1, 0)

@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://addons/icosa/brush_materials/KeijiroTube/KeijiroTube.gdshader" id="1"]
+
+[resource]
+resource_name = "KeijiroTube"
+blend_mode = 0
+shader = ExtResource("1")
+shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_Shininess = 0.4

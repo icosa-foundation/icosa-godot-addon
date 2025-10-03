@@ -1,0 +1,19 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://dtemlhq00csxd"]
+
+[ext_resource type="Shader" uid="uid://d0q10j4c5j7ql" path="res://addons/icosa/brush_materials/Lofted_Hue_Shift/LoftedHueShift.gdshader" id="1"]
+
+[resource]
+resource_name = "LoftedHueShift"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_BumpMap_TexelSize = Vector4(1, 1, 512, 512)
+shader_parameter/u_SpecColor = Color(0.235, 0.235, 0.235, 1)
+shader_parameter/u_Shininess = 0.4
+shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_ambient_light_color = Color(0.2, 0.2, 0.2, 1)
+shader_parameter/u_SceneLight_0_color = Color(1, 1, 1, 1)
+shader_parameter/u_SceneLight_1_color = Color(0.5, 0.5, 0.5, 1)
+shader_parameter/u_SceneLight_0_direction = Vector3(0, -1, 0)
+shader_parameter/u_SceneLight_1_direction = Vector3(0, 1, 0)

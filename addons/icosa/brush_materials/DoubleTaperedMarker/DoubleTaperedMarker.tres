@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://b1xlcxcjen6ey"]
+
+[ext_resource type="Shader" uid="uid://cst7wiwwyx1fj" path="res://addons/icosa/brush_materials/DoubleTaperedMarker/DoubleTaperedMarker.gdshader" id="1"]
+
+[resource]
+resource_name = "DoubleTaperedMarker"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_Cutoff = 0.5

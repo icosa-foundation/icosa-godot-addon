@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://dhnd11dpyd7wl"]
+
+[ext_resource type="Shader" uid="uid://bdo5yh1pfgqpx" path="res://addons/icosa/brush_materials/Fire/Fire.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://78wn3h7d7txi" path="res://addons/icosa/brush_materials/Fire/Fire-cb92b597-94ca-4255-b017-0e3f42f12f9e-v10.0-MainTex.png" id="2_6qous"]
+
+[resource]
+resource_name = "Fire"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_MainTex = ExtResource("2_6qous")
+shader_parameter/u_Cutoff = 0.067

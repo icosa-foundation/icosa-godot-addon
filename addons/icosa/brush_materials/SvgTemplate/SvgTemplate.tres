@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "SvgTemplate"
+blend_mode = 0
+cull_mode = 2
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = false
