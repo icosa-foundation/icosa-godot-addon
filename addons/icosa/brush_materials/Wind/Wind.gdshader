@@ -1,32 +1,21 @@
 shader_type spatial;
 render_mode unshaded, blend_add, depth_draw_opaque, cull_disabled;
 
-// Wind shader - Additive with bloom and texture
-// Based on Wind-7136a729-1aab-bd24-f8b2-ca88b6adfb67
-
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
-uniform float u_EmissionGain : hint_range(0.0, 2.0) = 0.5;
-
-varying vec4 v_color;
-
-vec4 bloom_color(vec4 color, float gain) {
-  float cmin = length(color.rgb) * 0.05;
-  color.rgb = max(color.rgb, vec3(cmin));
-  color.r = pow(color.r, 2.2);
-  color.g = pow(color.g, 2.2);
-  color.b = pow(color.b, 2.2);
-  color.a = pow(color.a, 2.2);
-  color.rgb *= 2.0 * exp(gain * 10.0);
-  return color;
-}
-
-void vertex() {
-  v_color = bloom_color(COLOR, u_EmissionGain);
-}
+uniform float u_Speed : hint_range(0.0, 1.0) = 1.0;
 
 void fragment() {
-  float brush_mask = texture(u_MainTex, UV).a;
-  vec4 color = brush_mask * v_color;
+  // Simple scrolling
+  // Unity's GetTime().y = _Time.y = time
+  float time = TIME * u_Speed;
+  vec2 scrollUV = UV;
+  scrollUV.x += time * 0.5;
+
+  vec4 tex = texture(u_MainTex, scrollUV);
+  vec4 color = tex * COLOR;
+
+  // Premultiply alpha
+  color.rgb *= color.a;
 
   ALBEDO = color.rgb;
   ALPHA = color.a;

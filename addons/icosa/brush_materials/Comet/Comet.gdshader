@@ -33,11 +33,11 @@ void fragment() {
   // Falloff at start of stroke
   float falloff = max((0.2 - UV.x) * 5.0, 0.0);
 
-  // Sample gradient texture
+  // Sample gradient texture (red channel only)
   float u = clamp(gradient_lookup + falloff, 0.0, 1.0);
-  vec4 tex = texture(u_AlphaMask, vec2(u, 0.0));
+  float tex = texture(u_AlphaMask, vec2(u, 0.0)).r;
 
-  vec3 final_color = (tex * COLOR).rgb;
+  vec3 final_color = (tex * COLOR.rgb);
 
   ALBEDO = final_color;
   ALPHA = 1.0;

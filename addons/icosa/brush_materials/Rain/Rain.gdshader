@@ -10,6 +10,17 @@ float rand_1_05(vec2 uv) {
   return abs(noise) * 0.7;
 }
 
+void vertex() {
+  // Inflate the tube outward using radius from CUSTOM0.z
+  float radius = 0.01; // Small default
+
+  #ifdef CUSTOM0
+  radius = CUSTOM0.z;
+  #endif
+
+  VERTEX += NORMAL * 1.5 * radius;
+}
+
 void fragment() {
   float u_scale = u_Speed;
   // Unity's _Time.y = time
