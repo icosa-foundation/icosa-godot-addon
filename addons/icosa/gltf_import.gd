@@ -184,9 +184,17 @@ func _find_matching_brush_material(material_name: String) -> Material:
 
 	# Handle "material_<GUID>" format - look up GUID in name mapping
 	if material_name.begins_with("material_"):
-		var guid = material_name.substr(9)  # Remove "material_" prefix
-		if name_mapping.has(guid):
-			material_name = name_mapping[guid]
+		# Distinguish "material_<name>-<GUID>" from "material_<GUID>"
+		# Count dashes to help identify the GUID
+		var rest = material_name.substr(9)
+		var dash_count = rest.count("-")
+		if dash_count >= 4:
+			# Likely a GUID (with or without a name prefix)
+			var dash_index = rest.find("-")
+			var guid = rest.substr(dash_index + 1)
+		else:
+			# Handle unexpected format
+			var guid = rest
 	# Remove other prefixes if present
 	elif material_name.begins_with("brush_"):
 		material_name = material_name.substr(6, material_name.length() - 6)
