@@ -30,7 +30,7 @@ func search(query):
 
 func build_query(keywords):
 	var query = "?"
-	return query + "keywords=" + keywords
+	return query + "orderBy=BEST&license=REMIXABLE&" + "keywords=" + keywords
 
 func on_search(result : int, response_code : int, headers : PackedStringArray, body : PackedByteArray):
 	#match response_code:
