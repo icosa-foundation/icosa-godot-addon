@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, blend_mix, cull_disabled;
+render_mode unshaded, blend_add, cull_disabled;
 
 #include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
 

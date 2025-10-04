@@ -1,69 +1,73 @@
 shader_type spatial;
-render_mode blend_mix, cull_back;
+render_mode blend_add, cull_back;
 
-// Include shared functions
-#include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
-#include "res://addons/icosa/brush_materials/_includes/normal_map.gdshaderinc"
 #include "res://addons/icosa/brush_materials/_includes/surface_shader.gdshaderinc"
 
-// Material properties
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
-uniform vec3 u_SpecColor : source_color = vec3(0.235);
-uniform float u_Shininess : hint_range(0.0, 1.0) = 0.4;
-uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
+uniform vec3 u_SpecColor : source_color = vec3(0.05);
+uniform float u_Shininess : hint_range(0.0, 1.0) = 0.8;
+uniform float u_EmissionGain : hint_range(0.0, 1.0) = 0.5;
 
-// Lighting
 global uniform vec4 u_ambient_light_color;
 global uniform vec4 u_SceneLight_0_color;
 global uniform vec4 u_SceneLight_1_color;
 global uniform vec3 u_SceneLight_0_direction;
 global uniform vec3 u_SceneLight_1_direction;
 
-// Varyings
 varying vec3 v_view_position;
 varying vec3 v_view_normal;
-varying float v_fog_coord;
 
 void vertex() {
-  // Transform to view space for lighting calculations
   v_view_position = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
   v_view_normal = normalize((MODELVIEW_MATRIX * vec4(NORMAL, 0.0)).xyz);
-  v_fog_coord = v_view_position.z;
+}
+
+vec4 bloom_color(vec4 color, float gain) {
+  color = pow(color, vec4(2.2));
+  color.rgb *= 80.0 * exp(gain * 10.0);
+  return color;
 }
 
 void fragment() {
-  // Sample textures
-  vec4 tex_color = texture(u_MainTex, UV);
-  float brush_mask = tex_color.a * COLOR.a;
-
-  // Alpha cutoff
-  if (brush_mask <= u_Cutoff) {
-    discard;
+  vec3 normal = normalize(v_view_normal);
+  if (!FRONT_FACING) {
+    normal *= -1.0;
   }
 
-  // Compute perturbed normal
-  vec3 perturbed_normal = perturb_normal(v_view_position, v_view_normal, UV, 0.0015, FRONT_FACING);
-
-  // Always use front-facing normal for double-sided
-  perturbed_normal.z *= mix(-1.0, 1.0, float(FRONT_FACING));
-
-  // Lighting
   vec3 eye_dir = -normalize(v_view_position);
   vec3 light_dir_0 = normalize(u_SceneLight_0_direction);
   vec3 light_dir_1 = normalize(u_SceneLight_1_direction);
 
+  // Specular lighting only (no diffuse)
+  vec3 diffuse = vec3(0.0);
+  vec3 spec = u_SpecColor;
+
   vec3 light_0 = surface_shader_specular_gloss(
-    perturbed_normal, light_dir_0, eye_dir,
-    u_SceneLight_0_color.rgb, COLOR.rgb, u_SpecColor, u_Shininess);
+    normal, light_dir_0, eye_dir,
+    u_SceneLight_0_color.rgb, diffuse, spec, u_Shininess);
 
   vec3 light_1 = sh_shader_with_spec(
-    perturbed_normal, light_dir_1,
-    u_SceneLight_1_color.rgb, COLOR.rgb, u_SpecColor);
+    normal, light_dir_1,
+    u_SceneLight_1_color.rgb, diffuse, spec);
 
-  vec3 ambient = COLOR.rgb * u_ambient_light_color.rgb;
+  // Neon pulse animation
+  // Unity's _Time.x = time/20, so we need TIME/20.0 in Godot
+  float time_x = TIME / 20.0;
 
-  vec3 final_color = light_0 + light_1 + ambient;
-  final_color = apply_fog(final_color, v_fog_coord);
+  vec2 uv = UV;
+  uv.x -= time_x * 15.0;
+  uv.x = mod(abs(uv.x), 1.0);
+  float neon = pow(10.0 * clamp(0.2 - uv.x, 0.0, 1.0), 5.0);
+  neon = clamp(neon, 0.0, 1.0);
+
+  vec4 bloom = bloom_color(COLOR, u_EmissionGain);
+
+  // Fresnel-like term
+  float NdotV = abs(dot(normal, eye_dir));
+  bloom *= pow(NdotV, 2.0);
+  bloom *= NdotV;
+
+  vec3 final_color = light_0 + light_1 + neon * bloom.rgb;
 
   ALBEDO = final_color;
   ALPHA = 1.0;

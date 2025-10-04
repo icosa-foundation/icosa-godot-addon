@@ -10,4 +10,3 @@ shader = ExtResource("1")
 shader_parameter/u_fogColor = Color(1, 1, 1, 1)
 shader_parameter/u_fogDensity = 0.0
 shader_parameter/u_MainTex = ExtResource("2_qmmao")
-shader_parameter/u_Cutoff = 0.5

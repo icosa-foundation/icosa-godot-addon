@@ -1,28 +1,44 @@
 shader_type spatial;
-render_mode unshaded, blend_mix, cull_disabled;
+render_mode unshaded, blend_add, cull_disabled;
 
-#include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
+uniform float u_Opacity : hint_range(0.0, 1.0) = 1.0;
 
-uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
-uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
+// From ColorSpace.cginc - hue06_to_base_rgb function
+vec3 hue06_to_base_rgb(float hue06) {
+  float r = -1.0 + abs(hue06 - 3.0);
+  float g = 2.0 - abs(hue06 - 2.0);
+  float b = 2.0 - abs(hue06 - 4.0);
+  return clamp(vec3(r, g, b), 0.0, 1.0);
+}
 
-varying float v_fog_coord;
-
-void vertex() {
-  v_fog_coord = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).z;
+// From ColorSpace.cginc - cy_to_rgb function
+vec3 cy_to_rgb(vec3 base_rgb, float chroma, float luma) {
+  vec3 g_max_luma = vec3(0.299, 0.587, 0.114);
+  float rgb_luma = dot(base_rgb, g_max_luma);
+  if (luma < rgb_luma) {
+    chroma *= luma / rgb_luma;
+  } else if (luma < 1.0) {
+    chroma *= (1.0 - luma) / (1.0 - rgb_luma);
+  }
+  return (base_rgb - rgb_luma) * chroma + luma;
 }
 
 void fragment() {
-  vec4 tex_color = texture(u_MainTex, UV);
-  float brush_mask = tex_color.a * COLOR.a;
+  // Slice uses CUSTOM0 for color space data: (chroma, luma, hue_position)
+  // If CUSTOM0 not available, fallback to UV-based calculation
+  vec3 color_data = vec3(UV.x, UV.y, UV.x);
 
-  if (brush_mask <= u_Cutoff) {
-    discard;
-  }
+  #ifdef CUSTOM0
+  color_data = CUSTOM0.xyz;
+  #endif
 
-  vec3 final_color = tex_color.rgb * COLOR.rgb;
-  final_color = apply_fog(final_color, v_fog_coord);
+  // Calculate hue: mod(z * 5, 6)
+  float hue = mod(color_data.z * 5.0, 6.0);
+  vec3 base_rgb = hue06_to_base_rgb(hue);
 
-  ALBEDO = final_color;
-  ALPHA = 1.0;
+  // cy_to_rgb(base_rgb, chroma, luma)
+  vec3 finalColor = cy_to_rgb(base_rgb, color_data.x, color_data.y);
+
+  ALBEDO = clamp(finalColor, 0.0, 1.0);
+  ALPHA = u_Opacity;
 }

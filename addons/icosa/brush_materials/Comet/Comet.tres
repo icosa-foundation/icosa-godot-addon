@@ -1,13 +1,14 @@
-[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://dnux20k62qfbn"]
+[gd_resource type="ShaderMaterial" load_steps=4 format=3 uid="uid://dnux20k62qfbn"]
 
 [ext_resource type="Shader" uid="uid://btiw65xhr71l2" path="res://addons/icosa/brush_materials/Comet/Comet.gdshader" id="1"]
 [ext_resource type="Texture2D" uid="uid://bhctdaiubx2w1" path="res://addons/icosa/brush_materials/Comet/Comet-1caa6d7d-f015-3f54-3a4b-8b5354d39f81-v10.0-MainTex.png" id="2_gm0ph"]
+[ext_resource type="Texture2D" uid="uid://b3ur1pqkp7e6k" path="res://addons/icosa/brush_materials/Comet/Comet-1caa6d7d-f015-3f54-3a4b-8b5354d39f81-v10.0-AlphaMask.png" id="2_q80gb"]
 
 [resource]
 resource_name = "Comet"
 render_priority = 0
 shader = ExtResource("1")
-shader_parameter/u_fogColor = Color(1, 1, 1, 1)
-shader_parameter/u_fogDensity = 0.0
 shader_parameter/u_MainTex = ExtResource("2_gm0ph")
-shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_AlphaMask = ExtResource("2_q80gb")
+shader_parameter/u_Speed = 1.0
+shader_parameter/u_EmissionGain = 0.5

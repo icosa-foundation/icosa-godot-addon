@@ -1,70 +1,60 @@
 shader_type spatial;
-render_mode blend_mix, cull_back;
+render_mode blend_add, cull_back;
 
-// Include shared functions
 #include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
-#include "res://addons/icosa/brush_materials/_includes/normal_map.gdshaderinc"
-#include "res://addons/icosa/brush_materials/_includes/surface_shader.gdshaderinc"
 
-// Material properties
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
-uniform vec3 u_SpecColor : source_color = vec3(0.235);
-uniform float u_Shininess : hint_range(0.0, 1.0) = 0.4;
+uniform vec3 u_SpecColor : source_color = vec3(0.6);
+uniform float u_Shininess : hint_range(0.0, 1.0) = 0.9;
 uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
 
-// Lighting
 global uniform vec4 u_ambient_light_color;
 global uniform vec4 u_SceneLight_0_color;
 global uniform vec4 u_SceneLight_1_color;
 global uniform vec3 u_SceneLight_0_direction;
 global uniform vec3 u_SceneLight_1_direction;
 
-// Varyings
 varying vec3 v_view_position;
 varying vec3 v_view_normal;
 varying float v_fog_coord;
 
 void vertex() {
-  // Transform to view space for lighting calculations
   v_view_position = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
   v_view_normal = normalize((MODELVIEW_MATRIX * vec4(NORMAL, 0.0)).xyz);
   v_fog_coord = v_view_position.z;
 }
 
 void fragment() {
-  // Sample textures
-  vec4 tex_color = texture(u_MainTex, UV);
-  float brush_mask = tex_color.a * COLOR.a;
+  vec3 normal = normalize(v_view_normal);
+  vec3 view_dir = normalize(-v_view_position);
 
-  // Alpha cutoff
-  if (brush_mask <= u_Cutoff) {
-    discard;
-  }
+  // Hardcode shiny specular values for bubble effect
+  float smoothness = 0.9;
+  vec3 specular_color = 0.6 * COLOR.rgb;
 
-  // Compute perturbed normal
-  vec3 perturbed_normal = perturb_normal(v_view_position, v_view_normal, UV, 0.0015, FRONT_FACING);
+  // Calculate rim effect
+  float rim = 1.0 - abs(dot(view_dir, normal));
+  rim *= 1.0 - pow(rim, 5.0);
 
-  // Always use front-facing normal for double-sided
-  perturbed_normal.z *= mix(-1.0, 1.0, float(FRONT_FACING));
+  // Unity's _Time.x = time/20, so we need TIME/20.0 in Godot
+  float time_x = TIME / 20.0;
 
-  // Lighting
-  vec3 eye_dir = -normalize(v_view_position);
+  // Thin slit diffraction texture ramp lookup
+  vec3 diffraction = texture(u_MainTex, vec2(rim + time_x + normal.y, rim + normal.y)).xyz;
+  vec3 emission = rim * (0.25 * diffraction * rim + 0.75 * diffraction * COLOR.rgb);
+
+  // Apply specular lighting from main light
   vec3 light_dir_0 = normalize(u_SceneLight_0_direction);
-  vec3 light_dir_1 = normalize(u_SceneLight_1_direction);
+  vec3 half_vector = normalize(light_dir_0 + view_dir);
+  float NdotH = max(dot(normal, half_vector), 0.0);
+  float specular = pow(NdotH, smoothness * 128.0);
 
-  vec3 light_0 = surface_shader_specular_gloss(
-    perturbed_normal, light_dir_0, eye_dir,
-    u_SceneLight_0_color.rgb, COLOR.rgb, u_SpecColor, u_Shininess);
+  vec3 color = emission;
+  color += specular_color * specular * u_SceneLight_0_color.rgb;
+  color += COLOR.rgb * u_ambient_light_color.rgb * 0.1;
 
-  vec3 light_1 = sh_shader_with_spec(
-    perturbed_normal, light_dir_1,
-    u_SceneLight_1_color.rgb, COLOR.rgb, u_SpecColor);
-
-  vec3 ambient = COLOR.rgb * u_ambient_light_color.rgb;
-
-  vec3 final_color = light_0 + light_1 + ambient;
-  final_color = apply_fog(final_color, v_fog_coord);
+  vec3 final_color = apply_fog(color, v_fog_coord);
 
   ALBEDO = final_color;
-  ALPHA = 1.0;
+  ALPHA = COLOR.a;
 }

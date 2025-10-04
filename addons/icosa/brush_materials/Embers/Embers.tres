@@ -7,7 +7,9 @@
 resource_name = "Embers"
 render_priority = 0
 shader = ExtResource("1")
-shader_parameter/u_fogColor = Color(1, 1, 1, 1)
-shader_parameter/u_fogDensity = 0.0
 shader_parameter/u_MainTex = ExtResource("2_w2uab")
-shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_TintColor = Color(1, 1, 1, 1)
+shader_parameter/u_ScrollRate = 0.3
+shader_parameter/u_ScrollDistance = Vector3(0, 3, 0)
+shader_parameter/u_ScrollJitterIntensity = 1.0
+shader_parameter/u_ScrollJitterFrequency = 3.0

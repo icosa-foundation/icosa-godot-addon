@@ -7,7 +7,5 @@
 resource_name = "Waveform"
 render_priority = 0
 shader = ExtResource("1")
-shader_parameter/u_fogColor = Color(1, 1, 1, 1)
-shader_parameter/u_fogDensity = 0.0
 shader_parameter/u_MainTex = ExtResource("2_pq8kh")
-shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_EmissionGain = 0.5

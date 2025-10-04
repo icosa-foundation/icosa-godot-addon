@@ -1,27 +1,43 @@
 shader_type spatial;
-render_mode unshaded, blend_mix, cull_disabled;
-
-#include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
+render_mode unshaded, blend_add, depth_draw_opaque, cull_disabled;
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
-uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
-
-varying float v_fog_coord;
-
-void vertex() {
-  v_fog_coord = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).z;
-}
+uniform sampler2D u_AlphaMask : source_color, filter_linear_mipmap;
+uniform float u_Speed : hint_range(0.0, 5.0) = 1.0;
+uniform float u_EmissionGain : hint_range(0.0, 1.0) = 0.5;
 
 void fragment() {
-  vec4 tex_color = texture(u_MainTex, UV);
-  float brush_mask = tex_color.a * COLOR.a;
+  // Unity's _Time.y = time, so just use TIME
+  float time = TIME * -u_Speed;
 
-  if (brush_mask <= u_Cutoff) {
-    discard;
-  }
+  // Set up staggered scrolling for fire effect
+  vec2 scroll_uv = UV;
+  vec2 scroll_uv2 = UV;
+  vec2 scroll_uv3 = UV;
+  scroll_uv.y += time;
+  scroll_uv.x += time;
+  scroll_uv2.x += time * 1.5;
+  scroll_uv3.x += time * 0.5;
 
-  vec3 final_color = tex_color.rgb * COLOR.rgb;
-  final_color = apply_fog(final_color, v_fog_coord);
+  // Each channel has its own tileable pattern scrolling at different rates
+  float r = texture(u_MainTex, scroll_uv).r;
+  float g = texture(u_MainTex, scroll_uv2).g;
+  float b = texture(u_MainTex, scroll_uv3).b;
+
+  // Combine all channels
+  float gradient_lookup = (r + g + b) / 3.0;
+  // Rescale lookup value along stroke
+  gradient_lookup *= (1.0 - UV.x);
+  gradient_lookup = (pow(gradient_lookup, 2.0) + 0.125) * 3.0;
+
+  // Falloff at start of stroke
+  float falloff = max((0.2 - UV.x) * 5.0, 0.0);
+
+  // Sample gradient texture
+  float u = clamp(gradient_lookup + falloff, 0.0, 1.0);
+  vec4 tex = texture(u_AlphaMask, vec2(u, 0.0));
+
+  vec3 final_color = (tex * COLOR).rgb;
 
   ALBEDO = final_color;
   ALPHA = 1.0;
