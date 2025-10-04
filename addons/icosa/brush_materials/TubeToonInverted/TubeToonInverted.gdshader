@@ -1,28 +1,21 @@
+// TubeToonInverted - Pass 1: Black front faces (cull_back)
 shader_type spatial;
-render_mode unshaded, blend_mix, cull_disabled;
+render_mode unshaded, blend_mix, cull_back;
 
-#include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
-
-uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
-uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
-
-varying float v_fog_coord;
+varying vec3 v_world_normal;
 
 void vertex() {
-  v_fog_coord = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).z;
+  v_world_normal = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
 }
 
 void fragment() {
-  vec4 tex_color = texture(u_MainTex, UV);
-  float brush_mask = tex_color.a * COLOR.a;
+  vec4 color = COLOR;
 
-  if (brush_mask <= u_Cutoff) {
-    discard;
-  }
+  // Add normal-based lighting
+  color.xyz += v_world_normal.y * 0.2;
+  color.a = 1.0;
 
-  vec3 final_color = tex_color.rgb * COLOR.rgb;
-  final_color = apply_fog(final_color, v_fog_coord);
-
-  ALBEDO = final_color;
+  // Front faces are black
+  ALBEDO = vec3(0.0, 0.0, 0.0);
   ALPHA = 1.0;
 }

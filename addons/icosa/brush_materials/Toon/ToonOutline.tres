@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://bmrtd488fnt5m"]
+
+[ext_resource type="Shader" uid="uid://1fduy4dxblij" path="res://addons/icosa/brush_materials/Toon/ToonOutline.gdshader" id="1"]
+
+[resource]
+resource_name = "ToonOutline"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_OutlineMax = 0.005
