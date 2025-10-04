@@ -14,16 +14,14 @@ void vertex() {
 }
 
 void fragment() {
-  vec4 tex_color = texture(u_MainTex, UV);
-  float brush_mask = tex_color.a * COLOR.a;
+  // Alpha-only texture (use .w channel)
+  float brush_mask = texture(u_MainTex, UV).a;
+  brush_mask *= COLOR.a;
 
   if (brush_mask <= u_Cutoff) {
     discard;
   }
 
-  vec3 final_color = tex_color.rgb * COLOR.rgb;
-  final_color = apply_fog(final_color, v_fog_coord);
-
-  ALBEDO = final_color;
-  ALPHA = tex_color.a * u_Opacity;
+  ALBEDO = COLOR.rgb;
+  ALPHA = 1.0;
 }
