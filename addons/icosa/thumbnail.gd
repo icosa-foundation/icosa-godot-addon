@@ -52,9 +52,11 @@ func _ready():
 			push_error("An error occurred in the HTTP request.")
 	
 	
-func thumbnail_request_completed(result, response_code, headers, body):
+func thumbnail_request_completed(result, response_code, headers, body : PackedByteArray):
 	if result != HTTPRequest.RESULT_SUCCESS:
 		push_error("Image couldn't be downloaded. Try a different image.")
+	## TODO: Error spam happens here when response is not an image.
+	
 	var image = Image.new()
 	var error = image.load_png_from_buffer(body)
 	if error != OK:

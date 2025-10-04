@@ -19,20 +19,206 @@ theme_override_font_sizes/font_size = 22
 placeholder_text = "Search for assets..."
 right_icon = ExtResource("2_ottfe")
 
-[node name="Gallery" type="PanelContainer" parent="."]
+[node name="Split" type="HSplitContainer" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Scroll" type="ScrollContainer" parent="Gallery"]
+[node name="Gallery" type="PanelContainer" parent="Split"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Scroll" type="ScrollContainer" parent="Split/Gallery"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Assets" type="FlowContainer" parent="Gallery/Scroll"]
+[node name="Assets" type="FlowContainer" parent="Split/Gallery/Scroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 1
 
+[node name="MarginContainer" type="MarginContainer" parent="Split"]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Split/MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Split/MarginContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="Title" type="PanelContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Split/MarginContainer/PanelContainer/VBoxContainer/Title"]
+layout_mode = 2
+text = "Search"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PanelContainer3" type="PanelContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer3/MarginContainer"]
+layout_mode = 2
+
+[node name="Title" type="PanelContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer3/MarginContainer/VBoxContainer2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer3/MarginContainer/VBoxContainer2/Title"]
+layout_mode = 2
+text = "Asset"
+horizontal_alignment = 1
+
+[node name="AuthorName" type="LineEdit" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer3/MarginContainer/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Author name.."
+
+[node name="DisplayName" type="LineEdit" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer3/MarginContainer/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Asset Name.."
+
+[node name="PanelContainer2" type="PanelContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3"]
+layout_mode = 2
+
+[node name="MarginContainer2" type="MarginContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer2"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer2/MarginContainer2"]
+layout_mode = 2
+
+[node name="Title" type="PanelContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer2/MarginContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer2/MarginContainer2/VBoxContainer/Title"]
+layout_mode = 2
+text = "Filters"
+horizontal_alignment = 1
+
+[node name="Curated" type="CheckBox" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer2/MarginContainer2/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+text = "curated"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer2/MarginContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer2/MarginContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "order: "
+clip_text = true
+
+[node name="OrderBy" type="OptionButton" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer2/MarginContainer2/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+item_count = 1
+popup/item_0/text = "order by..."
+popup/item_0/id = 0
+popup/item_0/disabled = true
+popup/item_0/separator = true
+
+[node name="PanelContainer" type="PanelContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3"]
+layout_mode = 2
+
+[node name="MarginContainer3" type="MarginContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer/MarginContainer3"]
+layout_mode = 2
+
+[node name="Title" type="PanelContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer/MarginContainer3/VBoxContainer3"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer/MarginContainer3/VBoxContainer3/Title"]
+layout_mode = 2
+text = "Formats"
+horizontal_alignment = 1
+
+[node name="GLTF" type="CheckBox" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer/MarginContainer3/VBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+text = "GLTF"
+
+[node name="OBJ" type="CheckBox" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer/MarginContainer3/VBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "OBJ"
+
+[node name="FBX" type="CheckBox" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer/MarginContainer3/VBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "FBX"
+
+[node name="TILT" type="CheckBox" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer/MarginContainer3/VBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "TILT"
+
+[node name="PanelContainer4" type="PanelContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3"]
+layout_mode = 2
+
+[node name="MarginContainer3" type="MarginContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer4"]
+layout_mode = 2
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer4/MarginContainer3"]
+layout_mode = 2
+
+[node name="Title" type="PanelContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer4/MarginContainer3/VBoxContainer3"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer4/MarginContainer3/VBoxContainer3/Title"]
+layout_mode = 2
+text = "License"
+horizontal_alignment = 1
+
+[node name="REMIXABLE" type="CheckBox" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer4/MarginContainer3/VBoxContainer3"]
+layout_mode = 2
+button_pressed = true
+text = "Remixable"
+
+[node name="CC0" type="CheckBox" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer4/MarginContainer3/VBoxContainer3"]
+layout_mode = 2
+text = "CC0"
+
+[node name="CCBY" type="CheckBox" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer4/MarginContainer3/VBoxContainer3"]
+layout_mode = 2
+text = "CC BY"
+
+[node name="ALL_CC" type="CheckBox" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer4/MarginContainer3/VBoxContainer3"]
+layout_mode = 2
+text = "CC BY"
+
+[connection signal="text_changed" from="Keywords" to="." method="_on_keywords_text_changed"]
 [connection signal="text_submitted" from="Keywords" to="." method="_on_keywords_text_submitted"]
+[connection signal="text_submitted" from="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer3/MarginContainer/VBoxContainer2/AuthorName" to="." method="_on_author_name_text_submitted"]
+[connection signal="text_submitted" from="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer3/MarginContainer/VBoxContainer2/DisplayName" to="." method="_on_display_name_text_submitted"]
+[connection signal="toggled" from="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer2/MarginContainer2/VBoxContainer/Curated" to="." method="_on_curated_toggled"]
+[connection signal="item_selected" from="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer2/MarginContainer2/VBoxContainer/HBoxContainer/OrderBy" to="." method="_on_order_by_item_selected"]
+[connection signal="toggled" from="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer/MarginContainer3/VBoxContainer3/GLTF" to="." method="_on_gltf_toggled"]
+[connection signal="toggled" from="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer/MarginContainer3/VBoxContainer3/OBJ" to="." method="_on_obj_toggled"]
+[connection signal="toggled" from="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer/MarginContainer3/VBoxContainer3/FBX" to="." method="_on_fbx_toggled"]
+[connection signal="toggled" from="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer/MarginContainer3/VBoxContainer3/TILT" to="." method="_on_tilt_toggled"]
+[connection signal="toggled" from="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer4/MarginContainer3/VBoxContainer3/REMIXABLE" to="." method="_on_remixable_toggled"]
+[connection signal="toggled" from="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer4/MarginContainer3/VBoxContainer3/CC0" to="." method="_on_cc_0_toggled"]
+[connection signal="toggled" from="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer4/MarginContainer3/VBoxContainer3/CCBY" to="." method="_on_cc_by_toggled"]
+[connection signal="toggled" from="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer4/MarginContainer3/VBoxContainer3/ALL_CC" to="." method="_on_all_cc_toggled"]
