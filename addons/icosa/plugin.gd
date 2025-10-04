@@ -4,10 +4,13 @@ func _get_plugin_name(): return "Icosa Gallery"
 func _get_plugin_icon(): return EditorInterface.get_editor_theme().get_icon("GridMap", "EditorIcons") #return load("res://addons/icosa-gallery/logo/logo_tiny.png")
 const MainPanel = preload("res://addons/icosa/browser.tscn")
 const LightSync = preload("res://addons/icosa/icosa_light_sync.gd")
+const FixOriginTool = preload("res://addons/icosa/fix_origin.gd")
 var main_panel_instance
 
 var gltf : IcosaGLTF
 var light_sync_instance
+var fix_origin_tool : IcosaFixOriginTool
+var fix_origin_button : Button
 
 
 func _enter_tree():
@@ -16,6 +19,8 @@ func _enter_tree():
 	gltf = IcosaGLTF.new()
 	GLTFDocument.register_gltf_document_extension(gltf)
 	main_panel_instance.visible = false
+
+	fix_origin_tool = FixOriginTool.new()
 
 	var settings = EditorInterface.get_editor_settings()
 	settings.set_setting("docks/filesystem/other_file_extensions", "ico,icns,bin")
@@ -27,6 +32,14 @@ func _enter_tree():
 	light_sync_instance = LightSync.new()
 	add_child(light_sync_instance)
 
+	fix_origin_button = Button.new()
+	fix_origin_button.text = "Fix Origin"
+	fix_origin_button.tooltip_text = "Wrap selected MeshInstance3D and recenter its pivot."
+	fix_origin_button.pressed.connect(_on_fix_origin)
+	add_control_to_container(CONTAINER_SPATIAL_EDITOR_MENU, fix_origin_button)
+
+	add_tool_menu_item("Icosa/Fix Selected Mesh Origin", Callable(self, "_on_fix_origin"))
+
 
 func _exit_tree():
 	if main_panel_instance:
@@ -37,11 +50,24 @@ func _exit_tree():
 	if light_sync_instance:
 		light_sync_instance.queue_free()
 
+	remove_tool_menu_item("Icosa/Fix Selected Mesh Origin")
+	if fix_origin_button:
+		if fix_origin_button.pressed.is_connected(_on_fix_origin):
+			fix_origin_button.pressed.disconnect(_on_fix_origin)
+		remove_control_from_container(CONTAINER_SPATIAL_EDITOR_MENU, fix_origin_button)
+		fix_origin_button.queue_free()
+		fix_origin_button = null
+	fix_origin_tool = null
+
 	# Remove global shader parameters
 	_unregister_global_shader_parameters()
 
 	var settings = EditorInterface.get_editor_settings()
 	settings.set_setting("docks/filesystem/other_file_extensions", "ico,icns")
+
+func _on_fix_origin():
+	if fix_origin_tool:
+		fix_origin_tool.run_for_selection(get_editor_interface())
 
 func _has_main_screen():
 	return true
