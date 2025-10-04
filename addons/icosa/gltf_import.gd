@@ -11,7 +11,10 @@ var name_mapping = {}
 func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> Error:
 ## written by aaronfranke. thank you!
 	# HACK: This is workaround for an issue fixed in Godot 4.5.
-	var gltf_json: Dictionary = gltf_state.json
+	var gltf_json_variant := gltf_state.json
+	if not (gltf_json_variant is Dictionary):
+		return OK
+	var gltf_json: Dictionary = gltf_json_variant
 
 	# Clear texture/image references early to prevent loading errors (we'll use brush materials instead)
 	if gltf_json.has("images"):
@@ -21,6 +24,8 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 	# Also clear material texture references
 	if gltf_json.has("materials"):
 		for material in gltf_json["materials"]:
+			if not material is Dictionary:
+				continue
 			if material.has("pbrMetallicRoughness"):
 				var pbr = material["pbrMetallicRoughness"]
 				pbr.erase("baseColorTexture")
@@ -34,7 +39,9 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 
 	if not gltf_json.has("bufferViews"):
 		return OK
-	var buffer_views: Array = gltf_json["bufferViews"]
+	var buffer_views = gltf_json["bufferViews"]
+	if not buffer_views is Array:
+		return OK
 	for i in range(buffer_views.size()):
 		var buffer_view_dict: Dictionary = buffer_views[i]
 		if not buffer_view_dict.has("byteStride"):
@@ -46,7 +53,7 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 			buffer_view_dict.erase("byteStride")
 
 	## check for uneeded lights and cameras.
-	if  "GOOGLE_camera_settings" or "GOOGLE_backgrounds" in extensions:
+	if "GOOGLE_camera_settings" in extensions or "GOOGLE_backgrounds" in extensions:
 		has_google_extensions = true
 	
 	
@@ -54,19 +61,24 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 	
 	
 	## aaronfranke patch #2, removing meshes (only for specific Obj2Gltf files)
-	var asset = gltf_state.json.get("asset")
+	var asset = gltf_json.get("asset")
 	if asset is Dictionary and asset.get("generator") == "Obj2GltfConverter":
-		var meshes = gltf_state.json.get("meshes")
+		var meshes = gltf_json.get("meshes")
 		if meshes is Array and meshes.size() == 1:
 			if extensions.has("GOOGLE_backgrounds") and extensions.has("GOOGLE_camera_settings"):
-				var ext_used: Array = gltf_state.json["extensionsUsed"]
+				var ext_used: Array = gltf_json["extensionsUsed"]
 				ext_used.append("GODOT_single_root")
 
 	return OK
 
 func _import_post_parse(gltf_state: GLTFState) -> Error:
 	# Only do the node replacement for specific Obj2GltfConverter files
-	var asset = gltf_state.json.get("asset")
+	var gltf_json_variant := gltf_state.json
+	if not (gltf_json_variant is Dictionary):
+		return OK
+	var gltf_json: Dictionary = gltf_json_variant
+
+	var asset = gltf_json.get("asset")
 	if asset is Dictionary and asset.get("generator") == "Obj2GltfConverter":
 		var mesh_node := GLTFNode.new()
 		mesh_node.original_name = gltf_state.filename
