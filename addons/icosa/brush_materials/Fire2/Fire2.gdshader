@@ -1,47 +1,55 @@
 shader_type spatial;
 render_mode unshaded, blend_add, depth_draw_opaque, cull_disabled;
 
-// Fire2 shader - Animated fire particles with scrolling UVs and displacement
-// Based on Fire2-53d753ef-083c-45e1-98e7-4459b4471219
-
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform sampler2D u_DisplaceTex : source_color, filter_linear_mipmap;
-uniform float u_EmissionGain : hint_range(0.0, 2.0) = 0.405;
 uniform float u_Scroll1 : hint_range(0.0, 30.0) = 15.0;
-uniform float u_Scroll2 : hint_range(0.0, 30.0) = 0.0;
+uniform float u_Scroll2 : hint_range(0.0, 30.0) = 2.5;
 uniform float u_DisplacementIntensity : hint_range(0.0, 1.0) = 0.04;
-
-vec4 bloom_color(vec4 color, float gain) {
-  // Guarantee that there's at least a little bit of all 3 channels.
-  // This makes fully-saturated strokes (which only have 2 non-zero
-  // color channels) eventually clip to white rather than to a secondary.
-  float cmin = length(color.rgb) * 0.05;
-  color.rgb = max(color.rgb, vec3(cmin, cmin, cmin));
-  // If we try to remove this pow() from .a, it brightens up
-  // pressure-sensitive strokes; looks better as-is.
-  color.r = pow(color.r, 2.2);
-  color.g = pow(color.g, 2.2);
-  color.b = pow(color.b, 2.2);
-  color.a = pow(color.a, 2.2);
-  color.rgb *= 2.0 * exp(gain * 10.0);
-  return color;
-}
+uniform float u_FlameFadeMin : hint_range(0.0, 10.0) = 5.0;
+uniform float u_FlameFadeMax : hint_range(0.0, 10.0) = 5.0;
 
 void fragment() {
-  // Bloom the vertex color with emission gain
-  vec4 bloomed_color = bloom_color(COLOR, u_EmissionGain);
-
   // Unity's _Time.x = time/20, so we need TIME/20.0 in Godot
   float time_x = TIME / 20.0;
 
-  // Animated scrolling displacement
-  float displacement = texture(u_DisplaceTex, UV + vec2(-time_x * u_Scroll1, 0.0)).a;
+  vec2 displacement;
+  float flame_fade_mix = 0.0;
 
-  // Sample main texture with scrolling and displacement
-  vec4 tex = texture(u_MainTex, UV + vec2(-time_x * u_Scroll2, 0.0) - displacement * u_DisplacementIntensity);
+  // Sample displacement texture
+  displacement = texture(u_DisplaceTex, UV).xy;
+  displacement = displacement * 2.0 - 1.0;
+  displacement *= u_DisplacementIntensity;
 
-  vec4 final_color = bloomed_color * tex;
+  // Sample mask from MainTex y channel
+  float mask = texture(u_MainTex, UV).y;
 
-  ALBEDO = final_color.rgb * final_color.a * 5.0;
-  ALPHA = tex.a;
+  // Apply displacement to UV coordinates
+  vec2 uv = UV;
+  uv += displacement;
+
+  // Sample flame textures with scrolling animation
+  float flame1 = texture(u_MainTex, uv * 0.7 + vec2(-time_x * u_Scroll1, 0.0)).x;
+  float flame2 = texture(u_MainTex, vec2(uv.x, 1.0 - uv.y) + vec2(-time_x * u_Scroll2, -time_x * u_Scroll2 / 4.0)).x;
+
+  // Combine flames
+  float flames = clamp((flame2 + flame1) / 2.0, 0.0, 1.0);
+  flames = smoothstep(0.0, 0.8, mask * flames);
+  flames *= mask;
+
+  // Create flame texture
+  vec4 tex = vec4(flames, flames, flames, 1.0);
+  float flame_fade = mix(u_FlameFadeMin, u_FlameFadeMax, flame_fade_mix);
+
+  // Apply flame fade along stroke
+  tex.xyz *= pow(1.0 - UV.x, flame_fade) * (flame_fade * 2.0);
+
+  // Final color calculation
+  vec4 color = COLOR * tex;
+
+  // Boost brightness
+  color.rgb *= color.a * 15.0;
+
+  ALBEDO = color.rgb;
+  ALPHA = 1.0;
 }

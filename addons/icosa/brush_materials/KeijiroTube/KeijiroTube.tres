@@ -1,10 +1,14 @@
-[gd_resource type="ShaderMaterial" format=3]
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://dmyf5gprivmie"]
 
-[ext_resource type="Shader" path="res://addons/icosa/brush_materials/KeijiroTube/KeijiroTube.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://beop36hhvv118" path="res://addons/icosa/brush_materials/KeijiroTube/KeijiroTube.gdshader" id="1"]
 
 [resource]
 resource_name = "KeijiroTube"
-blend_mode = 0
+render_priority = 0
 shader = ExtResource("1")
-shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_BumpMap_TexelSize = Vector4(1, 1, 512, 512)
+shader_parameter/u_SpecColor = Color(0.2, 0.2, 0.2, 1)
 shader_parameter/u_Shininess = 0.4
+shader_parameter/u_Cutoff = 0.5

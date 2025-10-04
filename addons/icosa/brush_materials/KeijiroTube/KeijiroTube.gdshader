@@ -21,9 +21,22 @@ varying vec3 v_view_normal;
 varying float v_fog_coord;
 
 void vertex() {
-  v_view_position = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
+  vec3 pos = VERTEX;
+
+  // Wave animation - requires CUSTOM0.z for radius
+  #ifdef CUSTOM0
+  float radius = CUSTOM0.z;
+  // Unity's _Time.z = time*2, so we need TIME*2.0 in Godot
+  float wave = sin(UV.x - TIME * 2.0);
+  float pulse = smoothstep(0.45, 0.5, clamp(wave, 0.0, 1.0));
+  pos -= pulse * radius * NORMAL;
+  #endif
+
+  v_view_position = (MODELVIEW_MATRIX * vec4(pos, 1.0)).xyz;
   v_view_normal = normalize((MODELVIEW_MATRIX * vec4(NORMAL, 0.0)).xyz);
   v_fog_coord = v_view_position.z;
+
+  VERTEX = pos;
 }
 
 void fragment() {

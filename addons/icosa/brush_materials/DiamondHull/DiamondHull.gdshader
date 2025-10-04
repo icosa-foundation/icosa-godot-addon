@@ -44,8 +44,6 @@ float tp(float n1, float n2, float cosI, float cosT) {
 }
 
 float thinFilmReflectance(float cos0, float lambda, float thickness, float n0, float n1, float n2) {
-  float PI = 3.1415926536;
-
   // Phase change terms
   float d10 = mix(PI, 0.0, float(n1 > n0));
   float d12 = mix(PI, 0.0, float(n1 > n2));

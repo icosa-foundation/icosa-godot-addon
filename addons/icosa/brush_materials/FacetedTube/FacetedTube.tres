@@ -1,10 +1,14 @@
-[gd_resource type="ShaderMaterial" format=3]
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://64or3faowmt1"]
 
-[ext_resource type="Shader" path="res://addons/icosa/brush_materials/FacetedTube/FacetedTube.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://bq8sbq2cepobk" path="res://addons/icosa/brush_materials/FacetedTube/FacetedTube.gdshader" id="1"]
 
 [resource]
 resource_name = "FacetedTube"
-blend_mode = 0
+render_priority = 0
 shader = ExtResource("1")
-shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_BumpMap_TexelSize = Vector4(1, 1, 512, 512)
+shader_parameter/u_SpecColor = Color(0.235, 0.235, 0.235, 1)
 shader_parameter/u_Shininess = 0.4
+shader_parameter/u_Cutoff = 0.5
