@@ -29,7 +29,7 @@ class Search:
 	var keywords: String = ""
 	var curated: bool = true
 	var category: String = ""
-	var formats: Array[String] = ["GLTF", "-TILT"]
+	var formats: Array[String] = ["GLTF"]
 	var asset_name: String = ""
 	var description: String = ""
 	var tags: Array[String] = []
@@ -150,27 +150,27 @@ func _ready():
 	# Initialize the search object
 	current_search = Search.new()
 	
-	# Populate the OrderBy dropdown
+	# Populate the OrderBy dropdown with icons
 	%OrderBy.clear()
 	%OrderBy.add_item("Best", 0)
 	%OrderBy.add_item("Newest", 1)
 	%OrderBy.add_item("Oldest", 2)
-	%OrderBy.add_item("Create Time (Asc)", 3)
-	%OrderBy.add_item("Create Time (Desc)", 4)
-	%OrderBy.add_item("Update Time (Asc)", 5)
-	%OrderBy.add_item("Update Time (Desc)", 6)
-	%OrderBy.add_item("Triangle Count (Asc)", 7)
-	%OrderBy.add_item("Triangle Count (Desc)", 8)
-	%OrderBy.add_item("Liked Time (Asc)", 9)
-	%OrderBy.add_item("Liked Time (Desc)", 10)
-	%OrderBy.add_item("Likes (Asc)", 11)
-	%OrderBy.add_item("Likes (Desc)", 12)
-	%OrderBy.add_item("Downloads (Asc)", 13)
-	%OrderBy.add_item("Downloads (Desc)", 14)
-	%OrderBy.add_item("Display Name (Asc)", 15)
-	%OrderBy.add_item("Display Name (Desc)", 16)
-	%OrderBy.add_item("Author Name (Asc)", 17)
-	%OrderBy.add_item("Author Name (Desc)", 18)
+	%OrderBy.add_icon_item(up_icon, "Create Time", 3)
+	%OrderBy.add_icon_item(down_icon, "Create Time", 4)
+	%OrderBy.add_icon_item(up_icon, "Update Time", 5)
+	%OrderBy.add_icon_item(down_icon, "Update Time", 6)
+	%OrderBy.add_icon_item(up_icon, "Triangle Count", 7)
+	%OrderBy.add_icon_item(down_icon, "Triangle Count", 8)
+	%OrderBy.add_icon_item(up_icon, "Liked Time", 9)
+	%OrderBy.add_icon_item(down_icon, "Liked Time", 10)
+	%OrderBy.add_icon_item(up_icon, "Likes", 11)
+	%OrderBy.add_icon_item(down_icon, "Likes", 12)
+	%OrderBy.add_icon_item(up_icon, "Downloads", 13)
+	%OrderBy.add_icon_item(down_icon, "Downloads", 14)
+	%OrderBy.add_icon_item(up_icon, "Display Name", 15)
+	%OrderBy.add_icon_item(down_icon, "Display Name", 16)
+	%OrderBy.add_icon_item(up_icon, "Author Name", 17)
+	%OrderBy.add_icon_item(down_icon, "Author Name", 18)
 	
 	_on_keywords_text_submitted("")
 
