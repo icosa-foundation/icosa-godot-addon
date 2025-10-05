@@ -1,17 +1,20 @@
 @tool
 extends EditorPlugin
+
 func _get_plugin_name(): return "Icosa Gallery"
 func _get_plugin_icon(): return EditorInterface.get_editor_theme().get_icon("GridMap", "EditorIcons") #return load("res://addons/icosa-gallery/logo/logo_tiny.png")
+
 const MainPanel = preload("res://addons/icosa/browser.tscn")
 const LightSync = preload("res://addons/icosa/icosa_light_sync.gd")
 const FixOriginTool = preload("res://addons/icosa/fix_origin.gd")
-var main_panel_instance
 
+var main_panel_instance
 var gltf : IcosaGLTF
 var light_sync_instance
 var fix_origin_tool : IcosaFixOriginTool
+var origin_mode_button : MenuButton
 var fix_origin_button : Button
-
+var button_container : HBoxContainer
 
 func _enter_tree():
 	main_panel_instance = MainPanel.instantiate()
@@ -32,14 +35,33 @@ func _enter_tree():
 	light_sync_instance = LightSync.new()
 	add_child(light_sync_instance)
 
+	# Create a container for the buttons
+	button_container = HBoxContainer.new()
+	
+	# Create mode selection dropdown
+	origin_mode_button = MenuButton.new()
+	origin_mode_button.text = "Origin: Center"
+	origin_mode_button.tooltip_text = "Select origin placement mode"
+	
+	var popup = origin_mode_button.get_popup()
+	popup.add_item("Center", FixOriginTool.OriginMode.CENTER)
+	popup.add_item("Bottom", FixOriginTool.OriginMode.BOTTOM)
+	popup.add_item("Top", FixOriginTool.OriginMode.TOP)
+	popup.set_item_checked(0, true)  # Center is default
+	popup.id_pressed.connect(_on_mode_selected)
+	
+	button_container.add_child(origin_mode_button)
+
+	# Create fix origin button
 	fix_origin_button = Button.new()
 	fix_origin_button.text = "Fix Origin"
-	fix_origin_button.tooltip_text = "Wrap selected MeshInstance3D and recenter its pivot."
+	fix_origin_button.tooltip_text = "Recenter the pivot of selected MeshInstance3D nodes."
 	fix_origin_button.pressed.connect(_on_fix_origin)
-	add_control_to_container(CONTAINER_SPATIAL_EDITOR_MENU, fix_origin_button)
-
+	
+	button_container.add_child(fix_origin_button)
+	
+	add_control_to_container(CONTAINER_SPATIAL_EDITOR_MENU, button_container)
 	add_tool_menu_item("Icosa/Fix Selected Mesh Origin", Callable(self, "_on_fix_origin"))
-
 
 func _exit_tree():
 	if main_panel_instance:
@@ -51,12 +73,21 @@ func _exit_tree():
 		light_sync_instance.queue_free()
 
 	remove_tool_menu_item("Icosa/Fix Selected Mesh Origin")
-	if fix_origin_button:
-		if fix_origin_button.pressed.is_connected(_on_fix_origin):
-			fix_origin_button.pressed.disconnect(_on_fix_origin)
-		remove_control_from_container(CONTAINER_SPATIAL_EDITOR_MENU, fix_origin_button)
-		fix_origin_button.queue_free()
+	
+	if button_container:
+		if origin_mode_button:
+			var popup = origin_mode_button.get_popup()
+			if popup.id_pressed.is_connected(_on_mode_selected):
+				popup.id_pressed.disconnect(_on_mode_selected)
+		if fix_origin_button:
+			if fix_origin_button.pressed.is_connected(_on_fix_origin):
+				fix_origin_button.pressed.disconnect(_on_fix_origin)
+		remove_control_from_container(CONTAINER_SPATIAL_EDITOR_MENU, button_container)
+		button_container.queue_free()
+		button_container = null
+		origin_mode_button = null
 		fix_origin_button = null
+	
 	fix_origin_tool = null
 
 	# Remove global shader parameters
@@ -64,6 +95,25 @@ func _exit_tree():
 
 	var settings = EditorInterface.get_editor_settings()
 	settings.set_setting("docks/filesystem/other_file_extensions", "ico,icns")
+
+func _on_mode_selected(id: int) -> void:
+	fix_origin_tool.set_mode(id)
+	
+	# Update button text and popup checkmarks
+	var popup = origin_mode_button.get_popup()
+	for i in range(popup.item_count):
+		popup.set_item_checked(i, popup.get_item_id(i) == id)
+	
+	var mode_name = ""
+	match id:
+		FixOriginTool.OriginMode.CENTER:
+			mode_name = "Center"
+		FixOriginTool.OriginMode.BOTTOM:
+			mode_name = "Bottom"
+		FixOriginTool.OriginMode.TOP:
+			mode_name = "Top"
+	
+	origin_mode_button.text = "Origin: %s" % mode_name
 
 func _on_fix_origin():
 	if fix_origin_tool:

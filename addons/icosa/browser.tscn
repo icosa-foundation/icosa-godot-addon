@@ -1,19 +1,15 @@
-[gd_scene load_steps=5 format=3 uid="uid://d15wcrmaekds2"]
+[gd_scene load_steps=4 format=3 uid="uid://d15wcrmaekds2"]
 
-[ext_resource type="FontFile" uid="uid://canolapetpx8l" path="res://addons/icosa/josefin_sans.ttf" id="1_0gaid"]
 [ext_resource type="Script" uid="uid://ciyjsctdmpdcx" path="res://addons/icosa/browser.gd" id="1_v1e32"]
 
-[sub_resource type="FontVariation" id="FontVariation_f6ujr"]
-base_font = ExtResource("1_0gaid")
-variation_opentype = {
-2003265652: 450
-}
+[sub_resource type="SystemFont" id="SystemFont_v1e32"]
+font_names = PackedStringArray("Arial")
 
 [sub_resource type="Theme" id="Theme_0gaid"]
-default_font = SubResource("FontVariation_f6ujr")
+default_font = SubResource("SystemFont_v1e32")
+default_font_size = 16
 
-[node name="Control" type="Control"]
-layout_mode = 3
+[node name="Control" type="PanelContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -23,13 +19,9 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="IcosaBrowser" type="TabContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 theme = SubResource("Theme_0gaid")
 current_tab = 0
+tabs_position = 1
 tab_focus_mode = 0
 script = ExtResource("1_v1e32")

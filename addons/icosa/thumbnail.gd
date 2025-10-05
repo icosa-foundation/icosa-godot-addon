@@ -52,13 +52,31 @@ func _ready():
 			push_error("An error occurred in the HTTP request.")
 	
 	
-func thumbnail_request_completed(result, response_code, headers, body):
+func thumbnail_request_completed(result, response_code, headers, body : PackedByteArray):
+	var is_png = true
+	for header in headers:
+		if header.begins_with("Content-Type: "):
+			var type = header.replace("Content-Type: image/", "")
+			if type == "jpeg":
+				print("TRYING JPEG")
+				is_png = false
+			
 	if result != HTTPRequest.RESULT_SUCCESS:
 		push_error("Image couldn't be downloaded. Try a different image.")
+	## TODO: Error spam happens here when response is not an image.
+	
 	var image = Image.new()
-	var error = image.load_png_from_buffer(body)
-	if error != OK:
-		push_error("Couldn't load the image.")
+	if is_png:
+		var error = image.load_png_from_buffer(body)
+		if error != OK:
+			push_error("Couldn't load the image.")
+	else:
+		## TODO: ask if there are any other thumbnail image formats
+		var error = image.load_jpg_from_buffer(body)
+		if error != OK:
+			push_error("Couldn't load the image.")
+			
+			
 	var texture = ImageTexture.create_from_image(image)
 	%ThumbnailImage.texture = texture
 	# cannot be clicked if has no image!
@@ -98,6 +116,9 @@ func _on_download_pressed():
 	var download = IcosaDownload.new()
 	add_child(download)
 	download.url_queue = download_urls
+	download.asset_name = asset.display_name
+	download.asset_id = asset.id.replace("assets/", "")
+	
 	download.download_queue_completed.connect(_on_queue_downloaded)
 	download.file_downloaded_to_path.connect(_on_file_downloaded)
 	download.start_next_download()
