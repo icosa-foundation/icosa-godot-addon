@@ -38,11 +38,8 @@ void vertex() {
   // Extract particle data from vertex attributes
   vec3 center = NORMAL;  // Particle center stored in normal
   // Rotation: Unity stores in texcoord0.z (vec4)
-  // Godot limitation: UV is vec2 only. Options:
-  // 1. CUSTOM0.z if GLTF importer maps TEXCOORD_0.zw -> CUSTOM0.zw
-  // 2. TANGENT.x if used as fallback storage
-  // 3. Default to 0.0 if neither available (billboards without rotation)
-  float rotation = TANGENT.x; // Temporary: use TANGENT.x until CUSTOM mapping is implemented
+  // GLTF importer maps _TEXCOORD_0 -> _CUSTOM0, accessible as CUSTOM0
+  float rotation = CUSTOM0.z;
   float particle_id = COLOR.a; // Particle ID stored in alpha
 
   // Calculate particle lifetime (0 to 1)

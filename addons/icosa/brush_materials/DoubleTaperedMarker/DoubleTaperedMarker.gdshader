@@ -12,7 +12,9 @@ void vertex() {
 	v_fog_coord = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).z;
 	float envelope = sin(UV.x * 3.14159);
 	float widthMultiplier = 1.0 - envelope;
-	VERTEX.xyz += vec3(-UV2.x, -UV2.y, 0) * widthMultiplier;
+	// TEXCOORD_1 (vec3) displacement stored in CUSTOM1
+	// GLTF importer maps _TEXCOORD_1 -> _CUSTOM1, accessible as CUSTOM1
+	VERTEX.xyz -= CUSTOM1.xyz * widthMultiplier;
 }
 
 void fragment() {

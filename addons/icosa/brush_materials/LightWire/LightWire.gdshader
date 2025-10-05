@@ -40,9 +40,9 @@ void vertex() {
   // Calculate light envelope pattern along the wire
   float envelope = sin(mod(UV.x * 2.0, 1.0) * 3.14159);
   float lights = envelope < 0.15 ? 1.0 : 0.0;
-  // Note: Original GLSL uses texcoord0.z for radius, but Godot doesn't have 3D UVs by default
-  // Using a default radius value here
-  float radius = 0.01;
+  // Radius stored in texcoord0.z (vec4)
+  // GLTF importer maps _TEXCOORD_0 -> _CUSTOM0, accessible as CUSTOM0
+  float radius = CUSTOM0.z;
 
   // Displace vertices outward where lights appear
   vec3 displaced = VERTEX + NORMAL * lights * radius;

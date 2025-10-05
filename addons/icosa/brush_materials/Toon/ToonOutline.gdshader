@@ -10,14 +10,8 @@ varying float v_fog_coord;
 
 void vertex() {
   float outlineEnabled = 1.0;
-  float radius = 1.0;
-
-  #ifdef CUSTOM0
-  radius = CUSTOM0.z;
-  #else
-  // If no CUSTOM0, use a reasonable default based on vertex scale
-  radius = length(VERTEX) * 0.01;
-  #endif
+  // GLTF importer maps _TEXCOORD_0 -> _CUSTOM0, accessible as CUSTOM0
+  float radius = CUSTOM0.z;
 
   float inflate = outlineEnabled * radius * 0.4;
 

@@ -25,12 +25,8 @@ vec3 cy_to_rgb(vec3 base_rgb, float chroma, float luma) {
 
 void fragment() {
   // Slice uses CUSTOM0 for color space data: (chroma, luma, hue_position)
-  // If CUSTOM0 not available, fallback to UV-based calculation
-  vec3 color_data = vec3(UV.x, UV.y, UV.x);
-
-  #ifdef CUSTOM0
-  color_data = CUSTOM0.xyz;
-  #endif
+  // GLTF importer maps _TEXCOORD_0 -> _CUSTOM0, accessible as CUSTOM0
+  vec3 color_data = CUSTOM0.xyz;
 
   // Calculate hue: mod(z * 5, 6)
   float hue = mod(color_data.z * 5.0, 6.0);

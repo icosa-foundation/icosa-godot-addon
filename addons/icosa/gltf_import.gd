@@ -60,7 +60,10 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 	
 	
 	
-	## aaronfranke patch #2, removing meshe nodes (only for specific Obj2Gltf files)
+	## Map custom attributes to CUSTOM0-3 for shader access
+	_map_custom_attributes_to_custom_slots(gltf_json)
+
+	## aaronfranke patch #2, removing meshes (only for specific Obj2Gltf files)
 	var asset = gltf_json.get("asset")
 	if asset is Dictionary and asset.get("generator") == "Obj2GltfConverter" or asset.get("generator") == "glTF 1-to-2 Upgrader for Google Blocks":
 		var meshes = gltf_json.get("meshes")
@@ -178,6 +181,43 @@ func _apply_materials_to_importer_scene(node: Node, gltf_state: GLTFState):
 	# Recursively process children
 	for child in node.get_children():
 		_apply_materials_to_importer_scene(child, gltf_state)
+
+func _map_custom_attributes_to_custom_slots(gltf_json: Dictionary):
+	# Process each mesh's primitives
+	if not gltf_json.has("meshes"):
+		return
+
+	var meshes = gltf_json["meshes"]
+	for mesh in meshes:
+		if not mesh is Dictionary:
+			continue
+
+		var primitives = mesh.get("primitives", [])
+		for primitive in primitives:
+			if not primitive is Dictionary:
+				continue
+
+			var attributes = primitive.get("attributes", {})
+			if not attributes is Dictionary:
+				continue
+
+			# Track which CUSTOM slots we've used (0-3)
+			var custom_slot = 0
+			var attrs_to_rename = {}
+
+			# Find all custom attributes (those starting with underscore)
+			for attr_name in attributes.keys():
+				if attr_name.begins_with("_") and custom_slot < 4:
+					var new_name = "_CUSTOM" + str(custom_slot)
+					attrs_to_rename[attr_name] = new_name
+					custom_slot += 1
+					push_warning("Mapping custom attribute ", attr_name, " to ", new_name, " (will be CUSTOM", str(custom_slot - 1), " in shader)")
+
+			# Perform the renaming
+			for old_name in attrs_to_rename.keys():
+				var new_name = attrs_to_rename[old_name]
+				attributes[new_name] = attributes[old_name]
+				attributes.erase(old_name)
 
 func _find_matching_brush_material(material_name: String) -> Material:
 	var original_name = material_name
