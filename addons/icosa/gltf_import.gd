@@ -62,7 +62,7 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 	
 	## aaronfranke patch #2, removing meshe nodes (only for specific Obj2Gltf files)
 	var asset = gltf_json.get("asset")
-	if asset is Dictionary and asset.get("generator") == "Obj2GltfConverter":
+	if asset is Dictionary and asset.get("generator") == "Obj2GltfConverter" or asset.get("generator") == "glTF 1-to-2 Upgrader for Google Blocks":
 		var meshes = gltf_json.get("meshes")
 		if meshes is Array and meshes.size() == 1:
 			if extensions.has("GOOGLE_backgrounds") and extensions.has("GOOGLE_camera_settings"):

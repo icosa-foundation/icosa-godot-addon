@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://d15wcrmaekds2"]
+[gd_scene load_steps=5 format=3 uid="uid://d15wcrmaekds2"]
 
 [ext_resource type="Script" uid="uid://ciyjsctdmpdcx" path="res://addons/icosa/browser.gd" id="1_v1e32"]
+[ext_resource type="Texture2D" uid="uid://bwqa7sodpxksf" path="res://addons/icosa/icons/cog.svg" id="2_0gaid"]
 
 [sub_resource type="SystemFont" id="SystemFont_v1e32"]
 font_names = PackedStringArray("Arial")
@@ -9,7 +10,8 @@ font_names = PackedStringArray("Arial")
 default_font = SubResource("SystemFont_v1e32")
 default_font_size = 16
 
-[node name="Control" type="PanelContainer"]
+[node name="Control" type="Control"]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -19,9 +21,28 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="IcosaBrowser" type="TabContainer" parent="."]
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme = SubResource("Theme_0gaid")
+theme_override_constants/side_margin = 32
 current_tab = 0
-tabs_position = 1
 tab_focus_mode = 0
 script = ExtResource("1_v1e32")
+
+[node name="Settings" type="Button" parent="."]
+layout_mode = 1
+offset_right = 32.0
+offset_bottom = 32.0
+toggle_mode = true
+icon = ExtResource("2_0gaid")
+
+[node name="SettingsWindow" type="Window" parent="."]
+oversampling_override = 1.0
+title = "⚙️ Icosa Settings"
+initial_position = 1
+size = Vector2i(550, 300)
+visible = false

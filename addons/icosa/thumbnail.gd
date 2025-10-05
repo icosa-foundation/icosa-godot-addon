@@ -8,15 +8,20 @@ var thumbnail_request := HTTPRequest.new()
 var asset : IcosaAsset
 var is_preview = false
 
+var download = IcosaDownload.new()
 var download_urls: Array
+var current_download_url:= 1 
+var download_urls_size: int
 signal download_requested(urls : Array[String])
 signal delete_requested(asset_url)
+var downloaded_bytes : int = 0
 
+signal author_id_clicked(author_id : String)
 
 var is_downloaded = false
 var preview_scene_path = ""
 var no_thumbnail_image = false
-
+var on_author_profile = false
 
 func init(chosen_asset : IcosaAsset):
 	asset = chosen_asset
@@ -26,7 +31,9 @@ func _ready():
 	load_license_sticker()
 	
 	%AssetName.text = asset.display_name
-	%AuthorName.text = asset.author_name
+	var url_bbcode = "[url=%s]%s[url]"
+	var author_link = url_bbcode % [asset.author_id, asset.author_name]
+	%AuthorName.text = author_link
 	%Description.text = asset.description
 	
 	if asset.user_asset:
@@ -41,7 +48,11 @@ func _ready():
 		if is_downloaded:
 			%ThumbnailImage.hide()
 			%Preview.show()
-
+	
+	if on_author_profile:
+		%AuthorName.hide()
+		
+	
 	add_child(thumbnail_request)
 	thumbnail_request.request_completed.connect(thumbnail_request_completed)
 	if !asset.thumbnail_url.is_empty():
@@ -88,19 +99,24 @@ func thumbnail_request_completed(result, response_code, headers, body : PackedBy
 func _on_download_queue_completed():
 	%Progress.hide()
 	%BufferingIcon.hide()
+	%Download.hide()
 	%DownloadFinished.show()
-
+	
 func downlad_failed():
 	%DownloadFailed.show()
 
-func update_progress(current_file: int, total_files: int):
-	%FilesDownloaded.value = current_file
-	%FilesDownloaded.max_value = total_files
-	%ProgressLabel.text = "%s/%s" % [current_file, total_files]
+func update_progress():
+	if !download_urls.is_empty():
+		%FilesDownloaded.value = current_download_url
+		%FilesDownloaded.max_value = download.url_queue.size()
+		%ProgressLabel.text = "%s/%s" % [current_download_url, download.url_queue.size()]
+
+	else:
+		_on_download_queue_completed()
 	
-func download_popup_pressed(index_pressed):
+func start_download_progress():
 	%Progress.show()
-	%Formats.hide() # hide the download button.
+	#%Formats.hide() # hide the download button.
 	%ProgressLabel.text = "Downloading.."
 	
 #func update_bytes_progress(current_bytes: int, total_bytes: int):
@@ -113,20 +129,22 @@ func _on_download_pressed():
 	var formats = Dictionary(asset.formats)
 	var gltf_urls = formats["GLTF2"]
 	download_urls = gltf_urls
-	var download = IcosaDownload.new()
+	
 	add_child(download)
 	download.url_queue = download_urls
 	download.asset_name = asset.display_name
 	download.asset_id = asset.id.replace("assets/", "")
-	
+	download_urls_size = download_urls.size()
 	download.download_queue_completed.connect(_on_queue_downloaded)
 	download.file_downloaded_to_path.connect(_on_file_downloaded)
 	download.start_next_download()
+	start_download_progress()
+	update_progress()
 
 func _on_file_downloaded(path : String):
 	if path.ends_with(".gltf"):
 		preview_scene_path = path
-	print(path)
+	update_progress()
 
 func load_license_sticker():
 	var sticker_table = {
@@ -148,7 +166,7 @@ func load_license_sticker():
 
 func _on_queue_downloaded(model_file):
 	is_downloaded = true
-
+	_on_download_queue_completed()
 	if Engine.is_editor_hint():
 		EditorInterface.get_resource_filesystem().scan()
 	
@@ -179,7 +197,21 @@ func _on_queue_downloaded(model_file):
 		#%Orbit.camera = cam2
 		#cam2.current = true
 	
-
+#func _process(delta):
+	#var downloaded_bytes = download.get_downloaded_bytes()
+	#var current_file_bytes = download
 
 func _on_delete_asset_pressed():
 	delete_requested.emit(asset.id)
+
+# This assumes RichTextLabel's `meta_clicked` signal was connected to
+# the function below using the signal connection dialog.
+func _richtextlabel_on_meta_clicked(meta):
+	# `meta` is of Variant type, so convert it to a String to avoid script errors at run-time.
+	#TODO: filter users assets by clicking username
+	pass
+	#OS.shell_open(str(meta))
+
+
+func _on_author_name_meta_clicked(meta):
+	author_id_clicked.emit(str(meta), asset.author_name)

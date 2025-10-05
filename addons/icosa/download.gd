@@ -104,10 +104,9 @@ func start_next_download():
 	
 	# Create asset directory with format: {asset_name}_{asset_id}
 	var asset_path = ""
-	if asset_id != "":
-		asset_path = asset_name + "_" + asset_id
-	else:
-		asset_path = asset_name
+	var sanitized_name = asset_name.to_lower().replace(" ", "_").validate_filename()
+	asset_path = sanitized_name + "_" + asset_id
+
 	
 	var dir = DirAccess.open(root_directory + "icosa_downloads")
 	if not dir.dir_exists(asset_path):
@@ -134,7 +133,7 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 	if response_code == 500:
 		host_offline.emit()
 		return
-	
+
 	# Handle 302 redirects
 	# HACK: This is a workaround for a Godot bug:
 	# https://github.com/godotengine/godot/issues/104651
@@ -143,12 +142,8 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 			if header.begins_with("location: "):
 				var redirect_url = header.split("location: ")[1]
 				print("Location redirect found: ", redirect_url)
-				
-				# Store the original file path
 				var original_file_path = download_file
 				print("Original file path: ", original_file_path)
-				
-				# Cancel the current request
 				cancel_request()
 				
 				# Create a new HTTPRequest for the redirect
@@ -158,6 +153,7 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 				
 				redirect_request.request_completed.connect(func(res, code, hdrs, bdy):
 					if res == HTTPRequest.RESULT_SUCCESS:
+						print(bdy.size())
 						print("Redirect download successful: ", original_file_path)
 						file_downloaded_to_path.emit(original_file_path)
 						current_queue_index += 1

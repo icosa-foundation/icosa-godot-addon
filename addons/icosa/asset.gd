@@ -35,6 +35,8 @@ func build(asset_data):
 		author_name = asset_data["authorName"]
 	if "name" in asset_data: 
 		id = asset_data["name"]
+	if "authorId" in asset_data:
+		author_id = asset_data["authorId"]
 	if "license" in asset_data: 
 		license = asset_data["license"]
 	if "formats" in asset_data:

@@ -1,7 +1,6 @@
-[gd_scene load_steps=25 format=3 uid="uid://c6qdcl0sg2mxy"]
+[gd_scene load_steps=27 format=3 uid="uid://c6qdcl0sg2mxy"]
 
 [ext_resource type="Script" uid="uid://bm22v3o2u7lln" path="res://addons/icosa/thumbnail.gd" id="1_8pxhf"]
-[ext_resource type="Script" uid="uid://cm4iu7i07qryo" path="res://addons/icosa/misc/description_urls.gd" id="2_prrh0"]
 [ext_resource type="Script" uid="uid://cbxuo7ms12d55" path="res://addons/icosa/misc/3d_preview.gd" id="2_yfmvu"]
 [ext_resource type="Texture2D" uid="uid://e41wpb7feofn" path="res://addons/icosa/icons/logo/logo_main_pixel.png" id="3_3vp83"]
 [ext_resource type="PackedScene" uid="uid://c7yig47a2sqmr" path="res://addons/icosa/loading_icon.tscn" id="3_8pxhf"]
@@ -55,6 +54,12 @@ fill_to = Vector2(1, 0.5)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hjirf"]
 bg_color = Color(0.148922, 0.574047, 0.258045, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rs5q6"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8wiaa"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_g4njl"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8pxhf"]
 
@@ -205,7 +210,7 @@ layout_mode = 2
 [node name="BufferingIcon" parent="Padding/Info/Progress" instance=ExtResource("3_8pxhf")]
 unique_name_in_owner = true
 layout_mode = 2
-value = 15.0
+value = 18.0
 texture_under = SubResource("GradientTexture2D_8wiaa")
 texture_progress = SubResource("GradientTexture2D_fmlye")
 
@@ -256,16 +261,21 @@ text = "AssetName"
 vertical_alignment = 2
 clip_text = true
 
-[node name="AuthorName" type="Label" parent="Padding/Info/Details/Asset"]
+[node name="AuthorName" type="RichTextLabel" parent="Padding/Info/Details/Asset"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_vertical = 3
 mouse_default_cursor_shape = 2
-theme_override_font_sizes/font_size = 11
+theme_override_styles/focus = SubResource("StyleBoxEmpty_rs5q6")
+theme_override_styles/background = SubResource("StyleBoxEmpty_8wiaa")
+theme_override_styles/fill = SubResource("StyleBoxEmpty_g4njl")
+bbcode_enabled = true
 text = "AuthorName"
+scroll_active = false
 vertical_alignment = 2
-clip_text = true
+deselect_on_focus_loss_enabled = false
+drag_and_drop_selection_enabled = false
 
 [node name="Description" type="RichTextLabel" parent="Padding/Info/Details/Asset"]
 unique_name_in_owner = true
@@ -282,7 +292,6 @@ autowrap_mode = 0
 context_menu_enabled = true
 vertical_alignment = 2
 selection_enabled = true
-script = ExtResource("2_prrh0")
 
 [node name="Download" type="HBoxContainer" parent="Padding/Info/Details"]
 layout_mode = 2
@@ -346,11 +355,12 @@ custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-value = 15.0
+value = 18.0
 texture_under = SubResource("GradientTexture2D_nf0yl")
 texture_progress = SubResource("GradientTexture2D_pygpc")
 throbber_size = Vector2i(32, 32)
 
 [connection signal="pressed" from="." to="." method="_on_pressed"]
+[connection signal="meta_clicked" from="Padding/Info/Details/Asset/AuthorName" to="." method="_on_author_name_meta_clicked"]
 [connection signal="pressed" from="Padding/Info/Details/Download/Download" to="." method="_on_download_pressed"]
 [connection signal="pressed" from="Padding/Info/Details/Download/DeleteAsset" to="." method="_on_delete_asset_pressed"]
