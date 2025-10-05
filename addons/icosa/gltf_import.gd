@@ -60,7 +60,7 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 	
 	
 	
-	## aaronfranke patch #2, removing meshes (only for specific Obj2Gltf files)
+	## aaronfranke patch #2, removing meshe nodes (only for specific Obj2Gltf files)
 	var asset = gltf_json.get("asset")
 	if asset is Dictionary and asset.get("generator") == "Obj2GltfConverter":
 		var meshes = gltf_json.get("meshes")

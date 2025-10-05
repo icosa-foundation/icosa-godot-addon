@@ -33,22 +33,22 @@ sky_material = SubResource("ProceduralSkyMaterial_prrh0")
 background_mode = 1
 sky = SubResource("Sky_yfmvu")
 
-[sub_resource type="Gradient" id="Gradient_yfmvu"]
+[sub_resource type="Gradient" id="Gradient_rs5q6"]
 offsets = PackedFloat32Array(0.3, 0.5, 0.7)
 colors = PackedColorArray(0.24696359, 0.24696359, 0.24696359, 0, 0.24696359, 0.24696359, 0.24696359, 1, 0.24696359, 0.24696359, 0.24696359, 0)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_3vp83"]
-gradient = SubResource("Gradient_yfmvu")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_8wiaa"]
+gradient = SubResource("Gradient_rs5q6")
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
-[sub_resource type="Gradient" id="Gradient_rs5q6"]
+[sub_resource type="Gradient" id="Gradient_g4njl"]
 offsets = PackedFloat32Array(0.3, 0.5, 0.7)
 colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_8wiaa"]
-gradient = SubResource("Gradient_rs5q6")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_fmlye"]
+gradient = SubResource("Gradient_g4njl")
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
@@ -60,24 +60,24 @@ bg_color = Color(0.148922, 0.574047, 0.258045, 1)
 
 [sub_resource type="FontVariation" id="FontVariation_3qkbe"]
 
-[sub_resource type="Gradient" id="Gradient_8wiaa"]
+[sub_resource type="Gradient" id="Gradient_xx4vk"]
 offsets = PackedFloat32Array(0.3, 0.5, 0.7)
 colors = PackedColorArray(0.24696359, 0.24696359, 0.24696359, 0, 0.24696359, 0.24696359, 0.24696359, 1, 0.24696359, 0.24696359, 0.24696359, 0)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_g4njl"]
-gradient = SubResource("Gradient_8wiaa")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_nf0yl"]
+gradient = SubResource("Gradient_xx4vk")
 width = 32
 height = 32
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
-[sub_resource type="Gradient" id="Gradient_fmlye"]
+[sub_resource type="Gradient" id="Gradient_dhxrd"]
 offsets = PackedFloat32Array(0.3, 0.5, 0.7)
 colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_xx4vk"]
-gradient = SubResource("Gradient_fmlye")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_pygpc"]
+gradient = SubResource("Gradient_dhxrd")
 width = 32
 height = 32
 fill = 1
@@ -149,7 +149,7 @@ stretch = true
 
 [node name="Preview3D" type="SubViewport" parent="Padding/Info/MarginContainer/PanelContainer/Preview3D"]
 handle_input_locally = false
-size = Vector2i(264, 212)
+size = Vector2i(2, 2)
 size_2d_override_stretch = true
 render_target_update_mode = 0
 script = ExtResource("2_yfmvu")
@@ -205,9 +205,9 @@ layout_mode = 2
 [node name="BufferingIcon" parent="Padding/Info/Progress" instance=ExtResource("3_8pxhf")]
 unique_name_in_owner = true
 layout_mode = 2
-value = 77.0
-texture_under = SubResource("GradientTexture2D_3vp83")
-texture_progress = SubResource("GradientTexture2D_8wiaa")
+value = 15.0
+texture_under = SubResource("GradientTexture2D_8wiaa")
+texture_progress = SubResource("GradientTexture2D_fmlye")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Padding/Info/Progress"]
 layout_mode = 2
@@ -346,9 +346,9 @@ custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-value = 77.0
-texture_under = SubResource("GradientTexture2D_g4njl")
-texture_progress = SubResource("GradientTexture2D_xx4vk")
+value = 15.0
+texture_under = SubResource("GradientTexture2D_nf0yl")
+texture_progress = SubResource("GradientTexture2D_pygpc")
 throbber_size = Vector2i(32, 32)
 
 [connection signal="pressed" from="." to="." method="_on_pressed"]

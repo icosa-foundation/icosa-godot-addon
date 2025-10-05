@@ -175,6 +175,7 @@ func _ready():
 	_on_keywords_text_submitted("")
 
 func execute_search():
+	%NoAssetsFound.hide()
 	"""Execute a search using the current_search object"""
 	var query = current_search.build_query()
 	print(query)
@@ -200,6 +201,10 @@ func on_search(result : int, response_code : int, headers : PackedStringArray, b
 	if current_assets == null or not current_assets.has("assets"):
 		return
 	
+	if current_assets["assets"].is_empty():
+		%NoAssetsFound.show()
+		return
+		
 	for asset in current_assets["assets"]:
 		var serialized_asset = IcosaAsset.new(asset)
 		

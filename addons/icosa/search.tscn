@@ -40,6 +40,16 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 1
 
+[node name="CenterContainer" type="CenterContainer" parent="Split/Gallery"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="NoAssetsFound" type="Label" parent="Split/Gallery/CenterContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "No assets found! Try another search."
+
 [node name="MarginContainer" type="MarginContainer" parent="Split"]
 layout_mode = 2
 
@@ -54,7 +64,7 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Split/MarginContainer/PanelContainer/VBoxContainer/Title"]
 layout_mode = 2
-text = "Search"
+text = "Search Options"
 horizontal_alignment = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="Split/MarginContainer/PanelContainer/VBoxContainer"]
@@ -122,6 +132,7 @@ text = "curated"
 layout_mode = 2
 
 [node name="Label" type="Label" parent="Split/MarginContainer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer3/PanelContainer2/MarginContainer2/VBoxContainer/HBoxContainer"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "order: "
