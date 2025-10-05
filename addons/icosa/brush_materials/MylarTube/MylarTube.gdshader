@@ -21,11 +21,9 @@ varying vec3 v_world_normal;
 varying float v_fog_coord;
 
 void vertex() {
-  float radius = 0.01; // Small default when CUSTOM0 not available
-
-  #ifdef CUSTOM0
-  radius = CUSTOM0.z;
-  #endif
+  // Radius stored in texcoord0.z (vec4)
+  // GLTF importer maps _TEXCOORD_0 -> _CUSTOM0, accessible as CUSTOM0
+  float radius = CUSTOM0.z;
 
   // Squeeze displacement
   float squeeze = sin(UV.x * 3.14159);

@@ -12,11 +12,8 @@ float rand_1_05(vec2 uv) {
 
 void vertex() {
   // Inflate the tube outward using radius from CUSTOM0.z
-  float radius = 0.01; // Small default
-
-  #ifdef CUSTOM0
-  radius = CUSTOM0.z;
-  #endif
+  // GLTF importer maps _TEXCOORD_0 -> _CUSTOM0, accessible as CUSTOM0
+  float radius = CUSTOM0.z;
 
   VERTEX += NORMAL * 1.5 * radius;
 }
