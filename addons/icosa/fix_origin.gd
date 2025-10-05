@@ -12,6 +12,13 @@ func run_for_selection(editor_interface: EditorInterface) -> void:
 	for node in selection:
 		fixed_count += _process_node_recursive(node, editor_interface)
 
+	if fixed_count == 0:
+		_notify("No MeshInstance3D nodes found in selection.")
+	elif fixed_count == 1:
+		_notify("Fixed 1 mesh origin.")
+	else:
+		_notify("Fixed %d mesh origins." % fixed_count)
+
 func _process_node_recursive(node: Node, editor_interface: EditorInterface) -> int:
 	var count := 0
 
@@ -28,6 +35,7 @@ func _process_node_recursive(node: Node, editor_interface: EditorInterface) -> i
 
 func _fix_mesh_origin(mesh_instance: MeshInstance3D, editor_interface: EditorInterface) -> void:
 	var mesh_aabb: AABB = mesh_instance.mesh.get_aabb()
+	var mesh_offset := mesh_aabb.position + mesh_aabb.size * 0.5
 	if mesh_offset.is_equal_approx(Vector3.ZERO):
 		return
 
@@ -50,6 +58,7 @@ func _fix_mesh_origin(mesh_instance: MeshInstance3D, editor_interface: EditorInt
 
 	var undo: EditorUndoRedoManager = editor_interface.get_editor_undo_redo()
 	if undo:
+		undo.create_action("Fix Mesh Origin")
 		undo.add_do_property(mesh_instance, "mesh", recentered)
 		undo.add_do_property(mesh_instance, "transform", new_transform)
 		undo.add_undo_property(mesh_instance, "mesh", mesh)
@@ -58,6 +67,8 @@ func _fix_mesh_origin(mesh_instance: MeshInstance3D, editor_interface: EditorInt
 	else:
 		mesh_instance.mesh = recentered
 		mesh_instance.transform = new_transform
+
+	_notify("Origin recentered for %s." % mesh_instance.name)
 
 func _recenter_array_mesh(mesh: ArrayMesh, translation: Vector3) -> ArrayMesh:
 	var new_mesh := ArrayMesh.new()
