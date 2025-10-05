@@ -1,21 +1,6 @@
 @tool
-"""
-This could be its own godot addon, very nice feature and shows how easy it is to add modal operations to godot
-"""
-
 class_name IcosaFixOriginTool
 extends RefCounted
-
-enum OriginMode {
-	CENTER,    # Center the origin
-	BOTTOM,    # Origin at bottom center
-	TOP        # Origin at top center
-}
-
-var current_mode: OriginMode = OriginMode.CENTER
-
-func set_mode(mode: OriginMode) -> void:
-	current_mode = mode
 
 func run_for_selection(editor_interface: EditorInterface) -> void:
 	var selection := editor_interface.get_selection().get_selected_nodes()
@@ -26,13 +11,6 @@ func run_for_selection(editor_interface: EditorInterface) -> void:
 	var fixed_count := 0
 	for node in selection:
 		fixed_count += _process_node_recursive(node, editor_interface)
-
-	if fixed_count == 0:
-		_notify("No MeshInstance3D nodes found in selection.")
-	elif fixed_count == 1:
-		_notify("Fixed 1 mesh origin (%s)." % _get_mode_name())
-	else:
-		_notify("Fixed %d mesh origins (%s)." % [fixed_count, _get_mode_name()])
 
 func _process_node_recursive(node: Node, editor_interface: EditorInterface) -> int:
 	var count := 0
@@ -50,25 +28,6 @@ func _process_node_recursive(node: Node, editor_interface: EditorInterface) -> i
 
 func _fix_mesh_origin(mesh_instance: MeshInstance3D, editor_interface: EditorInterface) -> void:
 	var mesh_aabb: AABB = mesh_instance.mesh.get_aabb()
-	
-	# Calculate offset based on current mode
-	var mesh_offset: Vector3
-	match current_mode:
-		OriginMode.CENTER:
-			mesh_offset = mesh_aabb.position + mesh_aabb.size * 0.5
-		OriginMode.BOTTOM:
-			mesh_offset = Vector3(
-				mesh_aabb.position.x + mesh_aabb.size.x * 0.5,
-				mesh_aabb.position.y,  # Bottom of the mesh
-				mesh_aabb.position.z + mesh_aabb.size.z * 0.5
-			)
-		OriginMode.TOP:
-			mesh_offset = Vector3(
-				mesh_aabb.position.x + mesh_aabb.size.x * 0.5,
-				mesh_aabb.position.y + mesh_aabb.size.y,  # Top of the mesh
-				mesh_aabb.position.z + mesh_aabb.size.z * 0.5
-			)
-	
 	if mesh_offset.is_equal_approx(Vector3.ZERO):
 		return
 
@@ -87,23 +46,18 @@ func _fix_mesh_origin(mesh_instance: MeshInstance3D, editor_interface: EditorInt
 	var offset_in_parent := mesh_instance.transform.basis * mesh_offset
 	var original_transform := mesh_instance.transform
 	var new_transform := original_transform
-	var original_position := mesh_instance.position
 	new_transform.origin += offset_in_parent
 
 	var undo: EditorUndoRedoManager = editor_interface.get_editor_undo_redo()
 	if undo:
-		undo.create_action("Fix Mesh Origin (%s)" % _get_mode_name())
 		undo.add_do_property(mesh_instance, "mesh", recentered)
 		undo.add_do_property(mesh_instance, "transform", new_transform)
-		undo.add_do_property(mesh_instance, "position", Vector3(0,0,0))
 		undo.add_undo_property(mesh_instance, "mesh", mesh)
 		undo.add_undo_property(mesh_instance, "transform", original_transform)
-		undo.add_undo_property(mesh_instance, "position", original_position)
 		undo.commit_action()
 	else:
 		mesh_instance.mesh = recentered
 		mesh_instance.transform = new_transform
-		mesh_instance.position = Vector3(0,0,0)
 
 func _recenter_array_mesh(mesh: ArrayMesh, translation: Vector3) -> ArrayMesh:
 	var new_mesh := ArrayMesh.new()
@@ -154,17 +108,6 @@ func _recenter_array_mesh(mesh: ArrayMesh, translation: Vector3) -> ArrayMesh:
 		new_mesh.custom_aabb = translated_aabb
 
 	return new_mesh
-
-func _get_mode_name() -> String:
-	match current_mode:
-		OriginMode.CENTER:
-			return "center"
-		OriginMode.BOTTOM:
-			return "bottom"
-		OriginMode.TOP:
-			return "top"
-		_:
-			return "unknown"
 
 func _notify(message: String) -> void:
 	print_rich("[color=yellow][Icosa Fix Origin][/color] %s" % message)
