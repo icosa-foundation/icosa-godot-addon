@@ -2,7 +2,6 @@
 class_name IcosaGLTF
 extends GLTFDocumentExtension
 
-var has_google_extensions = false
 var material_cache = {}
 var brush_materials = {}
 var name_mapping = {}
@@ -15,28 +14,6 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 	if not (gltf_json_variant is Dictionary):
 		return OK
 	var gltf_json: Dictionary = gltf_json_variant
-
-	# Clear texture/image references early to prevent loading errors (we'll use brush materials instead)
-	if gltf_json.has("images"):
-		gltf_json["images"] = []
-	if gltf_json.has("textures"):
-		gltf_json["textures"] = []
-	# Also clear material texture references
-	if gltf_json.has("materials"):
-		for material in gltf_json["materials"]:
-			if not material is Dictionary:
-				continue
-			if material.has("pbrMetallicRoughness"):
-				var pbr = material["pbrMetallicRoughness"]
-				pbr.erase("baseColorTexture")
-				pbr.erase("metallicRoughnessTexture")
-			material.erase("normalTexture")
-			material.erase("occlusionTexture")
-			material.erase("emissiveTexture")
-			# Clear Google-specific extensions
-			if material.has("extensions"):
-				material["extensions"].erase("GOOGLE_tilt_brush_material")
-
 	if not gltf_json.has("bufferViews"):
 		return OK
 	var buffer_views = gltf_json["bufferViews"]
@@ -52,17 +29,6 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 			#printerr("glTF import: Invalid byte stride " + str(stride) + " for buffer view at index " + str(i) + " while importing file '" + gltf_state.filename + "'. If defined, byte stride must be a multiple of 4 and between 4 and 252.")
 			buffer_view_dict.erase("byteStride")
 
-	## check for uneeded lights and cameras.
-	if "GOOGLE_camera_settings" in extensions or "GOOGLE_backgrounds" in extensions:
-		has_google_extensions = true
-	
-	
-	
-	
-	
-	## Map custom attributes to CUSTOM0-3 for shader access
-	_map_custom_attributes_to_custom_slots(gltf_json)
-
 	## aaronfranke patch #2, removing meshes (only for specific Obj2Gltf files)
 	var asset = gltf_json.get("asset")
 	if asset is Dictionary and asset.get("generator") == "Obj2GltfConverter" or asset.get("generator") == "glTF 1-to-2 Upgrader for Google Blocks":
@@ -71,6 +37,32 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 			if extensions.has("GOOGLE_backgrounds") and extensions.has("GOOGLE_camera_settings"):
 				var ext_used: Array = gltf_json["extensionsUsed"]
 				ext_used.append("GODOT_single_root")
+
+	if gltf_json.get("asset", {}).get("generator", "").find("Tilt Brush Exporter") != -1:
+		# Tilt Brush exports may have embedded images/textures we don't want to load
+		# Clear texture/image references early to prevent loading errors (we'll use brush materials instead)
+		if gltf_json.has("images"):
+			gltf_json["images"] = []
+		if gltf_json.has("textures"):
+			gltf_json["textures"] = []
+		# Also clear material texture references
+		if gltf_json.has("materials"):
+			for material in gltf_json["materials"]:
+				if not material is Dictionary:
+					continue
+				if material.has("pbrMetallicRoughness"):
+					var pbr = material["pbrMetallicRoughness"]
+					pbr.erase("baseColorTexture")
+					pbr.erase("metallicRoughnessTexture")
+				material.erase("normalTexture")
+				material.erase("occlusionTexture")
+				material.erase("emissiveTexture")
+				# Clear Google-specific extensions
+				if material.has("extensions"):
+					material["extensions"].erase("GOOGLE_tilt_brush_material")
+
+		## Map custom attributes to standard GLTF attributes that Godot recognizes
+		_map_custom_attributes_to_standard_slots(gltf_json)
 
 	return OK
 
