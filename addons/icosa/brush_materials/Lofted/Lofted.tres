@@ -1,12 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://d2xyjli7vny3v"]
 
 [resource]
 resource_name = "Lofted"
-blend_mode = 0
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
-alpha_scissor_threshold = 0.5
 roughness = 0.6
 emission_enabled = true
-emission_energy = 0.5
-albedo_color = Color(1.0, 1.0, 1.0, 1.0)
+emission_energy_multiplier = 0.5
