@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, blend_mix, cull_disabled;
+render_mode unshaded, depth_draw_always, cull_disabled;
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;

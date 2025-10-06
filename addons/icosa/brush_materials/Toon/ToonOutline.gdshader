@@ -1,6 +1,6 @@
 // Toon shader - Pass 2: Black outline (cull_front, inflated geometry)
 shader_type spatial;
-render_mode unshaded, blend_mix, cull_front, depth_test_disabled;
+render_mode unshaded, cull_front, depth_draw_never;
 
 #include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
 

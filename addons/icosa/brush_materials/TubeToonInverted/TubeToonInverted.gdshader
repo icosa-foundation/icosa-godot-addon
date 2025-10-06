@@ -1,6 +1,6 @@
 // TubeToonInverted - Pass 1: Black front faces (cull_back)
 shader_type spatial;
-render_mode unshaded, blend_mix, cull_back;
+render_mode unshaded, depth_draw_always, cull_back;
 
 varying vec3 v_world_normal;
 
