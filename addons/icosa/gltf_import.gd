@@ -281,15 +281,12 @@ func _find_matching_brush_material(material_name: String) -> Material:
 			# Likely a GUID (with or without a name prefix)
 			var dash_index = rest.find("-")
 			var guid = rest.substr(dash_index + 1)
-		else:
-			# Handle unexpected format
-			var guid = rest
+			material_name = name_mapping.get(guid, material_name)
 	# Remove other prefixes if present
 	elif material_name.begins_with("brush_"):
 		material_name = material_name.substr(6, material_name.length() - 6)
 	elif material_name.begins_with("ob-"):
 		material_name = material_name.substr(3, material_name.length() - 3)
-
 	# Check cache first (use original name as cache key to avoid conflicts)
 	if material_cache.has(original_name):
 		return material_cache[original_name]
