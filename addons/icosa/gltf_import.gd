@@ -174,10 +174,13 @@ func _apply_materials_to_importer_scene(node: Node, gltf_state: GLTFState):
 	for child in node.get_children():
 		_apply_materials_to_importer_scene(child, gltf_state)
 
-func _map_custom_attributes_to_custom_slots(gltf_json: Dictionary):
-	# Process each mesh's primitives
+func _map_custom_attributes_to_standard_slots(gltf_json: Dictionary):
+	# Map Tilt Brush custom attributes to standard GLTF attributes per-brush
 	if not gltf_json.has("meshes"):
 		return
+
+	# Get materials array for brush name lookup
+	var materials = gltf_json.get("materials", [])
 
 	var meshes = gltf_json["meshes"]
 	for mesh in meshes:
@@ -193,17 +196,36 @@ func _map_custom_attributes_to_custom_slots(gltf_json: Dictionary):
 			if not attributes is Dictionary:
 				continue
 
-			# Track which CUSTOM slots we've used (0-3)
-			var custom_slot = 0
+			# Get material name to determine brush type
+			var material_name = "unknown"
+			if primitive.has("material"):
+				var mat_index = primitive["material"]
+				if mat_index < materials.size() and materials[mat_index] is Dictionary:
+					material_name = materials[mat_index].get("name", "")
+
 			var attrs_to_rename = {}
 
-			# Find all custom attributes (those starting with underscore)
-			for attr_name in attributes.keys():
-				if attr_name.begins_with("_") and custom_slot < 4:
-					var new_name = "_CUSTOM" + str(custom_slot)
-					attrs_to_rename[attr_name] = new_name
-					custom_slot += 1
-					push_warning("Mapping custom attribute ", attr_name, " to ", new_name, " (will be CUSTOM", str(custom_slot - 1), " in shader)")
+			# PARTICLE BRUSH MAPPING (Smoke, Bubbles, Dots, Snow, Stars)
+			# These brushes have: POSITION, COLOR_0, TEXCOORD_0, _TB_TIMESTAMP, _TB_UNITY_NORMAL, _TB_UNITY_TEXCOORD_0
+			# They do NOT have: NORMAL or TANGENT - we can use these!
+			var is_particle_brush = (material_name.contains("Smoke") or
+			                         material_name.contains("Bubbles") or
+			                         material_name.contains("Dots") or
+			                         material_name.contains("Snow") or
+			                         material_name.contains("Stars"))
+
+			if is_particle_brush:
+				# _TB_UNITY_NORMAL (particle center, VEC3) → NORMAL
+				if attributes.has("_TB_UNITY_NORMAL"):
+					attrs_to_rename["_TB_UNITY_NORMAL"] = "NORMAL"
+
+				# _TB_UNITY_TEXCOORD_0 (has rotation in .z) → TANGENT
+				if attributes.has("_TB_UNITY_TEXCOORD_0"):
+					attrs_to_rename["_TB_UNITY_TEXCOORD_0"] = "TANGENT"
+
+				# _TB_TIMESTAMP → TEXCOORD_1 (UV2)
+				if attributes.has("_TB_TIMESTAMP"):
+					attrs_to_rename["_TB_TIMESTAMP"] = "TEXCOORD_1"
 
 			# Perform the renaming
 			for old_name in attrs_to_rename.keys():
