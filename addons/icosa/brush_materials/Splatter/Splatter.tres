@@ -6,7 +6,7 @@
 resource_name = "SplatterSingleSided"
 transparency = 2
 vertex_color_use_as_albedo = true
-vertex_color_is_srgb = false
+vertex_color_is_srgb = true
 alpha_scissor_threshold = 0.2
 roughness = 0.5
 metallic = 0

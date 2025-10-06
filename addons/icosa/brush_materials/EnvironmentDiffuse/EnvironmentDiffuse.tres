@@ -4,5 +4,5 @@
 resource_name = "EnvironmentDiffuse"
 blend_mode = 0
 vertex_color_use_as_albedo = true
-vertex_color_is_srgb = false
+vertex_color_is_srgb = true
 albedo_color = Color(1.0, 1.0, 1.0, 1.0)

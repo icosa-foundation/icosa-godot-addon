@@ -4,7 +4,7 @@
 resource_name = "BlocksBasic"
 blend_mode = 0
 vertex_color_use_as_albedo = true
-vertex_color_is_srgb = false
+vertex_color_is_srgb = true
 roughness = 0.8
 albedo_color = Color(1.0, 1.0, 1.0, 1.0)
 specular_mode = 1
