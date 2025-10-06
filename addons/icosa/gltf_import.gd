@@ -38,7 +38,7 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 				var ext_used: Array = gltf_json["extensionsUsed"]
 				ext_used.append("GODOT_single_root")
 
-	if gltf_json.get("asset", {}).get("generator", "").find("Tilt Brush Exporter") != -1:
+	if gltf_json.get("asset", {}).get("generator", "").find("Tilt Brush") != -1:
 		# Tilt Brush exports may have embedded images/textures we don't want to load
 		# Clear texture/image references early to prevent loading errors (we'll use brush materials instead)
 		if gltf_json.has("images"):
@@ -63,6 +63,9 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 
 		## Map custom attributes to standard GLTF attributes that Godot recognizes
 		_map_custom_attributes_to_standard_slots(gltf_json)
+	else:
+		print("=== NOT Applying Tilt Brush adjustments ===")
+		print(gltf_json.get("asset", {}).get("generator", "NO GENERATOR FOUND"))
 
 	return OK
 
@@ -153,9 +156,41 @@ func _replace_materials_with_brush_materials(gltf_state: GLTFState):
 	gltf_state.set_materials(materials)
 
 func _import_post(gltf_state: GLTFState, root: Node) -> Error:
+	# Verify VERTEX_ID mapping for Smoke mesh
+	_verify_vertex_id_for_smoke(gltf_state)
+
 	# Apply materials to all ImporterMeshInstance3D nodes
 	_apply_materials_to_importer_scene(root, gltf_state)
 	return OK
+
+func _verify_vertex_id_for_smoke(gltf_state: GLTFState):
+	var meshes = gltf_state.get_meshes()
+	for mesh_idx in range(meshes.size()):
+		var mesh = meshes[mesh_idx]
+		if mesh.resource_name.contains("Smoke"):
+			print("\n=== Verifying VERTEX_ID for Smoke mesh ===")
+			var importer_mesh = mesh.mesh
+			var arrays = importer_mesh.get_surface_arrays(0)
+
+			# Get index array
+			var indices = arrays[Mesh.ARRAY_INDEX]
+			if indices == null:
+				print("No index buffer found")
+				return
+
+			# Get position and UV arrays
+			var positions = arrays[Mesh.ARRAY_VERTEX]
+			var uvs = arrays[Mesh.ARRAY_TEX_UV]
+
+			print("First 12 indices (2 quads):")
+			for i in range(min(12, indices.size())):
+				var vertex_id = indices[i]
+				var corner_from_mod = vertex_id % 4
+				var pos = positions[vertex_id] if vertex_id < positions.size() else Vector3.ZERO
+				var uv = uvs[vertex_id] if vertex_id < uvs.size() else Vector2.ZERO
+				print("  Invocation %d: VERTEX_ID=%d, mod4=%d, UV=(%.3f,%.3f), pos=(%.2f,%.2f,%.2f)" % [i, vertex_id, corner_from_mod, uv.x, uv.y, pos.x, pos.y, pos.z])
+
+			return
 
 func _apply_materials_to_importer_scene(node: Node, gltf_state: GLTFState):
 	if node.get_class() == "ImporterMeshInstance3D":
@@ -209,10 +244,10 @@ func _map_custom_attributes_to_standard_slots(gltf_json: Dictionary):
 			# These brushes have: POSITION, COLOR_0, TEXCOORD_0, _TB_TIMESTAMP, _TB_UNITY_NORMAL, _TB_UNITY_TEXCOORD_0
 			# They do NOT have: NORMAL or TANGENT - we can use these!
 			var is_particle_brush = (material_name.contains("Smoke") or
-			                         material_name.contains("Bubbles") or
-			                         material_name.contains("Dots") or
-			                         material_name.contains("Snow") or
-			                         material_name.contains("Stars"))
+									 material_name.contains("Bubbles") or
+									 material_name.contains("Dots") or
+									 material_name.contains("Snow") or
+									 material_name.contains("Stars"))
 
 			if is_particle_brush:
 				# _TB_UNITY_NORMAL (particle center, VEC3) → NORMAL
