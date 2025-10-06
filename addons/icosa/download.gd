@@ -16,6 +16,7 @@ var total_queue_size = 0
 var download_path = ""
 var asset_name = ""
 var asset_id = ""
+var pending_download_file = ""  # Store the intended file path
 
 @onready var root_directory = "res://" if Engine.is_editor_hint() else "user://"
 
@@ -112,9 +113,9 @@ func start_next_download():
 	if not dir.dir_exists(asset_path):
 		dir.make_dir(asset_path)
 	
-	# Set the download file path with the properly decoded filename
-	download_file = root_directory + "icosa_downloads/" + asset_path + "/" + final_filename
-	
+	# Store the download file path (don't set download_file on HTTPRequest yet)
+	pending_download_file = root_directory + "icosa_downloads/" + asset_path + "/" + final_filename
+
 	# Request the URL
 	var error = request(url)
 	if error != OK:
@@ -142,7 +143,7 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 			if header.begins_with("location: "):
 				var redirect_url = header.split("location: ")[1]
 				print("Location redirect found: ", redirect_url)
-				var original_file_path = download_file
+				var original_file_path = pending_download_file
 				print("Original file path: ", original_file_path)
 				cancel_request()
 				
@@ -180,18 +181,19 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 					redirect_request.queue_free()
 				return
 		return
-	
+
+	print("### Handle successful download")
 	# Handle successful download
 	if result == HTTPRequest.RESULT_SUCCESS:
-		if download_file != "":
-			var file = FileAccess.open(download_file, FileAccess.WRITE)
+		if pending_download_file != "":
+			var file = FileAccess.open(pending_download_file, FileAccess.WRITE)
 			if file:
 				file.store_buffer(body)
 				file.close()
-				print("File downloaded and saved successfully: ", download_file)
-				file_downloaded_to_path.emit(download_file)
+				print("File downloaded and saved successfully: ", pending_download_file)
+				file_downloaded_to_path.emit(pending_download_file)
 			else:
-				push_error("Failed to open file for writing: ", download_file)
+				push_error("Failed to open file for writing: ", pending_download_file)
 		else:
 			push_error("Download file path is empty")
 		
