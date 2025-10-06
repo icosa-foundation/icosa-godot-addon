@@ -5,12 +5,13 @@
 
 [sub_resource type="SystemFont" id="SystemFont_v1e32"]
 font_names = PackedStringArray("Arial")
+subpixel_positioning = 0
 
 [sub_resource type="Theme" id="Theme_0gaid"]
 default_font = SubResource("SystemFont_v1e32")
 default_font_size = 16
 
-[node name="Control" type="Control"]
+[node name="Main" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -46,3 +47,7 @@ title = "⚙️ Icosa Settings"
 initial_position = 1
 size = Vector2i(550, 300)
 visible = false
+
+[node name="Downloads" type="Node" parent="."]
+
+[connection signal="tree_exited" from="Downloads" to="IcosaBrowser" method="_on_downloads_tree_exited"]

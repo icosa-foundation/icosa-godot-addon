@@ -136,3 +136,9 @@ func add_thumbnail_tab(thumbnail : IcosaThumbnail, title : String):
 	move_child(thumbnail_copy, place)
 	set_tab_title(place, title)
 	set_tab_button_icon(place, cross_icon)
+
+
+func _on_downloads_tree_exited():
+	if Engine.is_editor_hint(): 
+		var toaster = EditorInterface.get_editor_toaster()
+		toaster.push_toast("Download Finished!")

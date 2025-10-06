@@ -8,7 +8,7 @@ var thumbnail_request := HTTPRequest.new()
 var asset : IcosaAsset
 var is_preview = false
 
-var download = IcosaDownload.new()
+var download : IcosaDownload
 var download_urls: Array
 var current_download_url:= 1 
 var download_urls_size: int
@@ -130,7 +130,8 @@ func _on_download_pressed():
 	var gltf_urls = formats["GLTF2"]
 	download_urls = gltf_urls
 	
-	add_child(download)
+	get_tree().get_root().get_node("Main").get_node("Downloads").add_child(download)
+	
 	download.url_queue = download_urls
 	download.asset_name = asset.display_name
 	download.asset_id = asset.id.replace("assets/", "")
