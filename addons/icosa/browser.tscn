@@ -11,7 +11,7 @@ subpixel_positioning = 0
 default_font = SubResource("SystemFont_v1e32")
 default_font_size = 16
 
-[node name="Main" type="Control"]
+[node name="Icosa" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

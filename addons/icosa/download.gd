@@ -10,7 +10,7 @@ signal download_queue_completed(model_file)
 signal host_offline
 signal file_downloaded_to_path(path)
 
-var url_queue : Array[String] = []
+var url_queue = []
 var current_queue_index = 0
 var total_queue_size = 0
 var download_path = ""
@@ -35,23 +35,6 @@ func _ready():
 
 
 func start():
-	# Sort URLs so that .bin files are first and model files (.gltf or .glb) are last
-	url_queue.sort_custom(func(a, b):
-		var a_is_bin = a.ends_with(".bin")
-		var b_is_bin = b.ends_with(".bin")
-		var a_is_model = a.ends_with(".gltf") or a.ends_with(".glb")
-		var b_is_model = b.ends_with(".gltf") or b.ends_with(".glb")
-		
-		# .bin files should come first
-		if a_is_bin and not b_is_bin:
-			return true
-		if b_is_bin and not a_is_bin:
-			return false
-		
-		# Model files should come last
-		return b_is_model and not a_is_model
-	)
-	
 	# Initialize the queue and start downloading
 	total_queue_size = url_queue.size()
 	

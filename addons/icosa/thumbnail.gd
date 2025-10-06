@@ -12,7 +12,7 @@ var download : IcosaDownload
 var download_urls: Array
 var current_download_url:= 1 
 var download_urls_size: int
-signal download_requested(urls : Array[String])
+signal download_requested(urls : Array)
 signal delete_requested(asset_url)
 var downloaded_bytes : int = 0
 
@@ -130,7 +130,8 @@ func _on_download_pressed():
 	var gltf_urls = formats["GLTF2"]
 	download_urls = gltf_urls
 	
-	get_tree().get_root().get_node("Main").get_node("Downloads").add_child(download)
+	download = IcosaDownload.new()
+	get_tree().get_root().add_child(download)
 	
 	download.url_queue = download_urls
 	download.asset_name = asset.display_name
