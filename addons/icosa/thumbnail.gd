@@ -131,7 +131,7 @@ func _on_download_pressed():
 	download_urls = gltf_urls
 	
 	download = IcosaDownload.new()
-	get_tree().get_root().add_child(download)
+	owner.owner.owner.get_node("Downloads").add_child(download)
 	
 	download.url_queue = download_urls
 	download.asset_name = asset.display_name
@@ -171,7 +171,9 @@ func _on_queue_downloaded(model_file):
 	_on_download_queue_completed()
 	if Engine.is_editor_hint():
 		EditorInterface.get_resource_filesystem().scan()
-	
+		var toaster = EditorInterface.get_editor_toaster()
+		toaster.push_toast("Downloaded: ", model_file)
+	download.queue_free()
 	
 	## TODO: 3D preview code (terrible, but working)
 	#if is_preview:

@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://ba0b6yderoyxt"]
+[gd_scene load_steps=8 format=3 uid="uid://ba0b6yderoyxt"]
 
 [ext_resource type="Script" uid="uid://caqjd16i2dp01" path="res://addons/icosa/search.gd" id="1_ot4t0"]
 [ext_resource type="Texture2D" uid="uid://4ova4wsdy5x8" path="res://addons/icosa/icons/magnify.svg" id="2_ottfe"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://ccmeocu15nk48" path="res://addons/icosa/icons/plus.svg" id="3_bp884"]
 [ext_resource type="Texture2D" uid="uid://c3fwlyhb8aouh" path="res://addons/icosa/icons/arrow_left.svg" id="4_d4enq"]
 [ext_resource type="Texture2D" uid="uid://b64swhbw03k8b" path="res://addons/icosa/icons/arrow_right.svg" id="5_bivqy"]
+[ext_resource type="Texture2D" uid="uid://4uo3pd7erdcj" path="res://addons/icosa/icons/arrow_down.svg" id="7_d4enq"]
 
 [node name="Search" type="VBoxContainer"]
 anchors_preset = 15
@@ -234,11 +235,62 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-item_count = 1
-popup/item_0/text = "order by..."
+selected = 0
+item_count = 19
+popup/item_0/text = "Best"
 popup/item_0/id = 0
-popup/item_0/disabled = true
-popup/item_0/separator = true
+popup/item_1/text = "Newest"
+popup/item_1/id = 1
+popup/item_2/text = "Oldest"
+popup/item_2/id = 2
+popup/item_3/text = "Create Time"
+popup/item_3/icon = ExtResource("3_b5aqq")
+popup/item_3/id = 3
+popup/item_4/text = "Create Time"
+popup/item_4/icon = ExtResource("7_d4enq")
+popup/item_4/id = 4
+popup/item_5/text = "Update Time"
+popup/item_5/icon = ExtResource("3_b5aqq")
+popup/item_5/id = 5
+popup/item_6/text = "Update Time"
+popup/item_6/icon = ExtResource("7_d4enq")
+popup/item_6/id = 6
+popup/item_7/text = "Triangle Count"
+popup/item_7/icon = ExtResource("3_b5aqq")
+popup/item_7/id = 7
+popup/item_8/text = "Triangle Count"
+popup/item_8/icon = ExtResource("7_d4enq")
+popup/item_8/id = 8
+popup/item_9/text = "Liked Time"
+popup/item_9/icon = ExtResource("3_b5aqq")
+popup/item_9/id = 9
+popup/item_10/text = "Liked Time"
+popup/item_10/icon = ExtResource("7_d4enq")
+popup/item_10/id = 10
+popup/item_11/text = "Likes"
+popup/item_11/icon = ExtResource("3_b5aqq")
+popup/item_11/id = 11
+popup/item_12/text = "Likes"
+popup/item_12/icon = ExtResource("7_d4enq")
+popup/item_12/id = 12
+popup/item_13/text = "Downloads"
+popup/item_13/icon = ExtResource("3_b5aqq")
+popup/item_13/id = 13
+popup/item_14/text = "Downloads"
+popup/item_14/icon = ExtResource("7_d4enq")
+popup/item_14/id = 14
+popup/item_15/text = "Display Name"
+popup/item_15/icon = ExtResource("3_b5aqq")
+popup/item_15/id = 15
+popup/item_16/text = "Display Name"
+popup/item_16/icon = ExtResource("7_d4enq")
+popup/item_16/id = 16
+popup/item_17/text = "Author Name"
+popup/item_17/icon = ExtResource("3_b5aqq")
+popup/item_17/id = 17
+popup/item_18/text = "Author Name"
+popup/item_18/icon = ExtResource("7_d4enq")
+popup/item_18/id = 18
 
 [node name="FormatsPanel" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels"]
 layout_mode = 2
