@@ -1,16 +1,11 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://bfhsnsjbhhful"]
 
-[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/TaperedWire/TaperedWire-9568870f-8594-60f4-1b20-dfbc8a5eac0e-v10.0-MainTex.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://ddwpj6j7nsb7l" path="res://addons/icosa/brush_materials/TaperedWire/TaperedWire-9568870f-8594-60f4-1b20-dfbc8a5eac0e-v10.0-MainTex.png" id="1"]
 
 [resource]
 resource_name = "TaperedWire"
-blend_mode = 0
+specular_mode = 1
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
-alpha_scissor_threshold = 0.5
-roughness = 0.5
-metallic = 0
-albedo_color = Color(1.0, 1.0, 1.0, 1.0)
-specular_mode = 1
-specular_color = Color(0.09558821, 0.09558821, 0.09558821, 1.0)
 albedo_texture = ExtResource("1")
+roughness = 0.5

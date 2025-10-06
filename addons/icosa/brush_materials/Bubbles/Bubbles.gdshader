@@ -30,24 +30,47 @@ vec3 recreate_corner(vec3 center, float corner, float rotation, float size) {
 }
 
 void vertex() {
-  // Extract particle data from vertex attributes
-  vec3 center = NORMAL;  // Particle center stored in normal
-  // Rotation stored in CUSTOM0.z (from _TEXCOORD_0.z)
-  float rotation = CUSTOM0.z;
+  // Extract particle data from remapped attributes
+  // GLTF attribute mapping (remapped in gltf_import.gd):
+  // _TB_UNITY_NORMAL → NORMAL (particle center, VEC3)
+  // _TB_UNITY_TEXCOORD_0 → TANGENT (rotation in .z, VEC4)
+  // _TB_TIMESTAMP → TEXCOORD_1/UV2 (birth time)
 
-  // Calculate billboard size and corner
-  float corner = mod(float(VERTEX_ID), 4.0);
-  float size = length(VERTEX - center) * kRecipSquareRootOfTwo;
+  vec3 center_OS = NORMAL;      // Particle center
+  float rotation = TANGENT.z;   // Rotation angle
+  float birthTime = UV2.x;      // Birth time
+
+  // Calculate which corner this vertex represents
+  // We can't use mod(VERTEX_ID, 4) because index buffer draws vertices out of order
+  vec3 offset_OS = VERTEX - center_OS;
+
+  float corner;
+  if (offset_OS.x < 0.0 && offset_OS.y < 0.0) {
+    corner = 0.0;  // bottom-left
+  } else if (offset_OS.x >= 0.0 && offset_OS.y < 0.0) {
+    corner = 1.0;  // bottom-right
+  } else if (offset_OS.x < 0.0 && offset_OS.y >= 0.0) {
+    corner = 2.0;  // top-left
+  } else {
+    corner = 3.0;  // top-right
+  }
+
+  float halfSize_OS = length(VERTEX - center_OS) * kRecipSquareRootOfTwo;
 
   // Get scale from model matrix
   float scale = MODEL_MATRIX[1][1];
+  scale = 0.1; // Hardcoded scale adjustment
 
-  // Create camera-facing billboard in view space
-  vec3 center_view = (MODELVIEW_MATRIX * vec4(center, 1.0)).xyz;
-  vec3 vertex_view = recreate_corner(center_view, corner, rotation, size * scale);
-  vec3 vertex_world = (inverse(MODELVIEW_MATRIX) * vec4(vertex_view, 1.0)).xyz;
+  // Calculate modelview matrix
+  mat4 modelview_mat = VIEW_MATRIX * MODEL_MATRIX;
+  mat4 inv_modelview_mat = inverse(modelview_mat);
 
-  VERTEX = (inverse(MODEL_MATRIX) * vec4(vertex_world, 1.0)).xyz;
+  // Apply billboarding using recreate_corner in view space
+  vec3 center_final_OS = center_OS;
+  vec3 center_view = (modelview_mat * vec4(center_final_OS, 1.0)).xyz;
+  vec3 vertex_view = recreate_corner(center_view, corner, rotation, halfSize_OS * scale);
+
+  VERTEX = (inv_modelview_mat * vec4(vertex_view, 1.0)).xyz;
   v_fog_coord = vertex_view.z;
 }
 

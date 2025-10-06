@@ -1,19 +1,14 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" load_steps=3 format=3 uid="uid://bnrti4rtrbm26"]
 
-[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/Guts/Guts-99aafe96-1645-44cd-99bd-979bc6ef37c5-v10.0-MainTex.png" id="1"]
-[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/Guts/Guts-99aafe96-1645-44cd-99bd-979bc6ef37c5-v10.0-BumpMap.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://dhlg2mx30aa2o" path="res://addons/icosa/brush_materials/Guts/Guts-99aafe96-1645-44cd-99bd-979bc6ef37c5-v10.0-MainTex.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://cf1id8x07otc1" path="res://addons/icosa/brush_materials/Guts/Guts-99aafe96-1645-44cd-99bd-979bc6ef37c5-v10.0-BumpMap.png" id="2"]
 
 [resource]
 resource_name = "Guts"
 transparency = 1
-cull_mode = 2
-cull_mode = 0
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
-alpha_scissor_threshold = 0.3
-roughness = 0.6950000000000001
-metallic = 0
-albedo_color = Color(1.0, 1.0, 1.0, 1.0)
 albedo_texture = ExtResource("1")
+roughness = 0.695
 normal_enabled = true
 normal_texture = ExtResource("2")

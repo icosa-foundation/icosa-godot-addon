@@ -1,21 +1,17 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" load_steps=3 format=3 uid="uid://cj1my35bqwd7p"]
 
-[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/WetPaint/WetPaint-b67c0e81-ce6d-40a8-aeb0-ef036b081aa3-v10.0-MainTex.png" id="1"]
-[ext_resource type="Texture2D" path="res://addons/icosa/brush_materials/WetPaint/WetPaint-b67c0e81-ce6d-40a8-aeb0-ef036b081aa3-v10.0-BumpMap.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://pdrgqma2f35c" path="res://addons/icosa/brush_materials/WetPaint/WetPaint-b67c0e81-ce6d-40a8-aeb0-ef036b081aa3-v10.0-MainTex.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://beikeohsuv2ol" path="res://addons/icosa/brush_materials/WetPaint/WetPaint-b67c0e81-ce6d-40a8-aeb0-ef036b081aa3-v10.0-BumpMap.png" id="2"]
 
 [resource]
 resource_name = "WetPaintDoubleSided"
 transparency = 2
-cull_mode = 2
-cull_mode = 0
+alpha_scissor_threshold = 0.3
+alpha_antialiasing_mode = 0
+specular_mode = 1
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
-alpha_scissor_threshold = 0.3
-roughness = 0.5
-metallic = 0
-albedo_color = Color(1.0, 1.0, 1.0, 1.0)
-specular_mode = 1
-specular_color = Color(0.1397059, 0.1397059, 0.1397059, 1.0)
 albedo_texture = ExtResource("1")
+roughness = 0.5
 normal_enabled = true
 normal_texture = ExtResource("2")

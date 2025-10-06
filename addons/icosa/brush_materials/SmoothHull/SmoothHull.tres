@@ -1,15 +1,8 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://kiwxords4i6r"]
 
 [resource]
 resource_name = "SmoothHull"
-blend_mode = 0
-cull_mode = 2
-cull_mode = 0
+specular_mode = 1
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
-alpha_scissor_threshold = 0.5
 roughness = 0.5
-metallic = 0
-albedo_color = Color(1.0, 1.0, 1.0, 1.0)
-specular_mode = 1
-specular_color = Color(0.29411763, 0.29411763, 0.29411763, 1.0)
