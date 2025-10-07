@@ -362,7 +362,7 @@ text = "CC BY"
 
 [node name="ALL_CC" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3/VBoxContainer3"]
 layout_mode = 2
-text = "CC BY"
+text = "ALL CC"
 
 [node name="PageSize" type="SpinBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels"]
 unique_name_in_owner = true

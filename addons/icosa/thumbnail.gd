@@ -169,8 +169,9 @@ func load_license_sticker():
 func _on_queue_downloaded(model_file):
 	is_downloaded = true
 	_on_download_queue_completed()
+	await get_tree().process_frame
 	if Engine.is_editor_hint():
-		EditorInterface.get_resource_filesystem().scan()
+		await EditorInterface.get_resource_filesystem().scan()
 		var toaster = EditorInterface.get_editor_toaster()
 		toaster.push_toast("Downloaded: ", model_file)
 	download.queue_free()
@@ -208,14 +209,9 @@ func _on_queue_downloaded(model_file):
 func _on_delete_asset_pressed():
 	delete_requested.emit(asset.id)
 
-# This assumes RichTextLabel's `meta_clicked` signal was connected to
-# the function below using the signal connection dialog.
-func _richtextlabel_on_meta_clicked(meta):
-	# `meta` is of Variant type, so convert it to a String to avoid script errors at run-time.
-	#TODO: filter users assets by clicking username
-	pass
-	#OS.shell_open(str(meta))
-
-
 func _on_author_name_meta_clicked(meta):
 	author_id_clicked.emit(str(meta), asset.author_name)
+
+## no endpoint for this, it could be nice though.
+func _on_like_pressed():
+	pass # Replace with function body.

@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://c6qdcl0sg2mxy"]
+[gd_scene load_steps=26 format=3 uid="uid://c6qdcl0sg2mxy"]
 
 [ext_resource type="Script" uid="uid://bm22v3o2u7lln" path="res://addons/icosa/thumbnail.gd" id="1_8pxhf"]
 [ext_resource type="Script" uid="uid://cbxuo7ms12d55" path="res://addons/icosa/misc/3d_preview.gd" id="2_yfmvu"]
@@ -32,62 +32,49 @@ sky_material = SubResource("ProceduralSkyMaterial_prrh0")
 background_mode = 1
 sky = SubResource("Sky_yfmvu")
 
-[sub_resource type="Gradient" id="Gradient_3vp83"]
-offsets = PackedFloat32Array(0.3, 0.5, 0.7)
-colors = PackedColorArray(0.24696359, 0.24696359, 0.24696359, 0, 0.24696359, 0.24696359, 0.24696359, 1, 0.24696359, 0.24696359, 0.24696359, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_rs5q6"]
-gradient = SubResource("Gradient_3vp83")
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="Gradient" id="Gradient_8wiaa"]
-offsets = PackedFloat32Array(0.3, 0.5, 0.7)
-colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_g4njl"]
-gradient = SubResource("Gradient_8wiaa")
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hjirf"]
 bg_color = Color(0.148922, 0.574047, 0.258045, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rs5q6"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_g4njl"]
+
+[sub_resource type="Gradient" id="Gradient_rs5q6"]
+offsets = PackedFloat32Array(0.3, 0.5, 0.7)
+colors = PackedColorArray(0.24696359, 0.24696359, 0.24696359, 0, 0.24696359, 0.24696359, 0.24696359, 0.8, 0.24696359, 0.24696359, 0.24696359, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_8wiaa"]
+gradient = SubResource("Gradient_rs5q6")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_g4njl"]
+offsets = PackedFloat32Array(0.3, 0.5, 0.7)
+colors = PackedColorArray(0.6866236, 0.68662363, 0.6866236, 0, 0.6866236, 0.68662363, 0.6866236, 0.8, 0.6866236, 0.68662363, 0.6866236, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_fmlye"]
+gradient = SubResource("Gradient_g4njl")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3vp83"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fmlye"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8pxhf"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rs5q6"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8wiaa"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_g4njl"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8pxhf"]
-
 [sub_resource type="FontVariation" id="FontVariation_3qkbe"]
-
-[sub_resource type="Gradient" id="Gradient_fmlye"]
-offsets = PackedFloat32Array(0.3, 0.5, 0.7)
-colors = PackedColorArray(0.24696359, 0.24696359, 0.24696359, 0, 0.24696359, 0.24696359, 0.24696359, 1, 0.24696359, 0.24696359, 0.24696359, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_xx4vk"]
-gradient = SubResource("Gradient_fmlye")
-width = 32
-height = 32
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="Gradient" id="Gradient_nf0yl"]
-offsets = PackedFloat32Array(0.3, 0.5, 0.7)
-colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_dhxrd"]
-gradient = SubResource("Gradient_nf0yl")
-width = 32
-height = 32
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
 
 [node name="Thumbnail" type="Button"]
 custom_minimum_size = Vector2(300, 300)
@@ -118,10 +105,10 @@ alignment = 2
 [node name="MarginContainer" type="MarginContainer" parent="Padding/Info"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 6
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="Padding/Info/MarginContainer"]
 layout_mode = 2
@@ -207,13 +194,6 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="BufferingIcon" parent="Padding/Info/Progress" instance=ExtResource("3_8pxhf")]
-unique_name_in_owner = true
-layout_mode = 2
-value = 3.0
-texture_under = SubResource("GradientTexture2D_rs5q6")
-texture_progress = SubResource("GradientTexture2D_g4njl")
-
 [node name="VBoxContainer" type="VBoxContainer" parent="Padding/Info/Progress"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -266,16 +246,12 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_vertical = 3
-mouse_default_cursor_shape = 2
-theme_override_styles/focus = SubResource("StyleBoxEmpty_rs5q6")
-theme_override_styles/background = SubResource("StyleBoxEmpty_8wiaa")
-theme_override_styles/fill = SubResource("StyleBoxEmpty_g4njl")
 bbcode_enabled = true
 text = "AuthorName"
+fit_content = true
 scroll_active = false
+autowrap_mode = 0
 vertical_alignment = 2
-deselect_on_focus_loss_enabled = false
-drag_and_drop_selection_enabled = false
 
 [node name="Description" type="RichTextLabel" parent="Padding/Info/Details/Asset"]
 unique_name_in_owner = true
@@ -284,17 +260,19 @@ clip_contents = false
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_vertical = 3
-focus_mode = 2
+theme_override_font_sizes/normal_font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_rs5q6")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_g4njl")
 text = "Description"
 fit_content = true
 scroll_active = false
 autowrap_mode = 0
 context_menu_enabled = true
 vertical_alignment = 2
-selection_enabled = true
 
 [node name="Download" type="HBoxContainer" parent="Padding/Info/Details"]
 layout_mode = 2
+theme_override_constants/separation = 6
 alignment = 2
 
 [node name="License" type="TextureRect" parent="Padding/Info/Details/Download"]
@@ -305,15 +283,48 @@ size_flags_vertical = 4
 texture = ExtResource("6_3vp83")
 stretch_mode = 2
 
+[node name="BufferingIcon" parent="Padding/Info/Details/Download" instance=ExtResource("3_8pxhf")]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+value = 50.0
+nine_patch_stretch = true
+texture_under = SubResource("GradientTexture2D_8wiaa")
+texture_progress = SubResource("GradientTexture2D_fmlye")
+loop_time = 0.795
+rotation_speed = 0.105
+throbber_size = 32
+color = Color(0.6866236, 0.68662363, 0.6866236, 1)
+
 [node name="Download" type="Button" parent="Padding/Info/Details/Download"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxEmpty_3vp83")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_fmlye")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_8pxhf")
 icon = ExtResource("3_yfmvu")
 alignment = 0
+icon_alignment = 1
+
+[node name="Like" type="Button" parent="Padding/Info/Details/Download"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxEmpty_3vp83")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_rs5q6")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_8wiaa")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_fmlye")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_8pxhf")
+text = "♡"
 icon_alignment = 1
 
 [node name="DeleteAsset" type="Button" parent="Padding/Info/Details/Download"]
@@ -349,18 +360,8 @@ theme_override_font_sizes/font_size = 18
 text = "❌"
 vertical_alignment = 1
 
-[node name="BufferingIcon" parent="Padding/Info/Details/Download" instance=ExtResource("3_8pxhf")]
-visible = false
-custom_minimum_size = Vector2(32, 32)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-value = 3.0
-texture_under = SubResource("GradientTexture2D_xx4vk")
-texture_progress = SubResource("GradientTexture2D_dhxrd")
-throbber_size = Vector2i(32, 32)
-
 [connection signal="pressed" from="." to="." method="_on_pressed"]
 [connection signal="meta_clicked" from="Padding/Info/Details/Asset/AuthorName" to="." method="_on_author_name_meta_clicked"]
 [connection signal="pressed" from="Padding/Info/Details/Download/Download" to="." method="_on_download_pressed"]
+[connection signal="pressed" from="Padding/Info/Details/Download/Like" to="." method="_on_like_pressed"]
 [connection signal="pressed" from="Padding/Info/Details/Download/DeleteAsset" to="." method="_on_delete_asset_pressed"]

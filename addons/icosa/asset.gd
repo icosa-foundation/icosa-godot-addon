@@ -14,7 +14,7 @@ var author_id: String
 var license: String
 var formats: Dictionary[String, Array] = {}
 ## download & directory
-var root_directory = "res://" #if Engine.is_editor_hint() else "user://"
+var root_directory = "res://" if Engine.is_editor_hint() else "user://"
 
 var user_asset = false
 ## get a single asset json/dict and pass it in here
@@ -45,11 +45,11 @@ func build(asset_data):
 				var urls = []
 				var root = format["root"]
 				var resources = format["resources"]
-				if "url" in root: # get the model file
-					urls.append(root["url"])
 				for resource in resources: # get any resources. textures, bin, etc
 					if "url" in resource: # there may be multiple
-						urls.append(resource["url"])	
+						urls.append(resource["url"])
+				if "url" in root: # get the model file, last, so gltf is scanned after.
+					urls.append(root["url"])
 				formats.get_or_add(format_type, urls)
 
 func cache_asset(path_to_cache):
