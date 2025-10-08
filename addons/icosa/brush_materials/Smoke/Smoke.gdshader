@@ -131,17 +131,21 @@ vec3 recreate_corner(vec3 center_os, float corner, float rotation, float size, m
 void vertex() {
   // Extract particle data from vertex attributes
   // GLTF attribute mapping for Smoke brush (remapped to standard attributes):
-  // _TB_UNITY_NORMAL → NORMAL (particle center, VEC3)
+  // _TB_UNITY_NORMAL → packed into CUSTOM0.yzw (particle center, VEC3)
   // _TB_UNITY_TEXCOORD_0 → TANGENT (rotation in .z, VEC4)
   // _TB_TIMESTAMP → TEXCOORD_1/UV2 (birth time)
-  // CUSTOM0.x → vertex ID (added by GLTF importer)
+  // CUSTOM0.x → vertex ID (added by importer)
+  // CUSTOM0.yzw → particle center (object space)
 
-  vec3 center_OS = NORMAL;      // Particle center
   float rotation = TANGENT.z;   // Rotation angle
   float birthTime = UV2.x;      // Birth time
 
+  vec4 custom0 = CUSTOM0;
+  float vertex_id = custom0.x;
+  vec3 center_OS = custom0.yzw; // Particle center
+
   // Get corner ID from vertex ID (matching GLSL gl_VertexID % 4)
-  float corner = mod(CUSTOM0.x, 4.0);
+  float corner = mod(vertex_id, 4.0);
 
   // Three.js passes through a_texcoord0.xy unchanged (line 123)
   // In Godot, UV = TEXCOORD_0, which should have the correct atlas coordinates

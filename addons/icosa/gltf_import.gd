@@ -197,18 +197,35 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 
 			print("  Surface %d: %d vertices" % [surface_idx, vertex_count])
 
-			# Create vertex ID array in CUSTOM0 (R float format)
-			var vertex_ids = PackedFloat32Array()
-			vertex_ids.resize(vertex_count)
+			# Create vertex data buffer: CUSTOM0 stores vertex ID and particle center
+			var centers = arrays[Mesh.ARRAY_NORMAL]
+			if centers == null:
+				centers = PackedVector3Array()
+
+			var custom0 = PackedFloat32Array()
+			custom0.resize(vertex_count * 4)
 
 			for i in range(vertex_count):
-				vertex_ids[i] = float(i)
+				var base := i * 4
+				custom0[base] = float(i)
+				var center := Vector3.ZERO
+				if centers is PackedVector3Array and i < centers.size():
+					center = centers[i]
+				custom0[base + 1] = center.x
+				custom0[base + 2] = center.y
+				custom0[base + 3] = center.z
 
-			print("  Created CUSTOM0 array with %d floats (first vertex ID: %.1f)" %
-				[vertex_ids.size(), vertex_ids[0]])
+			if custom0.size() >= 4:
+				print("  Created CUSTOM0 array with %d floats (first vertex: id=%.1f center=(%.2f, %.2f, %.2f))" %
+					[custom0.size(), custom0[0], custom0[1], custom0[2], custom0[3]])
+			else:
+				print("  Created CUSTOM0 array with %d floats" % custom0.size())
 
-			# Set CUSTOM0 with vertex IDs
-			arrays[Mesh.ARRAY_CUSTOM0] = vertex_ids
+			# Remove particle centers from NORMAL slot so Godot doesn't treat them as normals
+			arrays[Mesh.ARRAY_NORMAL] = null
+
+			# Set CUSTOM0 data
+			arrays[Mesh.ARRAY_CUSTOM0] = custom0
 
 			# Store surface data
 			surfaces.append({
@@ -251,9 +268,9 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 				format_flags |= Mesh.ARRAY_FORMAT_TEX_UV2
 			if arrays[Mesh.ARRAY_INDEX] != null:
 				format_flags |= Mesh.ARRAY_FORMAT_INDEX
-			# Add CUSTOM0 with R float format (single float per vertex)
+			# Add CUSTOM0 with RGBA float format (vertex ID + center)
 			if arrays[Mesh.ARRAY_CUSTOM0] != null:
-				format_flags |= (Mesh.ARRAY_CUSTOM_R_FLOAT << Mesh.ARRAY_FORMAT_CUSTOM0_SHIFT)
+				format_flags |= (Mesh.ARRAY_CUSTOM_RGBA_FLOAT << Mesh.ARRAY_FORMAT_CUSTOM0_SHIFT)
 
 			new_mesh.add_surface(
 				surface_data["primitive_type"],
@@ -293,9 +310,57 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 func _import_post(gltf_state: GLTFState, root: Node) -> Error:
 	# Vertex IDs are now added in _import_post_parse
 
+	# Verify vertex packing for particle brushes (debug output only)
+	_verify_vertex_id_for_smoke(gltf_state)
+
 	# Apply materials to all ImporterMeshInstance3D nodes
 	_apply_materials_to_importer_scene(root, gltf_state)
 	return OK
+
+func _verify_vertex_id_for_smoke(gltf_state: GLTFState):
+	var meshes = gltf_state.get_meshes()
+	for mesh_idx in range(meshes.size()):
+		var mesh = meshes[mesh_idx]
+		if mesh.resource_name.contains("Smoke"):
+			print("\n=== Verifying CUSTOM0 layout for Smoke mesh ===")
+			var importer_mesh = mesh.mesh
+			var arrays = importer_mesh.get_surface_arrays(0)
+
+			var indices = arrays[Mesh.ARRAY_INDEX]
+			if indices == null:
+				print("No index buffer found")
+				return
+
+			var positions = arrays[Mesh.ARRAY_VERTEX]
+			var uvs = arrays[Mesh.ARRAY_TEX_UV]
+			var custom0 = arrays[Mesh.ARRAY_CUSTOM0]
+
+			if custom0 != null and custom0 is PackedFloat32Array:
+				var expected_custom0 = positions.size() * 4
+				print("CUSTOM0 array found with %d floats (expected %d)" %
+					[custom0.size(), expected_custom0])
+			else:
+				print("WARNING: CUSTOM0 array is null or wrong type!")
+
+			print("\nFirst 12 indices (3 quads):")
+			for i in range(min(12, indices.size())):
+				var vertex_id = indices[i]
+				var corner_from_mod = vertex_id % 4
+				var pos = positions[vertex_id] if vertex_id < positions.size() else Vector3.ZERO
+				var uv = uvs[vertex_id] if vertex_id < uvs.size() else Vector2.ZERO
+
+				var custom0_vertex_id = -1.0
+				var custom0_center = Vector3.ZERO
+				if custom0 != null and custom0 is PackedFloat32Array:
+					var base = int(vertex_id) * 4
+					if base + 3 < custom0.size():
+						custom0_vertex_id = custom0[base]
+						custom0_center = Vector3(custom0[base + 1], custom0[base + 2], custom0[base + 3])
+
+				print("  Invocation %d: index=%d, CUSTOM0 id=%.0f center=(%.2f, %.2f, %.2f), mod4=%d, UV=(%.3f,%.3f), pos=(%.2f,%.2f,%.2f)" %
+					[i, vertex_id, custom0_vertex_id, custom0_center.x, custom0_center.y, custom0_center.z, corner_from_mod, uv.x, uv.y, pos.x, pos.y, pos.z])
+
+			return
 
 func _apply_materials_to_importer_scene(node: Node, gltf_state: GLTFState):
 	if node.get_class() == "ImporterMeshInstance3D":
