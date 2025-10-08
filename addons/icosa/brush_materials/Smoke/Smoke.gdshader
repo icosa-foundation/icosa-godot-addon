@@ -134,26 +134,14 @@ void vertex() {
   // _TB_UNITY_NORMAL → NORMAL (particle center, VEC3)
   // _TB_UNITY_TEXCOORD_0 → TANGENT (rotation in .z, VEC4)
   // _TB_TIMESTAMP → TEXCOORD_1/UV2 (birth time)
+  // CUSTOM0.x → vertex ID (added by GLTF importer)
 
   vec3 center_OS = NORMAL;      // Particle center
   float rotation = TANGENT.z;   // Rotation angle
   float birthTime = UV2.x;      // Birth time
 
-  // Calculate which corner this vertex represents by examining its position relative to center
-  // We can't use mod(VERTEX_ID, 4) because the index buffer draws vertices out of order
-  vec3 offset_OS = VERTEX - center_OS;
-
-  // Determine corner based on position in a 2x2 grid
-  float corner;
-  if (offset_OS.x < 0.0 && offset_OS.y < 0.0) {
-    corner = 0.0;  // bottom-left
-  } else if (offset_OS.x >= 0.0 && offset_OS.y < 0.0) {
-    corner = 1.0;  // bottom-right
-  } else if (offset_OS.x < 0.0 && offset_OS.y >= 0.0) {
-    corner = 2.0;  // top-left
-  } else {
-    corner = 3.0;  // top-right
-  }
+  // Get corner ID from vertex ID (matching GLSL gl_VertexID % 4)
+  float corner = mod(CUSTOM0.x, 4.0);
 
   // Three.js passes through a_texcoord0.xy unchanged (line 123)
   // In Godot, UV = TEXCOORD_0, which should have the correct atlas coordinates

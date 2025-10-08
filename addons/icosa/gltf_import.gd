@@ -95,6 +95,9 @@ func _import_post_parse(gltf_state: GLTFState) -> Error:
 	# Replace materials with brush materials if matches found
 	_replace_materials_with_brush_materials(gltf_state)
 
+	# Add vertex IDs to particle brush meshes BEFORE final mesh processing
+	_add_vertex_ids_to_particle_brushes(gltf_state)
+
 	return OK
 
 func _load_brush_materials():
@@ -155,42 +158,144 @@ func _replace_materials_with_brush_materials(gltf_state: GLTFState):
 	# Set the modified materials array back
 	gltf_state.set_materials(materials)
 
+func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
+	var meshes = gltf_state.get_meshes()
+	var materials = gltf_state.get_materials()
+
+	print("\n=== _add_vertex_ids_to_particle_brushes called with %d meshes ===" % meshes.size())
+
+	for mesh_idx in range(meshes.size()):
+		var mesh = meshes[mesh_idx]
+		var importer_mesh = mesh.mesh
+
+		# Check if this is a particle brush by examining material names
+		var is_particle_brush = false
+		for surface_idx in range(importer_mesh.get_surface_count()):
+			var mat = importer_mesh.get_surface_material(surface_idx)
+			if mat != null:
+				var mat_name = mat.resource_name
+				print("Mesh '%s' surface %d material: '%s'" % [mesh.resource_name, surface_idx, mat_name])
+				if (mat_name.contains("Smoke") or
+					mat_name.contains("Bubbles") or
+					mat_name.contains("Dots") or
+					mat_name.contains("Snow") or
+					mat_name.contains("Stars")):
+					is_particle_brush = true
+					break
+
+		if not is_particle_brush:
+			print("Skipping non-particle mesh: %s" % mesh.resource_name)
+			continue
+
+		print("Processing particle brush mesh: %s" % mesh.resource_name)
+
+		# Collect all surface data with vertex IDs added
+		var surfaces = []
+		for surface_idx in range(importer_mesh.get_surface_count()):
+			var arrays = importer_mesh.get_surface_arrays(surface_idx)
+			var vertex_count = arrays[Mesh.ARRAY_VERTEX].size()
+
+			print("  Surface %d: %d vertices" % [surface_idx, vertex_count])
+
+			# Create vertex ID array in CUSTOM0 (R float format)
+			var vertex_ids = PackedFloat32Array()
+			vertex_ids.resize(vertex_count)
+
+			for i in range(vertex_count):
+				vertex_ids[i] = float(i)
+
+			print("  Created CUSTOM0 array with %d floats (first vertex ID: %.1f)" %
+				[vertex_ids.size(), vertex_ids[0]])
+
+			# Set CUSTOM0 with vertex IDs
+			arrays[Mesh.ARRAY_CUSTOM0] = vertex_ids
+
+			# Store surface data
+			surfaces.append({
+				"primitive_type": importer_mesh.get_surface_primitive_type(surface_idx),
+				"arrays": arrays,
+				"material": importer_mesh.get_surface_material(surface_idx),
+				"name": importer_mesh.get_surface_name(surface_idx)
+			})
+
+		# Create a new ImporterMesh with CUSTOM0 data
+		var new_mesh = ImporterMesh.new()
+		print("  Creating new mesh with %d surfaces" % surfaces.size())
+
+		for i in range(surfaces.size()):
+			var surface_data = surfaces[i]
+
+			# Get the correct brush material for this surface
+			var original_material = surface_data["material"]
+			var material_name = original_material.resource_name if original_material else ""
+			var brush_material = _find_matching_brush_material(material_name)
+			var final_material = brush_material if brush_material != null else original_material
+
+			print("  Adding surface %d: primitive_type=%d, original_material=%s, brush_material=%s" %
+				[i, surface_data["primitive_type"], material_name, "found" if brush_material != null else "not found"])
+
+			# Set array format - build flags based on which arrays exist
+			var format_flags = 0
+			var arrays = surface_data["arrays"]
+			if arrays[Mesh.ARRAY_VERTEX] != null:
+				format_flags |= Mesh.ARRAY_FORMAT_VERTEX
+			if arrays[Mesh.ARRAY_NORMAL] != null:
+				format_flags |= Mesh.ARRAY_FORMAT_NORMAL
+			if arrays[Mesh.ARRAY_TANGENT] != null:
+				format_flags |= Mesh.ARRAY_FORMAT_TANGENT
+			if arrays[Mesh.ARRAY_COLOR] != null:
+				format_flags |= Mesh.ARRAY_FORMAT_COLOR
+			if arrays[Mesh.ARRAY_TEX_UV] != null:
+				format_flags |= Mesh.ARRAY_FORMAT_TEX_UV
+			if arrays[Mesh.ARRAY_TEX_UV2] != null:
+				format_flags |= Mesh.ARRAY_FORMAT_TEX_UV2
+			if arrays[Mesh.ARRAY_INDEX] != null:
+				format_flags |= Mesh.ARRAY_FORMAT_INDEX
+			# Add CUSTOM0 with R float format (single float per vertex)
+			if arrays[Mesh.ARRAY_CUSTOM0] != null:
+				format_flags |= (Mesh.ARRAY_CUSTOM_R_FLOAT << Mesh.ARRAY_FORMAT_CUSTOM0_SHIFT)
+
+			new_mesh.add_surface(
+				surface_data["primitive_type"],
+				arrays,
+				[],
+				{},
+				final_material,
+				surface_data["name"],
+				format_flags
+			)
+
+			# Verify CUSTOM0 was added
+			var surface_idx = new_mesh.get_surface_count() - 1
+			print("  Mesh now has %d surfaces" % new_mesh.get_surface_count())
+
+			var check_arrays = new_mesh.get_surface_arrays(surface_idx)
+			var check_custom0 = check_arrays[Mesh.ARRAY_CUSTOM0]
+			if check_custom0 != null and check_custom0 is PackedFloat32Array:
+				print("  Surface %d: CUSTOM0 verified - %d floats" % [surface_idx, check_custom0.size()])
+			else:
+				print("  Surface %d: WARNING - CUSTOM0 is null or wrong type!" % surface_idx)
+
+		# Replace the old mesh with the new one
+		mesh.mesh = new_mesh
+
+		print("Finished adding vertex IDs to particle brush mesh: " + mesh.resource_name)
+		print("Final surface count: %d" % new_mesh.get_surface_count())
+
+		# Final verification - check if mesh has valid data
+		for i in range(new_mesh.get_surface_count()):
+			var final_arrays = new_mesh.get_surface_arrays(i)
+			var verts = final_arrays[Mesh.ARRAY_VERTEX]
+			var indices = final_arrays[Mesh.ARRAY_INDEX]
+			var custom0 = final_arrays[Mesh.ARRAY_CUSTOM0]
+			print("  Final check surface %d: %d verts, %d indices, CUSTOM0: %s" % [i, verts.size() if verts else 0, indices.size() if indices else 0, "found" if custom0 != null else "missing"])
+
 func _import_post(gltf_state: GLTFState, root: Node) -> Error:
-	# Verify VERTEX_ID mapping for Smoke mesh
-	_verify_vertex_id_for_smoke(gltf_state)
+	# Vertex IDs are now added in _import_post_parse
 
 	# Apply materials to all ImporterMeshInstance3D nodes
 	_apply_materials_to_importer_scene(root, gltf_state)
 	return OK
-
-func _verify_vertex_id_for_smoke(gltf_state: GLTFState):
-	var meshes = gltf_state.get_meshes()
-	for mesh_idx in range(meshes.size()):
-		var mesh = meshes[mesh_idx]
-		if mesh.resource_name.contains("Smoke"):
-			print("\n=== Verifying VERTEX_ID for Smoke mesh ===")
-			var importer_mesh = mesh.mesh
-			var arrays = importer_mesh.get_surface_arrays(0)
-
-			# Get index array
-			var indices = arrays[Mesh.ARRAY_INDEX]
-			if indices == null:
-				print("No index buffer found")
-				return
-
-			# Get position and UV arrays
-			var positions = arrays[Mesh.ARRAY_VERTEX]
-			var uvs = arrays[Mesh.ARRAY_TEX_UV]
-
-			print("First 12 indices (2 quads):")
-			for i in range(min(12, indices.size())):
-				var vertex_id = indices[i]
-				var corner_from_mod = vertex_id % 4
-				var pos = positions[vertex_id] if vertex_id < positions.size() else Vector3.ZERO
-				var uv = uvs[vertex_id] if vertex_id < uvs.size() else Vector2.ZERO
-				print("  Invocation %d: VERTEX_ID=%d, mod4=%d, UV=(%.3f,%.3f), pos=(%.2f,%.2f,%.2f)" % [i, vertex_id, corner_from_mod, uv.x, uv.y, pos.x, pos.y, pos.z])
-
-			return
 
 func _apply_materials_to_importer_scene(node: Node, gltf_state: GLTFState):
 	if node.get_class() == "ImporterMeshInstance3D":
