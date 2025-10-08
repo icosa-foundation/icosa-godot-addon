@@ -152,26 +152,33 @@ void vertex() {
   v_uv_base = UV;
 
   float halfSize_OS = length(VERTEX - center_OS) * kRecipSquareRootOfTwo;
-  // For curl noise displacement (currently disabled for debugging)
-  vec3 center_final_OS = center_OS;
-  // TODO: Enable curl noise displacement
-  // vec3 center_WS = (MODEL_MATRIX * vec4(center_OS, 1.0)).xyz;
-  // float time = TIME / 20.0 * 5.0;
-  // float d = 30.0;
-  // float freq = 0.1;
-  // vec3 disp = vec3(1.0, 0.0, 0.0) * curlX(center_WS * freq + time, d);
-  // disp += vec3(0.0, 1.0, 0.0) * curlY(center_WS * freq + time, d);
-  // disp += vec3(0.0, 0.0, 1.0) * curlZ(center_WS * freq + time, d);
-  // disp *= 5.0 * kDecimetersToWorldUnits;
-  // center_WS += disp;
-  // center_final_OS = (inverse(MODEL_MATRIX) * vec4(center_WS, 1.0)).xyz;
 
-  // Get scale from model matrix (matching Three.js line 101)
+  // Precompute basis vectors for scaling and curl strength
   vec3 basis_x = MODEL_MATRIX[0].xyz;
   vec3 basis_y = MODEL_MATRIX[1].xyz;
   vec3 basis_z = MODEL_MATRIX[2].xyz;
   float raw_scale = (length(basis_x) + length(basis_y) + length(basis_z)) / 3.0;
   float scale = max(raw_scale, 0.0001);
+
+  vec3 center_final_OS = center_OS;
+  mat4 inv_model_mat = inverse(MODEL_MATRIX);
+
+  // Apply subtle curl-noise displacement in world space, then convert back to object space
+  {
+    vec3 center_WS = (MODEL_MATRIX * vec4(center_OS, 1.0)).xyz;
+    float noise_time = TIME * 0.05 + birthTime * 0.5;
+    vec3 noise_coord = center_WS * 0.08 + vec3(noise_time);
+    float curl_divisor = 30.0;
+    vec3 curl_sample = vec3(
+      curlX(noise_coord, curl_divisor),
+      curlY(noise_coord, curl_divisor),
+      curlZ(noise_coord, curl_divisor)
+    );
+    float curl_strength = max(raw_scale * 0.1, 0.1);
+    vec3 disp = curl_sample * curl_strength;
+    center_WS += disp;
+    center_final_OS = (inv_model_mat * vec4(center_WS, 1.0)).xyz;
+  }
 
   // Calculate modelview matrix (Godot doesn't provide MODELVIEW_MATRIX)
   mat4 modelview_mat = VIEW_MATRIX * MODEL_MATRIX;
