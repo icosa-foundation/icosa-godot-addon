@@ -171,8 +171,8 @@ void vertex() {
   vec3 basis_y = MODEL_MATRIX[1].xyz;
   vec3 basis_z = MODEL_MATRIX[2].xyz;
   float raw_scale = (length(basis_x) + length(basis_y) + length(basis_z)) / 3.0;
-  float scale = max(raw_scale / kDecimetersToWorldUnits, 0.0001);
-  float atlas_scale = 0.5;
+  float scale = max(raw_scale, 0.0001);
+
   // Calculate modelview matrix (Godot doesn't provide MODELVIEW_MATRIX)
   mat4 modelview_mat = VIEW_MATRIX * MODEL_MATRIX;
   mat4 inv_modelview_mat = inverse(modelview_mat);
@@ -182,7 +182,7 @@ void vertex() {
   // recreateCorner does the view space transform internally
 
   // Apply billboarding
-  VERTEX = recreate_corner(center_final_OS, corner, rotation, halfSize_OS * scale * atlas_scale, modelview_mat, inv_modelview_mat);
+  VERTEX = recreate_corner(center_final_OS, corner, rotation, halfSize_OS * scale, modelview_mat, inv_modelview_mat);
 
   // Calculate fog coordinate for fragment shader
   vec3 vertex_VS = (modelview_mat * vec4(VERTEX, 1.0)).xyz;
