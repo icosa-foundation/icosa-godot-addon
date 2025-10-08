@@ -357,8 +357,12 @@ func _verify_vertex_id_for_smoke(gltf_state: GLTFState):
 						custom0_vertex_id = custom0[base]
 						custom0_center = Vector3(custom0[base + 1], custom0[base + 2], custom0[base + 3])
 
-				print("  Invocation %d: index=%d, CUSTOM0 id=%.0f center=(%.2f, %.2f, %.2f), mod4=%d, UV=(%.3f,%.3f), pos=(%.2f,%.2f,%.2f)" %
-					[i, vertex_id, custom0_vertex_id, custom0_center.x, custom0_center.y, custom0_center.z, corner_from_mod, uv.x, uv.y, pos.x, pos.y, pos.z])
+				var raw_radius = 0.0
+				if positions is PackedVector3Array and vertex_id < positions.size():
+					raw_radius = (positions[vertex_id] - custom0_center).length()
+
+				print("  Invocation %d: index=%d, CUSTOM0 id=%.0f center=(%.2f, %.2f, %.2f), radius=%.3f, mod4=%d, UV=(%.3f,%.3f), pos=(%.2f,%.2f,%.2f)" %
+					[i, vertex_id, custom0_vertex_id, custom0_center.x, custom0_center.y, custom0_center.z, raw_radius, corner_from_mod, uv.x, uv.y, pos.x, pos.y, pos.z])
 
 			return
 

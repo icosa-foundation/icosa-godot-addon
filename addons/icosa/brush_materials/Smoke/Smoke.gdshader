@@ -148,23 +148,12 @@ void vertex() {
   float corner = mod(vertex_id, 4.0);
 
   // Three.js passes through a_texcoord0.xy unchanged (line 123)
-  // In Godot, UV = TEXCOORD_0, which should have the correct atlas coordinates
-  // But we need to reconstruct UVs for the billboard quad
-
-  // Generate corner-based UVs (0-1 range for the quad)
-  vec2 corner_uv;
-  if (corner == 0.0) corner_uv = vec2(0.0, 0.0);
-  else if (corner == 1.0) corner_uv = vec2(1.0, 0.0);
-  else if (corner == 2.0) corner_uv = vec2(0.0, 1.0);
-  else corner_uv = vec2(1.0, 1.0);
-
-  v_uv_base = corner_uv;
+  // In Godot, UV = TEXCOORD_0 and already contains the atlas offset for each particle
+  v_uv_base = UV;
 
   float halfSize_OS = length(VERTEX - center_OS) * kRecipSquareRootOfTwo;
-
   // For curl noise displacement (currently disabled for debugging)
   vec3 center_final_OS = center_OS;
-
   // TODO: Enable curl noise displacement
   // vec3 center_WS = (MODEL_MATRIX * vec4(center_OS, 1.0)).xyz;
   // float time = TIME / 20.0 * 5.0;
@@ -178,17 +167,12 @@ void vertex() {
   // center_final_OS = (inverse(MODEL_MATRIX) * vec4(center_WS, 1.0)).xyz;
 
   // Get scale from model matrix (matching Three.js line 101)
-  float scale = MODEL_MATRIX[1][1];
-
-  // DEBUG: Show what scale value is
-  // v_color = vec4(scale, scale, scale, 1.0);
-
-  // The scale from MODEL_MATRIX is too large - maybe already applied to mesh?
-  // Just use 1.0 / the scale factor that works
-  scale = 0.1;
-
-  // Filtering now done earlier by setting center_OS to zero
-
+  vec3 basis_x = MODEL_MATRIX[0].xyz;
+  vec3 basis_y = MODEL_MATRIX[1].xyz;
+  vec3 basis_z = MODEL_MATRIX[2].xyz;
+  float raw_scale = (length(basis_x) + length(basis_y) + length(basis_z)) / 3.0;
+  float scale = max(raw_scale / kDecimetersToWorldUnits, 0.0001);
+  float atlas_scale = 0.5;
   // Calculate modelview matrix (Godot doesn't provide MODELVIEW_MATRIX)
   mat4 modelview_mat = VIEW_MATRIX * MODEL_MATRIX;
   mat4 inv_modelview_mat = inverse(modelview_mat);
@@ -198,7 +182,7 @@ void vertex() {
   // recreateCorner does the view space transform internally
 
   // Apply billboarding
-  VERTEX = recreate_corner(center_final_OS, corner, rotation, halfSize_OS * scale, modelview_mat, inv_modelview_mat);
+  VERTEX = recreate_corner(center_final_OS, corner, rotation, halfSize_OS * scale * atlas_scale, modelview_mat, inv_modelview_mat);
 
   // Calculate fog coordinate for fragment shader
   vec3 vertex_VS = (modelview_mat * vec4(VERTEX, 1.0)).xyz;
