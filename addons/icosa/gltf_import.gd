@@ -179,7 +179,8 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 					mat_name.contains("Bubbles") or
 					mat_name.contains("Dots") or
 					mat_name.contains("Snow") or
-					mat_name.contains("Stars")):
+					mat_name.contains("Stars") or
+					mat_name.contains("Embers")):
 					is_particle_brush = true
 					break
 
@@ -421,7 +422,8 @@ func _map_custom_attributes_to_standard_slots(gltf_json: Dictionary):
 									 material_name.contains("Bubbles") or
 									 material_name.contains("Dots") or
 									 material_name.contains("Snow") or
-									 material_name.contains("Stars"))
+									 material_name.contains("Stars") or
+									 material_name.contains("Embers"))
 
 			if is_particle_brush:
 				# _TB_UNITY_NORMAL (particle center, VEC3) → NORMAL
