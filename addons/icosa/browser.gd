@@ -72,6 +72,7 @@ func setup_tabs():
 	var search = search_tab_scene.instantiate()
 	search.search_requested.connect(update_search_tab_title)
 	add_child(search)
+	search.owner = self
 	set_tab_title(0, "Search")
 	set_tab_button_icon(0, cross_icon)
 	set_tab_icon(0, magnify_icon)
@@ -112,6 +113,7 @@ func on_tab_clicked(tab):
 		var search = search_tab_scene.instantiate() as IcosaSearchTab
 		search.search_requested.connect(update_search_tab_title)
 		add_child(search)
+		search.owner = self
 		move_child(search, last_tab-1)
 		set_tab_title(last_tab-1, "Search")
 		set_tab_button_icon(last_tab-1, cross_icon)
@@ -131,6 +133,7 @@ func add_thumbnail_tab(thumbnail : IcosaThumbnail, title : String):
 	thumbnail_copy.asset = thumbnail.asset
 	thumbnail_copy.is_preview = true
 	add_child(thumbnail_copy)
+	thumbnail_copy.owner = self
 	thumbnail_copy.disabled = true
 	var place = selected_tab.get_index()+1
 	move_child(thumbnail_copy, place)
@@ -139,6 +142,4 @@ func add_thumbnail_tab(thumbnail : IcosaThumbnail, title : String):
 
 
 func _on_downloads_tree_exited():
-	if Engine.is_editor_hint(): 
-		var toaster = EditorInterface.get_editor_toaster()
-		toaster.push_toast("Download Finished!")
+	pass

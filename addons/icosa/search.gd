@@ -232,7 +232,7 @@ func on_search(result : int, response_code : int, headers : PackedStringArray, b
 			thumbnail.author_id_clicked.connect(search_author_id)
 		thumbnail.pressed.connect(add_thumbnail_tab.bind(thumbnail, serialized_asset.display_name))
 		%Assets.add_child(thumbnail)
-	
+		thumbnail.owner = self
 	# Update pagination
 	update_pagination_ui()
 

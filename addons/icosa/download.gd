@@ -54,6 +54,7 @@ func update_progress():
 	if file_size_bytes == -1:
 		return
 	
+	
 	# Emit signal with progress information
 	emit_signal("download_progress", current_bytes, file_size_bytes)
 	

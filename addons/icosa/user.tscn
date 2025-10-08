@@ -68,9 +68,11 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-value = 48.0
+value = 6.0
 texture_under = SubResource("GradientTexture2D_xqmv5")
 texture_progress = SubResource("GradientTexture2D_gpenq")
+rotation_speed = null
+throbber_size = Vector2i(64, 64)
 
 [node name="UserDetails" type="PanelContainer" parent="."]
 unique_name_in_owner = true
@@ -140,7 +142,7 @@ size_flags_vertical = 3
 [node name="NoUserAssets" type="RichTextLabel" parent="UserDetails/Assets/DisplayAssets/VSplitContainer/UserAssetsSection/PanelContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 6
 size_flags_vertical = 4
 text = "you have not uploaded any assets!"
 fit_content = true
