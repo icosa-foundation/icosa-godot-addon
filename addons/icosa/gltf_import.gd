@@ -63,9 +63,6 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 
 		## Map custom attributes to standard GLTF attributes that Godot recognizes
 		_map_custom_attributes_to_standard_slots(gltf_json)
-	else:
-		print("=== NOT Applying Tilt Brush adjustments ===")
-		print(gltf_json.get("asset", {}).get("generator", "NO GENERATOR FOUND"))
 
 	return OK
 
@@ -162,7 +159,7 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 	var meshes = gltf_state.get_meshes()
 	var materials = gltf_state.get_materials()
 
-	print("\n=== _add_vertex_ids_to_particle_brushes called with %d meshes ===" % meshes.size())
+
 
 	for mesh_idx in range(meshes.size()):
 		var mesh = meshes[mesh_idx]
@@ -174,7 +171,7 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 			var mat = importer_mesh.get_surface_material(surface_idx)
 			if mat != null:
 				var mat_name = mat.resource_name
-				print("Mesh '%s' surface %d material: '%s'" % [mesh.resource_name, surface_idx, mat_name])
+
 				if (mat_name.contains("Smoke") or
 					mat_name.contains("Bubbles") or
 					mat_name.contains("Dots") or
@@ -185,10 +182,7 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 					break
 
 		if not is_particle_brush:
-			print("Skipping non-particle mesh: %s" % mesh.resource_name)
 			continue
-
-		print("Processing particle brush mesh: %s" % mesh.resource_name)
 
 		# Collect all surface data with vertex IDs added
 		var surfaces = []
@@ -196,12 +190,30 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 			var arrays = importer_mesh.get_surface_arrays(surface_idx)
 			var vertex_count = arrays[Mesh.ARRAY_VERTEX].size()
 
-			print("  Surface %d: %d vertices" % [surface_idx, vertex_count])
-
 			# Create vertex data buffer: CUSTOM0 stores vertex ID and particle center
 			var centers = arrays[Mesh.ARRAY_NORMAL]
 			if centers == null:
 				centers = PackedVector3Array()
+
+			# Remap TANGENT if it contains VEC4 TEXCOORD data (u, v, rotation, timestamp)
+			# This happens when we created a VEC4 accessor from VEC4 TEXCOORD_0
+			var tangents = arrays[Mesh.ARRAY_TANGENT]
+			if tangents != null and tangents.size() >= 4:
+				# Check if this looks like remapped VEC4 TEXCOORD data
+				# (first two components in 0-1 range, indicating UV coordinates)
+				var tx = tangents[0]
+				var ty = tangents[1]
+				if tx >= 0.0 and tx <= 1.0 and ty >= 0.0 and ty <= 1.0:
+					# Remap: extract rotation from .z, set x/y to 0, w to 1
+					var new_tangents = PackedFloat32Array()
+					new_tangents.resize(vertex_count * 4)
+					for i in range(vertex_count):
+						var base = i * 4
+						new_tangents[base + 0] = 0.0
+						new_tangents[base + 1] = 0.0
+						new_tangents[base + 2] = tangents[base + 2]  # rotation from .z
+						new_tangents[base + 3] = 1.0
+					arrays[Mesh.ARRAY_TANGENT] = new_tangents
 
 			var custom0 = PackedFloat32Array()
 			custom0.resize(vertex_count * 4)
@@ -215,12 +227,6 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 				custom0[base + 1] = center.x
 				custom0[base + 2] = center.y
 				custom0[base + 3] = center.z
-
-			if custom0.size() >= 4:
-				print("  Created CUSTOM0 array with %d floats (first vertex: id=%.1f center=(%.2f, %.2f, %.2f))" %
-					[custom0.size(), custom0[0], custom0[1], custom0[2], custom0[3]])
-			else:
-				print("  Created CUSTOM0 array with %d floats" % custom0.size())
 
 			# Remove particle centers from NORMAL slot so Godot doesn't treat them as normals
 			arrays[Mesh.ARRAY_NORMAL] = null
@@ -238,7 +244,6 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 
 		# Create a new ImporterMesh with CUSTOM0 data
 		var new_mesh = ImporterMesh.new()
-		print("  Creating new mesh with %d surfaces" % surfaces.size())
 
 		for i in range(surfaces.size()):
 			var surface_data = surfaces[i]
@@ -249,8 +254,6 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 			var brush_material = _find_matching_brush_material(material_name)
 			var final_material = brush_material if brush_material != null else original_material
 
-			print("  Adding surface %d: primitive_type=%d, original_material=%s, brush_material=%s" %
-				[i, surface_data["primitive_type"], material_name, "found" if brush_material != null else "not found"])
 
 			# Set array format - build flags based on which arrays exist
 			var format_flags = 0
@@ -285,20 +288,13 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 
 			# Verify CUSTOM0 was added
 			var surface_idx = new_mesh.get_surface_count() - 1
-			print("  Mesh now has %d surfaces" % new_mesh.get_surface_count())
 
 			var check_arrays = new_mesh.get_surface_arrays(surface_idx)
 			var check_custom0 = check_arrays[Mesh.ARRAY_CUSTOM0]
-			if check_custom0 != null and check_custom0 is PackedFloat32Array:
-				print("  Surface %d: CUSTOM0 verified - %d floats" % [surface_idx, check_custom0.size()])
-			else:
-				print("  Surface %d: WARNING - CUSTOM0 is null or wrong type!" % surface_idx)
 
 		# Replace the old mesh with the new one
 		mesh.mesh = new_mesh
 
-		print("Finished adding vertex IDs to particle brush mesh: " + mesh.resource_name)
-		print("Final surface count: %d" % new_mesh.get_surface_count())
 
 		# Final verification - check if mesh has valid data
 		for i in range(new_mesh.get_surface_count()):
@@ -306,66 +302,12 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 			var verts = final_arrays[Mesh.ARRAY_VERTEX]
 			var indices = final_arrays[Mesh.ARRAY_INDEX]
 			var custom0 = final_arrays[Mesh.ARRAY_CUSTOM0]
-			print("  Final check surface %d: %d verts, %d indices, CUSTOM0: %s" % [i, verts.size() if verts else 0, indices.size() if indices else 0, "found" if custom0 != null else "missing"])
+
 
 func _import_post(gltf_state: GLTFState, root: Node) -> Error:
-	# Vertex IDs are now added in _import_post_parse
-
-	# Verify vertex packing for particle brushes (debug output only)
-	_verify_vertex_id_for_smoke(gltf_state)
-
 	# Apply materials to all ImporterMeshInstance3D nodes
 	_apply_materials_to_importer_scene(root, gltf_state)
 	return OK
-
-func _verify_vertex_id_for_smoke(gltf_state: GLTFState):
-	var meshes = gltf_state.get_meshes()
-	for mesh_idx in range(meshes.size()):
-		var mesh = meshes[mesh_idx]
-		if mesh.resource_name.contains("Smoke"):
-			print("\n=== Verifying CUSTOM0 layout for Smoke mesh ===")
-			var importer_mesh = mesh.mesh
-			var arrays = importer_mesh.get_surface_arrays(0)
-
-			var indices = arrays[Mesh.ARRAY_INDEX]
-			if indices == null:
-				print("No index buffer found")
-				return
-
-			var positions = arrays[Mesh.ARRAY_VERTEX]
-			var uvs = arrays[Mesh.ARRAY_TEX_UV]
-			var custom0 = arrays[Mesh.ARRAY_CUSTOM0]
-
-			if custom0 != null and custom0 is PackedFloat32Array:
-				var expected_custom0 = positions.size() * 4
-				print("CUSTOM0 array found with %d floats (expected %d)" %
-					[custom0.size(), expected_custom0])
-			else:
-				print("WARNING: CUSTOM0 array is null or wrong type!")
-
-			print("\nFirst 12 indices (3 quads):")
-			for i in range(min(12, indices.size())):
-				var vertex_id = indices[i]
-				var corner_from_mod = vertex_id % 4
-				var pos = positions[vertex_id] if vertex_id < positions.size() else Vector3.ZERO
-				var uv = uvs[vertex_id] if vertex_id < uvs.size() else Vector2.ZERO
-
-				var custom0_vertex_id = -1.0
-				var custom0_center = Vector3.ZERO
-				if custom0 != null and custom0 is PackedFloat32Array:
-					var base = int(vertex_id) * 4
-					if base + 3 < custom0.size():
-						custom0_vertex_id = custom0[base]
-						custom0_center = Vector3(custom0[base + 1], custom0[base + 2], custom0[base + 3])
-
-				var raw_radius = 0.0
-				if positions is PackedVector3Array and vertex_id < positions.size():
-					raw_radius = (positions[vertex_id] - custom0_center).length()
-
-				print("  Invocation %d: index=%d, CUSTOM0 id=%.0f center=(%.2f, %.2f, %.2f), radius=%.3f, mod4=%d, UV=(%.3f,%.3f), pos=(%.2f,%.2f,%.2f)" %
-					[i, vertex_id, custom0_vertex_id, custom0_center.x, custom0_center.y, custom0_center.z, raw_radius, corner_from_mod, uv.x, uv.y, pos.x, pos.y, pos.z])
-
-			return
 
 func _apply_materials_to_importer_scene(node: Node, gltf_state: GLTFState):
 	if node.get_class() == "ImporterMeshInstance3D":
@@ -383,6 +325,26 @@ func _apply_materials_to_importer_scene(node: Node, gltf_state: GLTFState):
 	# Recursively process children
 	for child in node.get_children():
 		_apply_materials_to_importer_scene(child, gltf_state)
+
+func _split_vec4_texcoord_accessor(gltf_json: Dictionary, vec4_accessor: Dictionary) -> Array:
+	# Split a VEC4 TEXCOORD_0 accessor into:
+	# [0] = VEC2 accessor for UV coordinates (first 2 components)
+	# [1] = VEC4 accessor for all 4 components (for tangent/rotation data)
+
+	# Create VEC2 accessor for UV coordinates
+	var uv_accessor = vec4_accessor.duplicate()
+	uv_accessor["type"] = "VEC2"
+
+	# Update min/max if present (take only first 2 components)
+	if uv_accessor.has("min") and uv_accessor["min"] is Array and uv_accessor["min"].size() >= 2:
+		uv_accessor["min"] = [uv_accessor["min"][0], uv_accessor["min"][1]]
+	if uv_accessor.has("max") and uv_accessor["max"] is Array and uv_accessor["max"].size() >= 2:
+		uv_accessor["max"] = [uv_accessor["max"][0], uv_accessor["max"][1]]
+
+	# Create VEC4 accessor for tangent data (keeps all 4 components)
+	var tangent_accessor = vec4_accessor.duplicate()
+
+	return [uv_accessor, tangent_accessor]
 
 func _map_custom_attributes_to_standard_slots(gltf_json: Dictionary):
 	# Map Tilt Brush custom attributes to standard GLTF attributes per-brush
@@ -433,6 +395,26 @@ func _map_custom_attributes_to_standard_slots(gltf_json: Dictionary):
 				# _TB_UNITY_TEXCOORD_0 (has rotation in .z) → TANGENT
 				if attributes.has("_TB_UNITY_TEXCOORD_0"):
 					attrs_to_rename["_TB_UNITY_TEXCOORD_0"] = "TANGENT"
+				# SPECIAL CASE: Some files have rotation in TEXCOORD_0.z (VEC4 instead of VEC2)
+				# Fix by creating new accessors for VEC2 UV and VEC4 tangent data
+				elif attributes.has("TEXCOORD_0"):
+					var texcoord_idx = attributes["TEXCOORD_0"]
+					var accessors = gltf_json.get("accessors", [])
+					if texcoord_idx < accessors.size():
+						var accessor = accessors[texcoord_idx]
+						if accessor.get("type") == "VEC4":
+							# Create new accessors for VEC2 UV and VEC4 tangent
+							var new_accessors = _split_vec4_texcoord_accessor(gltf_json, accessor)
+							if new_accessors.size() == 2:
+								# Add new accessors to the array
+								var uv_accessor_idx = accessors.size()
+								var tangent_accessor_idx = accessors.size() + 1
+								accessors.append(new_accessors[0])  # VEC2 for UV
+								accessors.append(new_accessors[1])  # VEC4 for tangent
+
+								# Update attribute references
+								attributes["TEXCOORD_0"] = uv_accessor_idx
+								attributes["TANGENT"] = tangent_accessor_idx
 
 				# _TB_TIMESTAMP → TEXCOORD_1 (UV2)
 				if attributes.has("_TB_TIMESTAMP"):
