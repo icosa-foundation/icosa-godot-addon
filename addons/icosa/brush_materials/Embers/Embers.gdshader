@@ -11,6 +11,7 @@ uniform float u_ScrollJitterFrequency : hint_range(0.0, 20.0) = 3.0;
 varying vec4 v_color;
 
 const float kRecipSquareRootOfTwo = 0.70710678;
+const float kDecimetersToWorldUnits = 0.1;
 
 // Given a centerpoint and vertex corner, create a camera-facing quad
 vec3 recreate_corner(vec3 center_view, float corner, float rotation, float size) {
@@ -48,20 +49,20 @@ void vertex() {
   mat4 modelview_mat = VIEW_MATRIX * MODEL_MATRIX;
   mat4 inv_modelview_mat = inverse(modelview_mat);
 
-  vec3 center_view = (modelview_mat * vec4(center_OS, 1.0)).xyz;
-  vec3 vertex_view = recreate_corner(center_view, corner, rotation, halfSize_OS * scale);
-  vec3 vertex_obj = (inv_modelview_mat * vec4(vertex_view, 1.0)).xyz;
-
   float particle_id = COLOR.a;
   float t = mod(time_y * u_ScrollRate + particle_id * 10.0, 1.0);
 
-  vec3 scroll_local = u_ScrollDistance * t;
-  float jitter_x = sin(t * u_ScrollJitterFrequency + particle_id * 100.0 + time_y + vertex_obj.z) * u_ScrollJitterIntensity;
-  float jitter_y = (mod(particle_id * 100.0, 1.0) - 0.5) * u_ScrollDistance.y * t;
-  float jitter_z = cos(t * u_ScrollJitterFrequency + particle_id * 100.0 + time_y + vertex_obj.x) * u_ScrollJitterIntensity;
-  vec3 jitter_local = vec3(jitter_x, jitter_y, jitter_z);
-  vec3 disp_local = (scroll_local + jitter_local) * (scale * 0.1);
-  vec3 vertex_final_OS = vertex_obj + disp_local;
+  vec3 scroll_local = u_ScrollDistance * (t * kDecimetersToWorldUnits);
+  float jitter_x = sin(t * u_ScrollJitterFrequency + particle_id * 100.0 + time_y + center_OS.z) * u_ScrollJitterIntensity * kDecimetersToWorldUnits;
+  float jitter_y = (mod(particle_id * 100.0, 1.0) - 0.5) * u_ScrollDistance.y * (t * kDecimetersToWorldUnits);
+  float jitter_z = cos(t * u_ScrollJitterFrequency + particle_id * 100.0 + time_y + center_OS.x) * u_ScrollJitterIntensity * kDecimetersToWorldUnits;
+
+  vec3 disp_local = (scroll_local + vec3(jitter_x, jitter_y, jitter_z));
+  vec3 center_final_OS = center_OS + disp_local;
+
+  vec3 center_view = (modelview_mat * vec4(center_final_OS, 1.0)).xyz;
+  vec3 vertex_view = recreate_corner(center_view, corner, rotation, halfSize_OS * scale);
+  vec3 vertex_final_OS = (inv_modelview_mat * vec4(vertex_view, 1.0)).xyz;
 
   vec3 in_color = COLOR.rgb;
   float t_minus_1 = 1.0 - t;
@@ -75,7 +76,6 @@ void vertex() {
 
   VERTEX = vertex_final_OS;
 }
-
 
 void fragment() {
   vec4 color = 2.0 * v_color * u_TintColor * texture(u_MainTex, UV);
