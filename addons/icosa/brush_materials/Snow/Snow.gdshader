@@ -5,7 +5,7 @@ render_mode unshaded, blend_add, cull_disabled;
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
-uniform float u_DebugSizeMultiplier : hint_range(1.0, 100.0) = 10.0;
+uniform float u_DebugSizeMultiplier : hint_range(1.0, 100.0) = 1.25; // A bit arbitrary but 1.0 seems to be too small compared to unity rendering
 
 varying float v_fog_coord;
 
