@@ -174,7 +174,7 @@ void vertex() {
       curlY(noise_coord, curl_divisor),
       curlZ(noise_coord, curl_divisor)
     );
-    float curl_strength = max(raw_scale * 0.1, 0.1);
+    float curl_strength = max(raw_scale * 0.02, 0.02);
     vec3 disp = curl_sample * curl_strength;
     center_WS += disp;
     center_final_OS = (inv_model_mat * vec4(center_WS, 1.0)).xyz;
@@ -201,6 +201,7 @@ void vertex() {
 
 void fragment() {
   vec4 tex = texture(u_MainTex, v_uv_base);
+  tex = pow(tex, vec4(2.2));
   vec3 color = tex.rgb * v_color.rgb * u_TintColor.rgb;
   float alpha = tex.a * v_color.a * u_TintColor.a;
 
