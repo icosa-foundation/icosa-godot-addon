@@ -5,6 +5,7 @@ render_mode unshaded, blend_add, cull_disabled;
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
+uniform float u_DebugSizeMultiplier : hint_range(1.0, 100.0) = 10.0;
 
 varying float v_fog_coord;
 
@@ -49,29 +50,26 @@ void vertex() {
   vec3 basis_y = MODEL_MATRIX[1].xyz;
   float scale = max(length(basis_y), 0.0001);
 
-  mat4 modelview_mat = VIEW_MATRIX * MODEL_MATRIX;
-  mat4 inv_modelview_mat = inverse(modelview_mat);
-
-  vec3 center_view = (modelview_mat * vec4(center_OS, 1.0)).xyz;
-  vec3 vertex_view = recreate_corner(center_view, corner, rotation, halfSize_OS * scale);
-
-  // Get vertex in model space (this is the billboarded position)
-  vec3 pos_model = (inv_modelview_mat * vec4(vertex_view, 1.0)).xyz;
-
   // Calculate scroll animation params
   float scrollAmount = TIME;
   float t = mod(scrollAmount * 0.3 + COLOR.a, 1.0);
 
-  // Displacement in world space (matching original shader)
-  vec3 dispVec = (t - 0.5) * vec3(0.0, -3.0, 0.0);
-  dispVec.x += sin(t * 3.0 + TIME) * 0.5;
-  dispVec.z += cos(t * 3.0 * 0.5 + TIME) * 0.5;
+  // Displacement in LOCAL/object space (scales with mesh automatically)
+  vec3 dispVec = (t - 0.5) * vec3(0.0, -0.03, 0.0);
+  dispVec.x += sin(t * 3.0 + TIME) * 0.005;
+  dispVec.z += cos(t * 3.0 * 0.5 + TIME) * 0.005;
 
-  // Transform to world, displace, transform back to model
-  vec3 worldPos = (MODEL_MATRIX * vec4(pos_model, 1.0)).xyz;
-  worldPos += dispVec;
-  VERTEX = (inverse(MODEL_MATRIX) * vec4(worldPos, 1.0)).xyz;
+  // Apply displacement to center in object space BEFORE any transforms
+  vec3 animated_center_OS = center_OS + dispVec;
 
+  mat4 modelview_mat = VIEW_MATRIX * MODEL_MATRIX;
+  mat4 inv_modelview_mat = inverse(modelview_mat);
+
+  // Transform animated center to view space
+  vec3 center_view = (modelview_mat * vec4(animated_center_OS, 1.0)).xyz;
+  vec3 vertex_view = recreate_corner(center_view, corner, rotation, halfSize_OS * scale * u_DebugSizeMultiplier);
+
+  VERTEX = (inv_modelview_mat * vec4(vertex_view, 1.0)).xyz;
   v_fog_coord = vertex_view.z;
 }
 
