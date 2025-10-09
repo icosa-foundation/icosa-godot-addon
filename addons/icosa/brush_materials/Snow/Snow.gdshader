@@ -55,7 +55,23 @@ void vertex() {
   vec3 center_view = (modelview_mat * vec4(center_OS, 1.0)).xyz;
   vec3 vertex_view = recreate_corner(center_view, corner, rotation, halfSize_OS * scale);
 
-  VERTEX = (inv_modelview_mat * vec4(vertex_view, 1.0)).xyz;
+  // Get vertex in model space (this is the billboarded position)
+  vec3 pos_model = (inv_modelview_mat * vec4(vertex_view, 1.0)).xyz;
+
+  // Calculate scroll animation params
+  float scrollAmount = TIME;
+  float t = mod(scrollAmount * 0.3 + COLOR.a, 1.0);
+
+  // Displacement in world space (matching original shader)
+  vec3 dispVec = (t - 0.5) * vec3(0.0, -3.0, 0.0);
+  dispVec.x += sin(t * 3.0 + TIME) * 0.5;
+  dispVec.z += cos(t * 3.0 * 0.5 + TIME) * 0.5;
+
+  // Transform to world, displace, transform back to model
+  vec3 worldPos = (MODEL_MATRIX * vec4(pos_model, 1.0)).xyz;
+  worldPos += dispVec;
+  VERTEX = (inverse(MODEL_MATRIX) * vec4(worldPos, 1.0)).xyz;
+
   v_fog_coord = vertex_view.z;
 }
 
