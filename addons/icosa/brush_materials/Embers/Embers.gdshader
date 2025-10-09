@@ -55,15 +55,13 @@ void vertex() {
   float particle_id = COLOR.a;
   float t = mod(time_y * u_ScrollRate + particle_id * 10.0, 1.0);
 
-  vec3 world_pos = (MODEL_MATRIX * vec4(vertex_obj, 1.0)).xyz;
-  vec3 disp_world = (MODEL_MATRIX * vec4(u_ScrollDistance, 0.0)).xyz * t;
-  float jitter_x = sin(t * u_ScrollJitterFrequency + particle_id * 100.0 + time_y + world_pos.z) * u_ScrollJitterIntensity;
+  vec3 scroll_local = u_ScrollDistance * t;
+  float jitter_x = sin(t * u_ScrollJitterFrequency + particle_id * 100.0 + time_y + vertex_obj.z) * u_ScrollJitterIntensity;
   float jitter_y = (mod(particle_id * 100.0, 1.0) - 0.5) * u_ScrollDistance.y * t;
-  float jitter_z = cos(t * u_ScrollJitterFrequency + particle_id * 100.0 + time_y + world_pos.x) * u_ScrollJitterIntensity;
-  disp_world += vec3(jitter_x, jitter_y, jitter_z);
-  disp_world *= 0.1;
-  vec3 world_pos_final = world_pos + disp_world;
-  vec3 vertex_final_OS = (inverse(MODEL_MATRIX) * vec4(world_pos_final, 1.0)).xyz;
+  float jitter_z = cos(t * u_ScrollJitterFrequency + particle_id * 100.0 + time_y + vertex_obj.x) * u_ScrollJitterIntensity;
+  vec3 jitter_local = vec3(jitter_x, jitter_y, jitter_z);
+  vec3 disp_local = (scroll_local + jitter_local) * (scale * 0.1);
+  vec3 vertex_final_OS = vertex_obj + disp_local;
 
   vec3 in_color = COLOR.rgb;
   float t_minus_1 = 1.0 - t;
