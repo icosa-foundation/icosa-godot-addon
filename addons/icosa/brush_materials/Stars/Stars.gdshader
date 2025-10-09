@@ -3,8 +3,10 @@ render_mode unshaded, blend_add, cull_disabled;
 
 #include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
 
+uniform float u_SparkleRate = 2.0;
+
+varying vec4 v_color;
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
-uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
 
 varying float v_fog_coord;
 
@@ -57,19 +59,18 @@ void vertex() {
 
   VERTEX = (inv_modelview_mat * vec4(vertex_view, 1.0)).xyz;
   v_fog_coord = vertex_view.z;
+
+  // Twinkle: phase from COLOR.a, brightness from time
+  float phase = COLOR.a * (2.0 * PI);
+  float brightness = 800.0 * pow(abs(sin(TIME * u_SparkleRate + phase)), 20.0);
+  v_color.rgb = COLOR.rgb * brightness;
+  v_color.a = 1.0;
 }
 
 void fragment() {
-  vec4 tex_color = texture(u_MainTex, UV);
-  float brush_mask = tex_color.a * COLOR.a;
-
-  if (brush_mask <= u_Cutoff) {
-    discard;
-  }
-
-  vec3 final_color = tex_color.rgb * COLOR.rgb;
-  final_color = apply_fog(final_color, v_fog_coord);
-
-  ALBEDO = final_color;
+  vec4 tex = texture(u_MainTex, UV);
+  vec3 rgb = (v_color * tex).rgb;
+  rgb = apply_fog(rgb, v_fog_coord);
+  ALBEDO = rgb;
   ALPHA = 1.0;
 }
