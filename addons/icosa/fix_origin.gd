@@ -88,7 +88,18 @@ func _recenter_array_mesh(mesh: ArrayMesh, translation: Vector3) -> ArrayMesh:
 		for i in range(verts.size()):
 			verts[i] += translation
 		arrays[ArrayMesh.ARRAY_VERTEX] = verts
-
+		var custom0 = arrays[ArrayMesh.ARRAY_CUSTOM0]
+		if custom0 is PackedFloat32Array:
+			var expected := verts.size() * 4
+			if custom0.size() >= expected:
+				for i in range(verts.size()):
+					var base := i * 4
+					if base + 3 >= custom0.size():
+						break
+					custom0[base + 1] += translation.x
+					custom0[base + 2] += translation.y
+					custom0[base + 3] += translation.z
+			arrays[ArrayMesh.ARRAY_CUSTOM0] = custom0
 		var blend_shapes := []
 		var blend_shape_arrays := mesh.surface_get_blend_shape_arrays(surface)
 		for blend_shape_index in range(blend_shape_arrays.size()):
