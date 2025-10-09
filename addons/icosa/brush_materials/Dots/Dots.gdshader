@@ -63,6 +63,7 @@ void vertex() {
 
 void fragment() {
   vec4 tex = texture(u_MainTex, UV);
+  tex = pow(tex, vec4(2.2));
   vec4 c = COLOR * u_TintColor * u_BaseGain * tex;
   c.rgb += c.rgb * c.a * u_EmissionGain;
   vec3 final_color = apply_fog(c.rgb, v_fog_coord);
