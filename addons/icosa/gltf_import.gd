@@ -89,13 +89,12 @@ func _import_post_parse(gltf_state: GLTFState) -> Error:
 	if name_mapping.is_empty():
 		_load_name_mapping()
 
-	# Replace materials with brush materials if matches found
-	_replace_materials_with_brush_materials(gltf_state)
+	# Add CUSTOM0 data to all brushes that need it FIRST
+	# This ensures materials see the correct mesh format with CUSTOM0
+	_add_custom_data_to_brushes(gltf_state, gltf_json)
 
-	# Add vertex IDs to particle brush meshes BEFORE final mesh processing
-	_add_vertex_ids_to_particle_brushes(gltf_state)
-	# Add CUSTOM1 to ribbon brush meshes for ribbon offset data
-	_add_custom_data_to_ribbon_brushes(gltf_state)
+	# Replace materials with brush materials AFTER mesh modification
+	_replace_materials_with_brush_materials(gltf_state)
 
 
 	return OK
@@ -158,7 +157,7 @@ func _replace_materials_with_brush_materials(gltf_state: GLTFState):
 	# Set the modified materials array back
 	gltf_state.set_materials(materials)
 
-func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
+func _add_custom_data_to_brushes(gltf_state: GLTFState, gltf_json: Dictionary):
 	var meshes = gltf_state.get_meshes()
 	var materials = gltf_state.get_materials()
 
@@ -291,101 +290,6 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 
 		# Replace the old mesh with the new one
 		mesh.mesh = new_mesh
-
-func _add_custom_data_to_ribbon_brushes(gltf_state: GLTFState):
-
-	var meshes = gltf_state.get_meshes()
-	var gltf_json = gltf_state.json
-	
-	for mesh_idx in range(meshes.size()):
-		var mesh = meshes[mesh_idx]
-		var importer_mesh = mesh.mesh
-		
-		# Check if this is a ribbon brush (Electricity, DoubleTaperedMarker, etc.)
-		var is_ribbon_brush = false
-		for surface_idx in range(importer_mesh.get_surface_count()):
-			var mat = importer_mesh.get_surface_material(surface_idx)
-			if mat != null:
-				var mat_name = mat.resource_name
-				if (mat_name.contains("Electricity") or
-					mat_name.contains("DoubleTaperedMarker") or
-					mat_name.contains("DoubleTaperedFlat") or
-					mat_name.contains("HyperGrid")):
-					is_ribbon_brush = true
-					break
-		
-		if not is_ribbon_brush:
-			continue
-			
-		# Extract _TB_UNITY_TEXCOORD_1 data from GLTF JSON and add as CUSTOM1
-		var surfaces = []
-		for surface_idx in range(importer_mesh.get_surface_count()):
-			var arrays = importer_mesh.get_surface_arrays(surface_idx)
-			var vertex_count = arrays[Mesh.ARRAY_VERTEX].size()
-			
-			# Try to extract _TB_UNITY_TEXCOORD_1 data
-			var ribbon_offsets = _extract_tb_unity_texcoord1(gltf_state, gltf_json, mesh_idx, surface_idx)
-			
-			if ribbon_offsets != null and ribbon_offsets.size() > 0:
-				# Create CUSTOM1 array with ribbon offset data (vec3 stored as vec4)
-				var custom1 = PackedFloat32Array()
-				custom1.resize(vertex_count * 4)
-				for i in range(vertex_count):
-					var base = i * 4
-					var offset = ribbon_offsets[i] if i < ribbon_offsets.size() else Vector3.ZERO
-					custom1[base + 0] = offset.x
-					custom1[base + 1] = offset.y
-					custom1[base + 2] = offset.z
-					custom1[base + 3] = 0.0  # unused
-				arrays[Mesh.ARRAY_CUSTOM1] = custom1
-			
-			surfaces.append({
-				"primitive_type": importer_mesh.get_surface_primitive_type(surface_idx),
-				"arrays": arrays,
-				"material": importer_mesh.get_surface_material(surface_idx),
-				"name": importer_mesh.get_surface_name(surface_idx)
-			})
-		
-		# Create new mesh with CUSTOM1 data
-		var new_mesh = ImporterMesh.new()
-		for i in range(surfaces.size()):
-			var surface_data = surfaces[i]
-			var original_material = surface_data["material"]
-			var material_name = original_material.resource_name if original_material else ""
-			var brush_material = _find_matching_brush_material(material_name)
-			var final_material = brush_material if brush_material != null else original_material
-			
-			var format_flags = 0
-			var arrays = surface_data["arrays"]
-			if arrays[Mesh.ARRAY_VERTEX] != null:
-				format_flags |= Mesh.ARRAY_FORMAT_VERTEX
-			if arrays[Mesh.ARRAY_NORMAL] != null:
-				format_flags |= Mesh.ARRAY_FORMAT_NORMAL
-			if arrays[Mesh.ARRAY_TANGENT] != null:
-				format_flags |= Mesh.ARRAY_FORMAT_TANGENT
-			if arrays[Mesh.ARRAY_COLOR] != null:
-				format_flags |= Mesh.ARRAY_FORMAT_COLOR
-			if arrays[Mesh.ARRAY_TEX_UV] != null:
-				format_flags |= Mesh.ARRAY_FORMAT_TEX_UV
-			if arrays[Mesh.ARRAY_TEX_UV2] != null:
-				format_flags |= Mesh.ARRAY_FORMAT_TEX_UV2
-			if arrays[Mesh.ARRAY_INDEX] != null:
-				format_flags |= Mesh.ARRAY_FORMAT_INDEX
-			if arrays[Mesh.ARRAY_CUSTOM1] != null:
-				format_flags |= (Mesh.ARRAY_CUSTOM_RGBA_FLOAT << Mesh.ARRAY_FORMAT_CUSTOM1_SHIFT)
-			
-			new_mesh.add_surface(
-				surface_data["primitive_type"],
-				arrays,
-				[],
-				{},
-				final_material,
-				surface_data["name"],
-				format_flags
-			)
-		
-		mesh.mesh = new_mesh
-		print("Added CUSTOM1 data to ribbon brush: ", mesh.resource_name)
 
 func _extract_tb_unity_texcoord1(gltf_state: GLTFState, gltf_json: Dictionary, mesh_idx: int, surface_idx: int) -> PackedVector3Array:
 	# Extract _TB_UNITY_TEXCOORD_1 vec3 data from GLTF JSON
