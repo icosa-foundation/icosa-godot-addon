@@ -3,7 +3,7 @@ render_mode unshaded, blend_add, depth_draw_opaque, cull_disabled;
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform float u_EmissionGain : hint_range(0.0, 1.0) = 0.2;
-uniform float u_DisplacementIntensity : hint_range(0.0, 2.0) = 0.1;
+uniform float u_DisplacementIntensity : hint_range(0.0, 0.1) = 0.01;
 
 varying vec4 v_color;
 
@@ -28,7 +28,7 @@ void vertex() {
   float time_w = TIME * 3.0;
 
   // Envelope for tapering at stroke edges
-  float envelope = sin(UV.x * 3.14159);
+  float envelope = sin(UV.x * PI);
   float envelope_pow = 1.0 - pow(1.0 - envelope, 10.0);
 
   // TEXCOORD_1 (vec3) displacement stored in CUSTOM1
@@ -37,9 +37,9 @@ void vertex() {
   vec3 world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 
   // Add animated noise to displacement
-  disp_vec.x += sin(VERTEX.z * 100.0 + time_w * 13.0) * 0.05;
-  disp_vec.y += cos(VERTEX.x * 120.0 + time_w * 10.0) * 0.05;
-  disp_vec.z += cos(VERTEX.y * 80.0 + time_w * 7.0) * 0.05;
+  disp_vec.x += sin(VERTEX.z * 100.0 + time_w * 13.0);
+  disp_vec.y += cos(VERTEX.x * 120.0 + time_w * 10.0);
+  disp_vec.z += cos(VERTEX.y * 80.0 + time_w * 7.0);
 
   disp_vec = (MODEL_MATRIX * vec4(disp_vec, 0.0)).xyz;
   world_pos += disp_vec * u_DisplacementIntensity * envelope_pow;

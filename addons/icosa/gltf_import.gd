@@ -159,16 +159,13 @@ func _replace_materials_with_brush_materials(gltf_state: GLTFState):
 
 func _add_custom_data_to_brushes(gltf_state: GLTFState, gltf_json: Dictionary):
 	var meshes = gltf_state.get_meshes()
-	var materials = gltf_state.get_materials()
-
-
 
 	for mesh_idx in range(meshes.size()):
 		var mesh = meshes[mesh_idx]
 		var importer_mesh = mesh.mesh
 
-		# Check if this is a particle brush by examining material names
-		var is_particle_brush = false
+		# Detect brush type by material name
+		var brush_type = ""  # "particle" or "ribbon"
 		for surface_idx in range(importer_mesh.get_surface_count()):
 			var mat = importer_mesh.get_surface_material(surface_idx)
 			if mat != null:
@@ -180,10 +177,16 @@ func _add_custom_data_to_brushes(gltf_state: GLTFState, gltf_json: Dictionary):
 					mat_name.contains("Snow") or
 					mat_name.contains("Stars") or
 					mat_name.contains("Embers")):
-					is_particle_brush = true
+					brush_type = "particle"
 					break
-
-		if not is_particle_brush:
+				elif (mat_name.contains("Electricity") or
+					mat_name.contains("DoubleTaperedMarker") or
+					mat_name.contains("DoubleTaperedFlat") or
+					mat_name.contains("HyperGrid")):
+					brush_type = "ribbon"
+					break
+		# Skip if not a brush we need to process
+		if brush_type == "":
 			continue
 
 		# Collect all surface data
@@ -192,47 +195,66 @@ func _add_custom_data_to_brushes(gltf_state: GLTFState, gltf_json: Dictionary):
 			var arrays = importer_mesh.get_surface_arrays(surface_idx)
 			var vertex_count = arrays[Mesh.ARRAY_VERTEX].size()
 
-			# Create vertex data buffer: CUSTOM0 stores vertex ID and particle center
-			var centers = arrays[Mesh.ARRAY_NORMAL]
-			if centers == null:
-				centers = PackedVector3Array()
-
-			# Remap TANGENT if it contains VEC4 TEXCOORD data (u, v, rotation, timestamp)
-			# This happens when we created a VEC4 accessor from VEC4 TEXCOORD_0
-			var tangents = arrays[Mesh.ARRAY_TANGENT]
-			if tangents != null and tangents.size() >= 4:
-				# Check if this looks like remapped VEC4 TEXCOORD data
-				# (first two components in 0-1 range, indicating UV coordinates)
-				var tx = tangents[0]
-				var ty = tangents[1]
-				if tx >= 0.0 and tx <= 1.0 and ty >= 0.0 and ty <= 1.0:
-					# Remap: extract rotation from .z, set x/y to 0, w to 1
-					var new_tangents = PackedFloat32Array()
-					new_tangents.resize(vertex_count * 4)
-					for i in range(vertex_count):
-						var base = i * 4
-						new_tangents[base + 0] = 0.0
-						new_tangents[base + 1] = 0.0
-						new_tangents[base + 2] = tangents[base + 2]  # rotation from .z
-						new_tangents[base + 3] = 1.0
-					arrays[Mesh.ARRAY_TANGENT] = new_tangents
-
 			# Create CUSTOM0 data based on brush type
 			var custom0 = PackedFloat32Array()
 			custom0.resize(vertex_count * 4)
 
-			for i in range(vertex_count):
-				var base := i * 4
-				custom0[base] = float(i)
-				var center := Vector3.ZERO
-				if centers is PackedVector3Array and i < centers.size():
-					center = centers[i]
-				custom0[base + 1] = center.x
-				custom0[base + 2] = center.y
-				custom0[base + 3] = center.z
+			if brush_type == "particle":
+				# Particle brushes: vertex ID + particle center from remapped NORMAL
+				var centers = arrays[Mesh.ARRAY_NORMAL]
+				if centers == null:
+					centers = PackedVector3Array()
 
-			# Remove particle centers from NORMAL slot so Godot doesn't treat them as normals
-			arrays[Mesh.ARRAY_NORMAL] = null
+				for i in range(vertex_count):
+					var base := i * 4
+					custom0[base] = float(i)
+					var center := Vector3.ZERO
+					if centers is PackedVector3Array and i < centers.size():
+						center = centers[i]
+					custom0[base + 1] = center.x
+					custom0[base + 2] = center.y
+					custom0[base + 3] = center.z
+
+				# Remove particle centers from NORMAL slot
+				arrays[Mesh.ARRAY_NORMAL] = null
+
+				# Remap TANGENT if it contains VEC4 TEXCOORD data
+				var tangents = arrays[Mesh.ARRAY_TANGENT]
+				if tangents != null and tangents.size() >= 4:
+					var tx = tangents[0]
+					var ty = tangents[1]
+					if tx >= 0.0 and tx <= 1.0 and ty >= 0.0 and ty <= 1.0:
+						var new_tangents = PackedFloat32Array()
+						new_tangents.resize(vertex_count * 4)
+						for i in range(vertex_count):
+							var base = i * 4
+							new_tangents[base + 0] = 0.0
+							new_tangents[base + 1] = 0.0
+							new_tangents[base + 2] = tangents[base + 2]
+							new_tangents[base + 3] = 1.0
+						arrays[Mesh.ARRAY_TANGENT] = new_tangents
+
+			elif brush_type == "ribbon":
+				# Ribbon brushes: Extract ribbon offset from _TB_UNITY_TEXCOORD_1
+				var ribbon_offsets = _extract_tb_unity_texcoord1(gltf_state, gltf_json, mesh_idx, surface_idx)
+
+				for i in range(vertex_count):
+					var base := i * 4
+					custom0[base] = float(i)  # vertex ID
+
+					# Store ribbon offset in yzw
+					if i < ribbon_offsets.size():
+						var offset = ribbon_offsets[i]
+						custom0[base + 1] = offset.x
+						custom0[base + 2] = offset.y
+						custom0[base + 3] = offset.z
+					else:
+						custom0[base + 1] = 0.0
+						custom0[base + 2] = 0.0
+						custom0[base + 3] = 0.0
+
+				# Remove NORMAL to match particle brush format
+				arrays[Mesh.ARRAY_NORMAL] = null
 
 			# Set CUSTOM0 data
 			arrays[Mesh.ARRAY_CUSTOM0] = custom0
@@ -331,16 +353,26 @@ func _extract_tb_unity_texcoord1(gltf_state: GLTFState, gltf_json: Dictionary, m
 	# Get buffer file path or use embedded buffer from GLB
 	var buffer_info = buffers[buffer_idx]
 	var buffer_uri = buffer_info.get("uri", "")
+
+	var buffer_data: PackedByteArray
+
 	if buffer_uri.is_empty():
-		return PackedVector3Array()
-	
-	var gltf_path = gltf_state.get_base_path()
-	var buffer_path = gltf_path.path_join(buffer_uri)
-	
-	var file = FileAccess.open(buffer_path, FileAccess.READ)
-	if file == null:
-		return PackedVector3Array()
-	
+		# GLB file with embedded buffer - use gltf_state.get_glb_data()
+		buffer_data = gltf_state.get_glb_data()
+		if buffer_data.is_empty():
+			return PackedVector3Array()
+	else:
+		# External buffer file
+		var gltf_path = gltf_state.get_base_path()
+		var buffer_path = gltf_path.path_join(buffer_uri)
+
+		var file = FileAccess.open(buffer_path, FileAccess.READ)
+		if file == null:
+			return PackedVector3Array()
+
+		buffer_data = file.get_buffer(file.get_length())
+		file.close()
+
 	var byte_offset = accessor.get("byteOffset", 0) + buffer_view.get("byteOffset", 0)
 	var count = accessor.get("count", 0)
 	var byte_stride = buffer_view.get("byteStride", 12)  # VEC3 = 12 bytes
@@ -350,13 +382,13 @@ func _extract_tb_unity_texcoord1(gltf_state: GLTFState, gltf_json: Dictionary, m
 	
 	for i in range(count):
 		var vertex_offset = byte_offset + (i * byte_stride)
-		file.seek(vertex_offset)
-		var x = file.get_float()
-		var y = file.get_float()
-		var z = file.get_float()
+		if vertex_offset + 12 > buffer_data.size():
+			break
+
+		var x = buffer_data.decode_float(vertex_offset)
+		var y = buffer_data.decode_float(vertex_offset + 4)
+		var z = buffer_data.decode_float(vertex_offset + 8)
 		vec3_array[i] = Vector3(x, y, z)
-	
-	file.close()
 	return vec3_array
 
 func _import_post(gltf_state: GLTFState, root: Node) -> Error:
@@ -441,6 +473,12 @@ func _map_custom_attributes_to_standard_slots(gltf_json: Dictionary):
 									 material_name.contains("Snow") or
 									 material_name.contains("Stars") or
 									 material_name.contains("Embers"))
+
+			# RIBBON BRUSH MAPPING (Electricity, DoubleTaperedMarker, etc.)
+			var is_ribbon_brush = (material_name.contains("Electricity") or
+								   material_name.contains("DoubleTaperedMarker") or
+								   material_name.contains("DoubleTaperedFlat") or
+								   material_name.contains("HyperGrid"))
 
 			if is_particle_brush:
 				# _TB_UNITY_NORMAL (particle center, VEC3) → NORMAL
