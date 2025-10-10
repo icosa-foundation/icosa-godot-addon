@@ -3,7 +3,7 @@ render_mode unshaded, blend_add, depth_draw_opaque, cull_disabled;
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform float u_EmissionGain : hint_range(0.0, 1.0) = 0.2;
-uniform float u_DisplacementIntensity : hint_range(0.0, 2.0) = 1.0;
+uniform float u_DisplacementIntensity : hint_range(0.0, 2.0) = 0.1;
 
 varying vec4 v_color;
 
