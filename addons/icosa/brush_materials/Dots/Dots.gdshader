@@ -67,6 +67,6 @@ void fragment() {
   vec4 c = COLOR * u_TintColor * u_BaseGain * tex;
   c.rgb += c.rgb * c.a * u_EmissionGain;
   vec3 final_color = apply_fog(c.rgb, v_fog_coord);
-  ALBEDO = final_color;
+  ALBEDO = final_color * 5.0;
   ALPHA = 1.0;
 }

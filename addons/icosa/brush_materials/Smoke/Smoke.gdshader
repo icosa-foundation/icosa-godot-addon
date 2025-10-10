@@ -208,6 +208,6 @@ void fragment() {
   // Apply fog
   color = apply_fog(color, v_fog_coord);
 
-  ALBEDO = color;
+  ALBEDO = color * 5.0;
   ALPHA = alpha;
 }
