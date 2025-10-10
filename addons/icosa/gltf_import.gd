@@ -94,6 +94,9 @@ func _import_post_parse(gltf_state: GLTFState) -> Error:
 
 	# Add vertex IDs to particle brush meshes BEFORE final mesh processing
 	_add_vertex_ids_to_particle_brushes(gltf_state)
+	# Add CUSTOM1 to ribbon brush meshes for ribbon offset data
+	_add_custom_data_to_ribbon_brushes(gltf_state)
+
 
 	return OK
 
@@ -286,23 +289,170 @@ func _add_vertex_ids_to_particle_brushes(gltf_state: GLTFState):
 				format_flags
 			)
 
-			# Verify CUSTOM0 was added
-			var surface_idx = new_mesh.get_surface_count() - 1
-
-			var check_arrays = new_mesh.get_surface_arrays(surface_idx)
-			var check_custom0 = check_arrays[Mesh.ARRAY_CUSTOM0]
-
 		# Replace the old mesh with the new one
 		mesh.mesh = new_mesh
 
+func _add_custom_data_to_ribbon_brushes(gltf_state: GLTFState):
 
-		# Final verification - check if mesh has valid data
-		for i in range(new_mesh.get_surface_count()):
-			var final_arrays = new_mesh.get_surface_arrays(i)
-			var verts = final_arrays[Mesh.ARRAY_VERTEX]
-			var indices = final_arrays[Mesh.ARRAY_INDEX]
-			var custom0 = final_arrays[Mesh.ARRAY_CUSTOM0]
+	var meshes = gltf_state.get_meshes()
+	var gltf_json = gltf_state.json
+	
+	for mesh_idx in range(meshes.size()):
+		var mesh = meshes[mesh_idx]
+		var importer_mesh = mesh.mesh
+		
+		# Check if this is a ribbon brush (Electricity, DoubleTaperedMarker, etc.)
+		var is_ribbon_brush = false
+		for surface_idx in range(importer_mesh.get_surface_count()):
+			var mat = importer_mesh.get_surface_material(surface_idx)
+			if mat != null:
+				var mat_name = mat.resource_name
+				if (mat_name.contains("Electricity") or
+					mat_name.contains("DoubleTaperedMarker") or
+					mat_name.contains("DoubleTaperedFlat") or
+					mat_name.contains("HyperGrid")):
+					is_ribbon_brush = true
+					break
+		
+		if not is_ribbon_brush:
+			continue
+			
+		# Extract _TB_UNITY_TEXCOORD_1 data from GLTF JSON and add as CUSTOM1
+		var surfaces = []
+		for surface_idx in range(importer_mesh.get_surface_count()):
+			var arrays = importer_mesh.get_surface_arrays(surface_idx)
+			var vertex_count = arrays[Mesh.ARRAY_VERTEX].size()
+			
+			# Try to extract _TB_UNITY_TEXCOORD_1 data
+			var ribbon_offsets = _extract_tb_unity_texcoord1(gltf_state, gltf_json, mesh_idx, surface_idx)
+			
+			if ribbon_offsets != null and ribbon_offsets.size() > 0:
+				# Create CUSTOM1 array with ribbon offset data (vec3 stored as vec4)
+				var custom1 = PackedFloat32Array()
+				custom1.resize(vertex_count * 4)
+				for i in range(vertex_count):
+					var base = i * 4
+					var offset = ribbon_offsets[i] if i < ribbon_offsets.size() else Vector3.ZERO
+					custom1[base + 0] = offset.x
+					custom1[base + 1] = offset.y
+					custom1[base + 2] = offset.z
+					custom1[base + 3] = 0.0  # unused
+				arrays[Mesh.ARRAY_CUSTOM1] = custom1
+			
+			surfaces.append({
+				"primitive_type": importer_mesh.get_surface_primitive_type(surface_idx),
+				"arrays": arrays,
+				"material": importer_mesh.get_surface_material(surface_idx),
+				"name": importer_mesh.get_surface_name(surface_idx)
+			})
+		
+		# Create new mesh with CUSTOM1 data
+		var new_mesh = ImporterMesh.new()
+		for i in range(surfaces.size()):
+			var surface_data = surfaces[i]
+			var original_material = surface_data["material"]
+			var material_name = original_material.resource_name if original_material else ""
+			var brush_material = _find_matching_brush_material(material_name)
+			var final_material = brush_material if brush_material != null else original_material
+			
+			var format_flags = 0
+			var arrays = surface_data["arrays"]
+			if arrays[Mesh.ARRAY_VERTEX] != null:
+				format_flags |= Mesh.ARRAY_FORMAT_VERTEX
+			if arrays[Mesh.ARRAY_NORMAL] != null:
+				format_flags |= Mesh.ARRAY_FORMAT_NORMAL
+			if arrays[Mesh.ARRAY_TANGENT] != null:
+				format_flags |= Mesh.ARRAY_FORMAT_TANGENT
+			if arrays[Mesh.ARRAY_COLOR] != null:
+				format_flags |= Mesh.ARRAY_FORMAT_COLOR
+			if arrays[Mesh.ARRAY_TEX_UV] != null:
+				format_flags |= Mesh.ARRAY_FORMAT_TEX_UV
+			if arrays[Mesh.ARRAY_TEX_UV2] != null:
+				format_flags |= Mesh.ARRAY_FORMAT_TEX_UV2
+			if arrays[Mesh.ARRAY_INDEX] != null:
+				format_flags |= Mesh.ARRAY_FORMAT_INDEX
+			if arrays[Mesh.ARRAY_CUSTOM1] != null:
+				format_flags |= (Mesh.ARRAY_CUSTOM_RGBA_FLOAT << Mesh.ARRAY_FORMAT_CUSTOM1_SHIFT)
+			
+			new_mesh.add_surface(
+				surface_data["primitive_type"],
+				arrays,
+				[],
+				{},
+				final_material,
+				surface_data["name"],
+				format_flags
+			)
+		
+		mesh.mesh = new_mesh
+		print("Added CUSTOM1 data to ribbon brush: ", mesh.resource_name)
 
+func _extract_tb_unity_texcoord1(gltf_state: GLTFState, gltf_json: Dictionary, mesh_idx: int, surface_idx: int) -> PackedVector3Array:
+	# Extract _TB_UNITY_TEXCOORD_1 vec3 data from GLTF JSON
+	if not gltf_json.has("meshes"):
+		return PackedVector3Array()
+	
+	var meshes = gltf_json.get("meshes", [])
+	if mesh_idx >= meshes.size():
+		return PackedVector3Array()
+	
+	var mesh = meshes[mesh_idx]
+	var primitives = mesh.get("primitives", [])
+	if surface_idx >= primitives.size():
+		return PackedVector3Array()
+	
+	var primitive = primitives[surface_idx]
+	var attributes = primitive.get("attributes", {})
+	if not attributes.has("_TB_UNITY_TEXCOORD_1"):
+		return PackedVector3Array()
+	
+	var accessor_idx = attributes["_TB_UNITY_TEXCOORD_1"]
+	var accessors = gltf_json.get("accessors", [])
+	if accessor_idx >= accessors.size():
+		return PackedVector3Array()
+	
+	var accessor = accessors[accessor_idx]
+	var buffer_view_idx = accessor.get("bufferView")
+	var buffer_views = gltf_json.get("bufferViews", [])
+	if buffer_view_idx >= buffer_views.size():
+		return PackedVector3Array()
+	
+	var buffer_view = buffer_views[buffer_view_idx]
+	var buffer_idx = buffer_view.get("buffer", 0)
+	var buffers = gltf_json.get("buffers", [])
+	if buffer_idx >= buffers.size():
+		return PackedVector3Array()
+	
+	# Get buffer file path
+	var buffer_info = buffers[buffer_idx]
+	var buffer_uri = buffer_info.get("uri", "")
+	if buffer_uri.is_empty():
+		return PackedVector3Array()
+	
+	var gltf_path = gltf_state.get_base_path()
+	var buffer_path = gltf_path.path_join(buffer_uri)
+	
+	var file = FileAccess.open(buffer_path, FileAccess.READ)
+	if file == null:
+		return PackedVector3Array()
+	
+	var byte_offset = accessor.get("byteOffset", 0) + buffer_view.get("byteOffset", 0)
+	var count = accessor.get("count", 0)
+	var byte_stride = buffer_view.get("byteStride", 12)  # VEC3 = 12 bytes
+	
+	var vec3_array = PackedVector3Array()
+	vec3_array.resize(count)
+	
+	for i in range(count):
+		var vertex_offset = byte_offset + (i * byte_stride)
+		file.seek(vertex_offset)
+		var x = file.get_float()
+		var y = file.get_float()
+		var z = file.get_float()
+		vec3_array[i] = Vector3(x, y, z)
+	
+	file.close()
+	return vec3_array
 
 func _import_post(gltf_state: GLTFState, root: Node) -> Error:
 	# Apply materials to all ImporterMeshInstance3D nodes
