@@ -186,7 +186,7 @@ func _add_custom_data_to_brushes(gltf_state: GLTFState, gltf_json: Dictionary):
 		if not is_particle_brush:
 			continue
 
-		# Collect all surface data with vertex IDs added
+		# Collect all surface data
 		var surfaces = []
 		for surface_idx in range(importer_mesh.get_surface_count()):
 			var arrays = importer_mesh.get_surface_arrays(surface_idx)
@@ -217,6 +217,7 @@ func _add_custom_data_to_brushes(gltf_state: GLTFState, gltf_json: Dictionary):
 						new_tangents[base + 3] = 1.0
 					arrays[Mesh.ARRAY_TANGENT] = new_tangents
 
+			# Create CUSTOM0 data based on brush type
 			var custom0 = PackedFloat32Array()
 			custom0.resize(vertex_count * 4)
 
@@ -326,8 +327,8 @@ func _extract_tb_unity_texcoord1(gltf_state: GLTFState, gltf_json: Dictionary, m
 	var buffers = gltf_json.get("buffers", [])
 	if buffer_idx >= buffers.size():
 		return PackedVector3Array()
-	
-	# Get buffer file path
+
+	# Get buffer file path or use embedded buffer from GLB
 	var buffer_info = buffers[buffer_idx]
 	var buffer_uri = buffer_info.get("uri", "")
 	if buffer_uri.is_empty():
@@ -473,6 +474,9 @@ func _map_custom_attributes_to_standard_slots(gltf_json: Dictionary):
 				# _TB_TIMESTAMP → TEXCOORD_1 (UV2)
 				if attributes.has("_TB_TIMESTAMP"):
 					attrs_to_rename["_TB_TIMESTAMP"] = "TEXCOORD_1"
+
+			# Note: Ribbon brushes don't need preflight attribute remapping
+			# Their custom data (_TB_UNITY_TEXCOORD_1) is extracted directly in post_parse
 
 			# Perform the renaming
 			for old_name in attrs_to_rename.keys():
