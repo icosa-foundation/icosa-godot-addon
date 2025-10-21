@@ -116,7 +116,7 @@ text = "No assets found! Try another search."
 
 [node name="SearchOptions" type="MarginContainer" parent="Split"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(180, 0)
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="Split/SearchOptions"]
