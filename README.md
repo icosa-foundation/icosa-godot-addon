@@ -1,4 +1,4 @@
-﻿# Icosa Godot Addon
+﻿# Icosa Gallery - Godot Addon
 
 A Godot 4.5+ plugin that lets you browse the [Icosa Gallery](https://icosa.gallery) of curated 3D assets, download ready-to-use glTF packages, and keep the imported content aligned with Icosa's lighting setup without leaving the editor.
 
@@ -6,10 +6,10 @@ A Godot 4.5+ plugin that lets you browse the [Icosa Gallery](https://icosa.galle
 
 ## Features
 
-- **Asset browser** – Access a dockable main screen for searching Icosa's catalog, opening multiple result tabs, and duplicating thumbnails into preview tabs directly in the editor.
+- **Asset browser** – Search Icosa's catalog, with tabs!
 - **Account login** – Sign in with a device code to fetch your user profile, personal and liked assets so you can re-import anything from your Icosa library.
 - **GLTF and OBJ Downloads** – Queue asset files for download, save them into per-asset folders, and track progress for every file in the bundle, including textures referenced by the glTF.
-- **Runtime support** - Expose the browser to allow users of your game or app to download and instantiate Icosa assets at runtime. 
+- **Runtime support** - Embed the browser in your project to allow users of your game or app to download and instantiate Icosa assets at runtime. 
 - **Open Brush Material replacement** – Imported models are derived from Open Brush sketches have their materials remapped with custom shaders.
 
 ## Installation
@@ -21,20 +21,22 @@ A Godot 4.5+ plugin that lets you browse the [Icosa Gallery](https://icosa.galle
 
 ## Usage
 
-1. After enabling the plugin, switch to the **Icosa Gallery** main screen tab that appears alongside the 3D, 2D, and Script editors.
+1. After enabling the plugin, switch to the **Icosa Gallery** main screen tab that appears alongside the 3D, 2D, and Script at the top of Godot Editor.
 2. Use the **Search** tab to look for assets. Apply filters such as curated assets, formats, triangle count, and ordering to refine results.
-3. Click a thumbnail to open it in its own tab or duplicate it as a preview. Open multiple search tabs or asset previews as needed.
+3. Click a thumbnail to open it in its own tab, or open multiple search tabs or asset previews as needed.
 4. Select an asset to queue downloads; files are saved under `res://addons/icosa_downloads/{asset_name}_{asset_id}` by default, so referenced textures stay linked in the glTF. This can be changed in the settings menu.
-5. Sign in through the **Login** tab to sync your Icosa account. Enter the device code in a browser, then return to Godot to fetch your profile, personal uploads, and liked assets.
+5. Sign in through the **Login** tab to sync your Icosa account securely in a web browser. Enter the device code in a browser, then return to Godot to fetch your profile, personal uploads, and liked assets.
 
 ## Hardcoded filters
 
-1. By default, public assets are only returned if they have Creative Commons licenses that allow remixing
+1. By default, public assets are only returned if they have Creative Commons licenses that allow remixing.
 2. The Icosa Gallery HTTP API recommends which formats are most suitable for each format. If it suggests multiple formats, we pick the first one but prefer **glTF 2.0** over OBJ and FBX.
 
 ## Roadmap
 
 ## Open Brush Support Progress
+
+<explain open brush here to godot users>
 
 ![brushes.png](docs/images/brushes.png)
 
