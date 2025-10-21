@@ -11,7 +11,6 @@ A Godot 4.5+ plugin that lets you browse the [Icosa Gallery](https://icosa.galle
 - **GLTF and OBJ Downloads** – Queue asset files for download, save them into per-asset folders, and track progress for every file in the bundle, including textures referenced by the glTF.
 - **Runtime support** - Expose the browser to allow users of your game or app to download and instantiate Icosa assets at runtime. 
 - **Open Brush Material replacement** – Imported models are derived from Open Brush sketches have their materials remapped with custom shaders.
-- **Lighting sync** – Automatically publishes two directional lights and ambient color to Icosa's global shader uniforms so brushes match your scene lighting.
 
 ## Installation
 
@@ -20,21 +19,18 @@ A Godot 4.5+ plugin that lets you browse the [Icosa Gallery](https://icosa.galle
 3. Open your project in Godot 4.5 or newer (Forward+ renderer is recommended, matching the demo project settings).
 4. In the **Project > Project Settings > Plugins** tab, enable the **Icosa Gallery** plugin.
 
-The plugin registers additional file extensions for `.ico`, `.icns`, and Icosa download bundles so the filesystem dock recognizes them when the plugin is active.
-
 ## Usage
 
 1. After enabling the plugin, switch to the **Icosa Gallery** main screen tab that appears alongside the 3D, 2D, and Script editors.
 2. Use the **Search** tab to look for assets. Apply filters such as curated assets, formats, triangle count, and ordering to refine results.
 3. Click a thumbnail to open it in its own tab or duplicate it as a preview. Open multiple search tabs or asset previews as needed.
-4. Select an asset to queue downloads; files are saved under `res://addons/icosa_downloads/{asset_name}_{asset_id}` so referenced textures stay linked in the glTF.
+4. Select an asset to queue downloads; files are saved under `res://addons/icosa_downloads/{asset_name}_{asset_id}` by default, so referenced textures stay linked in the glTF. This can be changed in the settings menu.
 5. Sign in through the **Login** tab to sync your Icosa account. Enter the device code in a browser, then return to Godot to fetch your profile, personal uploads, and liked assets.
-6. Add up to two DirectionalLight3D nodes (or place them in the `icosa_lights` group) to drive Icosa brush shader uniforms automatically; the plugin keeps the global shader parameters in sync each frame.
 
 ## Hardcoded filters
 
 1. By default, public assets are only returned if they have Creative Commons licenses that allow remixing
-2. The Icosa Gallery HTTP API reco mmends which formats are most suitable for each format. If it suggests multiple formats, we pick the first one but prefer glTF2 over OBJ and FBX.
+2. The Icosa Gallery HTTP API recommends which formats are most suitable for each format. If it suggests multiple formats, we pick the first one but prefer **glTF 2.0** over OBJ and FBX.
 
 ## Roadmap
 
@@ -149,7 +145,7 @@ The plugin registers additional file extensions for `.ico`, `.icns`, and Icosa d
 
 ## Building & Contributing
 
-The plugin ships as standard Godot addon scripts. Open the repository as a Godot project to iterate on the UI scenes (`browser.tscn`, `search.tscn`, etc.) and scripts under `addons/icosa`. Contributions are welcome via pull requests.
+Open the repository as a Godot project to iterate on the UI scenes (`browser.tscn`, `search.tscn`, etc.) and scripts under `addons/icosa`. Contributions are welcome via pull requests.
 
 ## License
 
