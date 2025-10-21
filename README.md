@@ -36,6 +36,8 @@ A Godot 4.5+ plugin that lets you browse the [Icosa Gallery](https://icosa.galle
 
 ## Open Brush Support Progress
 
+![brushes.png](docs/images/brushes.png)
+
 * There are some global issues with color and contrast that need working on. This may or may not affect you depending on your use case.
 * The shaders support two directional lights plus a global ambient light color. We try and automatically select the correct lights from your scene and track their settings in realtime. 
 * Fog syncing is not implemented yet but you can manually set the fog parameters for each material if needed.
