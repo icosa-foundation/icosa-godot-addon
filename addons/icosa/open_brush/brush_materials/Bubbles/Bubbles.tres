@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://bc6chspt3ska6"]
+
+[ext_resource type="Shader" uid="uid://bwbl83cxj12td" path="res://addons/icosa/open_brush/brush_materials/Bubbles/Bubbles.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://lo0yirnnh4rf" path="res://addons/icosa/open_brush/brush_materials/Bubbles/Bubbles-89d104cd-d012-426b-b5b3-bbaee63ac43c-v10.0-MainTex.png" id="2_477je"]
+
+[resource]
+resource_name = "Bubbles"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_MainTex = ExtResource("2_477je")
+shader_parameter/u_Cutoff = 0.5

@@ -1,0 +1,363 @@
+[gd_scene load_steps=26 format=3 uid="uid://c6qdcl0sg2mxy"]
+
+[ext_resource type="Script" uid="uid://bm22v3o2u7lln" path="res://addons/icosa/browser/thumbnail.gd" id="1_8pxhf"]
+[ext_resource type="Script" uid="uid://cbxuo7ms12d55" path="res://addons/icosa/misc/3d_preview.gd" id="2_yfmvu"]
+[ext_resource type="Texture2D" uid="uid://e41wpb7feofn" path="res://addons/icosa/icons/logo/logo_main_pixel.png" id="3_3vp83"]
+[ext_resource type="PackedScene" uid="uid://c7yig47a2sqmr" path="res://addons/icosa/misc/loading_icon.tscn" id="3_8pxhf"]
+[ext_resource type="Texture2D" uid="uid://b7qrs5qju2ois" path="res://addons/icosa/icons/download.svg" id="3_yfmvu"]
+[ext_resource type="Texture2D" uid="uid://dh8rcfcws5n78" path="res://addons/icosa/icons/cc/cc.svg" id="6_3vp83"]
+[ext_resource type="Texture2D" uid="uid://ccq5bibqvbefc" path="res://addons/icosa/icons/trash.svg" id="8_rs5q6"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3vp83"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.039981965, 0.039981965, 0.039981965, 0.80784315)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8oa6n"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_prrh0"]
+
+[sub_resource type="Sky" id="Sky_yfmvu"]
+sky_material = SubResource("ProceduralSkyMaterial_prrh0")
+
+[sub_resource type="Environment" id="Environment_3vp83"]
+background_mode = 1
+sky = SubResource("Sky_yfmvu")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hjirf"]
+bg_color = Color(0.148922, 0.574047, 0.258045, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rs5q6"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_g4njl"]
+
+[sub_resource type="Gradient" id="Gradient_mk3ky"]
+offsets = PackedFloat32Array(0.3, 0.5, 0.7)
+colors = PackedColorArray(0.24696359, 0.24696359, 0.24696359, 0, 0.24696359, 0.24696359, 0.24696359, 0.8, 0.24696359, 0.24696359, 0.24696359, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_x15us"]
+gradient = SubResource("Gradient_mk3ky")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_fkpa0"]
+offsets = PackedFloat32Array(0.3, 0.5, 0.7)
+colors = PackedColorArray(0.6866236, 0.68662363, 0.6866236, 0, 0.6866236, 0.68662363, 0.6866236, 0.8, 0.6866236, 0.68662363, 0.6866236, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_28c6v"]
+gradient = SubResource("Gradient_fkpa0")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3vp83"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fmlye"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8pxhf"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rs5q6"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8wiaa"]
+
+[sub_resource type="FontVariation" id="FontVariation_3qkbe"]
+
+[node name="Thumbnail" type="Button"]
+custom_minimum_size = Vector2(350, 350)
+offset_right = 256.0
+offset_bottom = 300.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+disabled = true
+script = ExtResource("1_8pxhf")
+
+[node name="Padding" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Info" type="VBoxContainer" parent="Padding"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Padding/Info"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Padding/Info/MarginContainer"]
+layout_mode = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_8oa6n")
+
+[node name="Thumbnail" type="MarginContainer" parent="Padding/Info/MarginContainer/PanelContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ThumbnailImage" type="TextureRect" parent="Padding/Info/MarginContainer/PanelContainer/Thumbnail"]
+unique_name_in_owner = true
+z_index = 2
+z_as_relative = false
+clip_contents = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 1
+
+[node name="Preview3D" type="SubViewportContainer" parent="Padding/Info/MarginContainer/PanelContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+stretch = true
+
+[node name="Preview3D" type="SubViewport" parent="Padding/Info/MarginContainer/PanelContainer/Preview3D"]
+handle_input_locally = false
+size = Vector2i(2, 2)
+size_2d_override_stretch = true
+render_target_update_mode = 0
+script = ExtResource("2_yfmvu")
+
+[node name="Root3D" type="Node3D" parent="Padding/Info/MarginContainer/PanelContainer/Preview3D/Preview3D"]
+unique_name_in_owner = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Padding/Info/MarginContainer/PanelContainer/Preview3D/Preview3D"]
+environment = SubResource("Environment_3vp83")
+
+[node name="Orbit" type="Node3D" parent="Padding/Info/MarginContainer/PanelContainer/Preview3D/Preview3D"]
+unique_name_in_owner = true
+
+[node name="DummyCam" type="Camera3D" parent="Padding/Info/MarginContainer/PanelContainer/Preview3D/Preview3D/Orbit"]
+
+[node name="MissingImage" type="MarginContainer" parent="Padding/Info/MarginContainer/PanelContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Texture" type="TextureRect" parent="Padding/Info/MarginContainer/PanelContainer/MissingImage"]
+texture_filter = 1
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_3vp83")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Padding/Info/MarginContainer/PanelContainer/MissingImage/Texture"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/normal_font_size = 16
+text = "NO IMAGE"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Progress" type="HBoxContainer" parent="Padding/Info"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Padding/Info/Progress"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DownloadProgress" type="ProgressBar" parent="Padding/Info/Progress/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_hjirf")
+show_percentage = false
+
+[node name="FilesDownloaded" type="ProgressBar" parent="Padding/Info/Progress/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+show_percentage = false
+
+[node name="ProgressLabel" type="Label" parent="Padding/Info/Progress/VBoxContainer/FilesDownloaded"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+
+[node name="Details" type="HBoxContainer" parent="Padding/Info"]
+layout_mode = 2
+
+[node name="Asset" type="VBoxContainer" parent="Padding/Info/Details"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="AssetName" type="Label" parent="Padding/Info/Details/Asset"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_vertical = 3
+text = "AssetName"
+vertical_alignment = 2
+clip_text = true
+
+[node name="AuthorName" type="RichTextLabel" parent="Padding/Info/Details/Asset"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "AuthorName"
+scroll_active = false
+autowrap_mode = 0
+vertical_alignment = 2
+
+[node name="Description" type="RichTextLabel" parent="Padding/Info/Details/Asset"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_rs5q6")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_g4njl")
+text = "Description"
+scroll_active = false
+context_menu_enabled = true
+vertical_alignment = 2
+
+[node name="Download" type="HBoxContainer" parent="Padding/Info/Details"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 2
+
+[node name="License" type="TextureRect" parent="Padding/Info/Details/Download"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+texture = ExtResource("6_3vp83")
+stretch_mode = 2
+
+[node name="BufferingIcon" parent="Padding/Info/Details/Download" instance=ExtResource("3_8pxhf")]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+value = 0.0
+nine_patch_stretch = true
+texture_under = SubResource("GradientTexture2D_x15us")
+texture_progress = SubResource("GradientTexture2D_28c6v")
+loop_time = 0.795
+rotation_speed = 0.105
+throbber_size = 32
+color = Color(0.6866236, 0.68662363, 0.6866236, 1)
+
+[node name="Download" type="Button" parent="Padding/Info/Details/Download"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxEmpty_3vp83")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_fmlye")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_8pxhf")
+icon = ExtResource("3_yfmvu")
+alignment = 0
+icon_alignment = 1
+
+[node name="Like" type="Button" parent="Padding/Info/Details/Download"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxEmpty_3vp83")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_rs5q6")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_8wiaa")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_fmlye")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_8pxhf")
+text = "♡"
+icon_alignment = 1
+
+[node name="DeleteAsset" type="Button" parent="Padding/Info/Details/Download"]
+unique_name_in_owner = true
+visible = false
+modulate = Color(1, 0.4857641, 0.4182539, 1)
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 14
+theme_override_styles/focus = SubResource("StyleBoxEmpty_8pxhf")
+icon = ExtResource("8_rs5q6")
+alignment = 0
+icon_alignment = 1
+
+[node name="DownloadFinished" type="Label" parent="Padding/Info/Details/Download"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = SubResource("FontVariation_3qkbe")
+theme_override_font_sizes/font_size = 18
+text = "✔️"
+vertical_alignment = 1
+
+[node name="DownloadFailed" type="Label" parent="Padding/Info/Details/Download"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = SubResource("FontVariation_3qkbe")
+theme_override_font_sizes/font_size = 18
+text = "❌"
+vertical_alignment = 1
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]
+[connection signal="meta_clicked" from="Padding/Info/Details/Asset/AuthorName" to="." method="_on_author_name_meta_clicked"]
+[connection signal="pressed" from="Padding/Info/Details/Download/Download" to="." method="_on_download_pressed"]
+[connection signal="pressed" from="Padding/Info/Details/Download/Like" to="." method="_on_like_pressed"]
+[connection signal="pressed" from="Padding/Info/Details/Download/DeleteAsset" to="." method="_on_delete_asset_pressed"]

@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://bdwc7ryc6h133"]
+
+[ext_resource type="Shader" uid="uid://cmajmbvv7pr8" path="res://addons/icosa/open_brush/brush_materials/Smoke/Smoke.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://clvxvk6k65blc" path="res://addons/icosa/open_brush/brush_materials/Smoke/Smoke-70d79cca-b159-4f35-990c-f02193947fe8-v10.0-MainTex.png" id="2_4cpyu"]
+
+[resource]
+resource_name = "Smoke"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_MainTex = ExtResource("2_4cpyu")
+shader_parameter/u_TintColor = Color(1, 1, 1, 1)
+shader_parameter/u_ScrollRate = 1.0

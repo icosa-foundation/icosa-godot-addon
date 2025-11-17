@@ -1,0 +1,14 @@
+[gd_resource type="StandardMaterial3D" load_steps=0 format=3]
+
+[ext_resource type="Texture2D" uid="uid://b7oj1ruluoxo6" path="res://addons/icosa/open_brush/brush_materials/TaperedMarker_Flat/TaperedMarker_Flat-1a26b8c0-8a07-4f8a-9fac-d2ef36e0cad0-v10.0-MainTex.png" id="1"]
+
+[resource]
+resource_name = "TaperedMarkerFlat"
+transparency = 2
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+alpha_scissor_threshold = 0.5
+roughness = 0.5
+metallic = 0
+albedo_color = Color(1.0, 1.0, 1.0, 1.0)
+albedo_texture = ExtResource("1")

@@ -1,8 +1,0 @@
-[gd_resource type="ShaderMaterial" format=3]
-
-[ext_resource type="Shader" path="res://addons/icosa/brush_materials/Space/Space.gdshader" id="1"]
-
-[resource]
-resource_name = "Space"
-shader = ExtResource("1")
-shader_parameter/u_EmissionGain = 0.5

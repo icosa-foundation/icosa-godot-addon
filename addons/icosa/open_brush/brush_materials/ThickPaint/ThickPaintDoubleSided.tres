@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" load_steps=0 format=3]
+
+[ext_resource type="Texture2D" uid="uid://cb8f6lq8inojj" path="res://addons/icosa/open_brush/brush_materials/ThickPaint/ThickPaint-75b32cf0-fdd6-4d89-a64b-e2a00b247b0f-v10.0-MainTex.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://cj306io54mmrv" path="res://addons/icosa/open_brush/brush_materials/ThickPaint/ThickPaint-75b32cf0-fdd6-4d89-a64b-e2a00b247b0f-v10.0-BumpMap.png" id="2"]
+
+[resource]
+resource_name = "ThickPaintDoubleSided"
+transparency = 2
+cull_mode = 2
+cull_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+alpha_scissor_threshold = 0.5
+roughness = 0.5
+metallic = 0
+albedo_color = Color(1.0, 1.0, 1.0, 1.0)
+albedo_texture = ExtResource("1")
+normal_enabled = true
+normal_texture = ExtResource("2")

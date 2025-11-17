@@ -1,4 +1,9 @@
 @tool
+## TODO: Remove this if not used.
+## this was made so that brush materials fit into the godot project standards, like snake_case filenames
+## but because brush materials are from Unity / C# so the namespace is already decided and it makes it much easier to work with.
+
+
 extends EditorScript
 
 var path = "res://godot_brush_materials/"

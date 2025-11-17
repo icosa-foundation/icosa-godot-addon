@@ -1,0 +1,19 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://8qckyotqu5l4"]
+
+[ext_resource type="Shader" uid="uid://cfg8adngdv3hp" path="res://addons/icosa/open_brush/brush_materials/LightWire/LightWire.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://pdio2riui66a" path="res://addons/icosa/open_brush/brush_materials/LightWire/LightWire-4391aaaa-df81-4396-9e33-31e4e4930b27-v10.0-MainTex.png" id="2"]
+
+[resource]
+resource_name = "LightWire"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0
+shader_parameter/u_MainTex = ExtResource("2")
+shader_parameter/u_SpecColor = Color(0.3, 0.3, 0.3, 1)
+shader_parameter/u_Shininess = 0.81
+shader_parameter/u_ambient_light_color = Color(0.2, 0.2, 0.2, 1)
+shader_parameter/u_SceneLight_0_color = Color(1, 1, 1, 1)
+shader_parameter/u_SceneLight_1_color = Color(0.5, 0.5, 0.5, 1)
+shader_parameter/u_SceneLight_0_direction = Vector3(0, -1, 0)
+shader_parameter/u_SceneLight_1_direction = Vector3(0, 1, 0)

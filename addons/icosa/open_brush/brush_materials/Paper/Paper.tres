@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" load_steps=3 format=3 uid="uid://iwo0oitdcoxg"]
+
+[ext_resource type="Texture2D" uid="uid://beo0os6br7jp2" path="res://addons/icosa/open_brush/brush_materials/Paper/Paper-759f1ebd-20cd-4720-8d41-234e0da63716-v10.0-MainTex.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://bu2t4aoe8qdvc" path="res://addons/icosa/open_brush/brush_materials/Paper/Paper-759f1ebd-20cd-4720-8d41-234e0da63716-v10.0-BumpMap.png" id="2"]
+
+[resource]
+resource_name = "PaperSingleSided"
+transparency = 2
+alpha_scissor_threshold = 0.16
+alpha_antialiasing_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("1")
+roughness = 0.5
+normal_enabled = true
+normal_texture = ExtResource("2")

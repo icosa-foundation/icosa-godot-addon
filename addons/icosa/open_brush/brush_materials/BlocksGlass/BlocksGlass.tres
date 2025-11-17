@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" load_steps=0 format=3]
+
+[ext_resource type="Shader" uid="uid://d0xp8aas41sys" path="res://addons/icosa/open_brush/brush_materials/BlocksGlass/BlocksGlass.gdshader" id="1"]
+
+[resource]
+resource_name = "BlocksGlass"
+blend_mode = 2
+flags_transparent = true
+cull_mode = 2
+shader = ExtResource("1")
+shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_Shininess = 0.4

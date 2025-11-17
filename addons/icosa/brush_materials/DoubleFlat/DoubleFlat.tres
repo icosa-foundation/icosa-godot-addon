@@ -1,9 +1,0 @@
-[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://dyt41o8qbpif4"]
-
-[ext_resource type="Texture2D" uid="uid://bc6tafr5t74nl" path="res://addons/icosa/brush_materials/DoubleFlat/DoubleFlat-f4a0550c-332a-4e1a-9793-b71508f4a454-v10.0-MainTex.png" id="1"]
-
-[resource]
-resource_name = "DoubleFlat"
-vertex_color_use_as_albedo = true
-albedo_texture = ExtResource("1")
-roughness = 0.5

@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=0 format=3]
+
+[ext_resource type="Shader" uid="uid://c3xrgse848ac3" path="res://addons/icosa/open_brush/brush_materials/BlocksGem/BlocksGem.gdshader" id="1"]
+
+[resource]
+resource_name = "BlocksGem"
+blend_mode = 2
+flags_transparent = true
+shader = ExtResource("1")
+shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_Shininess = 0.4

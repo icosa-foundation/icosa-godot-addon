@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cemq84x1080s3"]
+
+[ext_resource type="Shader" uid="uid://cu58prfaje6bw" path="res://addons/icosa/open_brush/brush_materials/ChromaticWave/ChromaticWave.gdshader" id="1"]
+
+[resource]
+resource_name = "ChromaticWave"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_EmissionGain = 0.405

@@ -1,10 +1,12 @@
 @tool
 extends EditorPlugin
 func _get_plugin_name(): return "Icosa Gallery"
-func _get_plugin_icon(): return EditorInterface.get_editor_theme().get_icon("GridMap", "EditorIcons") #return load("res://addons/icosa-gallery/logo/logo_tiny.png")
-const MainPanel = preload("res://addons/icosa/browser.tscn")
-const LightSync = preload("res://addons/icosa/icosa_light_sync.gd")
-const FixOriginTool = preload("res://addons/icosa/fix_origin.gd")
+#
+#@onready var icon = preload("res://addons/icosa/icons/key.svg")
+func _get_plugin_icon(): return EditorInterface.get_editor_theme().get_icon("HTTPRequest", "EditorIcons") 
+const MainPanel = preload("res://addons/icosa/browser/browser.tscn")
+const LightSync = preload("res://addons/icosa/open_brush/icosa_light_sync.gd")
+const FixOriginTool = preload("res://addons/icosa/misc/fix_origin.gd")
 var main_panel_instance
 
 var gltf : IcosaGLTF

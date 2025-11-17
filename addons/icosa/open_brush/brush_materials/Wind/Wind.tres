@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://dla2gi4x1ahte"]
+
+[ext_resource type="Shader" uid="uid://vmlnk8vkkfnn" path="res://addons/icosa/open_brush/brush_materials/Wind/Wind.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://c82sbcgur2iqb" path="res://addons/icosa/open_brush/brush_materials/Wind/Wind-7136a729-1aab-bd24-f8b2-ca88b6adfb67-v10.0-MainTex.png" id="2"]
+
+[resource]
+resource_name = "Wind"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_MainTex = ExtResource("2")
+shader_parameter/u_EmissionGain = 0.5

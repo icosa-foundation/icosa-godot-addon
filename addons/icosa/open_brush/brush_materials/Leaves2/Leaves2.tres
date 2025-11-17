@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" load_steps=3 format=3 uid="uid://rwanyutvpno6"]
+
+[ext_resource type="Texture2D" uid="uid://ci6k6o7l6pgit" path="res://addons/icosa/open_brush/brush_materials/Leaves2/Leaves2-7259cce5-41c1-ec74-c885-78af28a31d95-v10.0-MainTex.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://c8ilcuqlqfspc" path="res://addons/icosa/open_brush/brush_materials/Leaves2/Leaves2-7259cce5-41c1-ec74-c885-78af28a31d95-v10.0-BumpMap.png" id="2"]
+
+[resource]
+resource_name = "Leaves2"
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+specular_mode = 1
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("1")
+normal_enabled = true
+normal_texture = ExtResource("2")

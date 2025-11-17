@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://djqyv2xnax4yi"]
+
+[ext_resource type="Shader" uid="uid://bps3qmp7p0bbt" path="res://addons/icosa/open_brush/brush_materials/SoftHighlighter/SoftHighlighter.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://bgk5q4o0slgng" path="res://addons/icosa/open_brush/brush_materials/SoftHighlighter/SoftHighlighter-accb32f5-4509-454f-93f8-1df3fd31df1b-v10.0-MainTex.png" id="2"]
+
+[resource]
+resource_name = "SoftHighlighter"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_MainTex = ExtResource("2")
+shader_parameter/u_Opacity = 1.0

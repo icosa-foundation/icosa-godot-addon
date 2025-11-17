@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=0 format=3]
+
+[ext_resource type="Shader" uid="uid://ccnkfmjoeu6ou" path="res://addons/icosa/open_brush/brush_materials/Fire2/Fire2.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://c5g36srdswkxe" path="res://addons/icosa/open_brush/brush_materials/Fire2/Fire2-53d753ef-083c-45e1-98e7-4459b4471219-v10.0-MainTex.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://cwsej31pmk7g6" path="res://addons/icosa/open_brush/brush_materials/Fire2/Fire2-53d753ef-083c-45e1-98e7-4459b4471219-v10.0-DisplaceTex.png" id="3"]
+
+[resource]
+resource_name = "Fire2"
+shader = ExtResource("1")
+shader_parameter/u_EmissionGain = 0.405
+shader_parameter/u_Scroll1 = 15.0
+shader_parameter/u_Scroll2 = 0.0
+shader_parameter/u_DisplacementIntensity = 0.04
+shader_parameter/u_MainTex = ExtResource("2")
+shader_parameter/u_DisplaceTex = ExtResource("3")

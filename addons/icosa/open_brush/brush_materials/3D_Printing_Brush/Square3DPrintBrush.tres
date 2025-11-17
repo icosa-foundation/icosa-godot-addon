@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" load_steps=0 format=3]
+
+[ext_resource type="Shader" uid="uid://doovbnwp45ac0" path="res://addons/icosa/open_brush/brush_materials/3D_Printing_Brush/Square3DPrintBrush.gdshader" id="1"]
+
+[resource]
+resource_name = "Square3DPrintBrush"
+blend_mode = 0
+shader = ExtResource("1")
+shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_Shininess = 0.4
