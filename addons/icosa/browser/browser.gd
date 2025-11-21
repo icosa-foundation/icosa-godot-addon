@@ -63,16 +63,17 @@ func token_too_old():
 
 func setup_tabs():
 	# make it easier.
-	drag_to_rearrange_enabled = false 
-	
+	drag_to_rearrange_enabled = false
+
 	tab_button_pressed.connect(on_tab_button_pressed)
 	tab_selected.connect(on_tab_selected)
 	tab_clicked.connect(on_tab_clicked)
-	
-	var search = search_tab_scene.instantiate()
+
+	var search = search_tab_scene.instantiate() as IcosaSearchTab
 	search.search_requested.connect(update_search_tab_title)
 	add_child(search)
 	search.owner = self
+	search.tab_index = 0
 	set_tab_title(0, "Search")
 	set_tab_button_icon(0, cross_icon)
 	set_tab_icon(0, magnify_icon)
@@ -104,19 +105,24 @@ func on_tab_selected(tab):
 
 func on_tab_clicked(tab):
 	get_previous_tab()
-	
+
 	if !is_setup:
 		return
-	
+
 	var last_tab = get_tab_count()-1
 	if tab == last_tab:
 		var search = search_tab_scene.instantiate() as IcosaSearchTab
 		search.search_requested.connect(update_search_tab_title)
 		add_child(search)
 		search.owner = self
-		move_child(search, last_tab-1)
-		set_tab_title(last_tab-1, "Search")
-		set_tab_button_icon(last_tab-1, cross_icon)
+		move_child(search, last_tab)
+		search.tab_index = last_tab
+		set_tab_title(last_tab, "Search")
+		set_tab_icon(last_tab, magnify_icon)
+		set_tab_button_icon(last_tab, cross_icon)
+		# Move the "+" button to the end to maintain tab order invariant
+		move_child(add_tab_button, get_child_count()-1)
+		set_tab_icon(get_tab_count()-1, plus_icon)
 		get_child(get_previous_tab()).show()
 	
 func update_search_tab_title(index, new_title):
@@ -128,7 +134,7 @@ func add_thumbnail_tab(thumbnail : IcosaThumbnail, title : String):
 	for child in get_children():
 		if child.visible:
 			selected_tab = child
-	
+
 	var thumbnail_copy = thumbnail.duplicate()
 	thumbnail_copy.asset = thumbnail.asset
 	thumbnail_copy.is_preview = true
@@ -139,6 +145,8 @@ func add_thumbnail_tab(thumbnail : IcosaThumbnail, title : String):
 	move_child(thumbnail_copy, place)
 	set_tab_title(place, title)
 	set_tab_button_icon(place, cross_icon)
+	# Move the "+" button to the end to maintain tab order invariant
+	move_child(add_tab_button, get_child_count()-1)
 
 
 func _on_downloads_tree_exited():

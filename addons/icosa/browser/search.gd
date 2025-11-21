@@ -18,6 +18,7 @@ var cached_assets : Array[IcosaAsset] = []
 
 var keywords = ""
 var browser : IcosaBrowser
+var tab_index : int = -1
 
 # Create a Search object to manage search parameters
 var current_search : Search
@@ -330,7 +331,7 @@ func clear_gallery():
 func _on_keywords_text_submitted(new_text : String):
 	keywords = new_text
 	current_search.keywords = new_text
-	search_requested.emit(get_index(), keywords)
+	search_requested.emit(tab_index, keywords)
 	
 	# Reset pagination when starting new search
 	current_page_tokens = [""]

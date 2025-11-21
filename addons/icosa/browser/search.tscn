@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://fmieafew1yqi"]
 
-[ext_resource type="Script" uid="uid://caqjd16i2dp01" path="res://addons/icosa/search.gd" id="1_ot4t0"]
+[ext_resource type="Script" uid="uid://caqjd16i2dp01" path="res://addons/icosa/browser/search.gd" id="1_ot4t0"]
 [ext_resource type="Texture2D" uid="uid://4ova4wsdy5x8" path="res://addons/icosa/icons/magnify.svg" id="2_ottfe"]
 [ext_resource type="Texture2D" uid="uid://burqvekfq2l4j" path="res://addons/icosa/icons/arrow_up.svg" id="3_b5aqq"]
 [ext_resource type="Texture2D" uid="uid://ccmeocu15nk48" path="res://addons/icosa/icons/plus.svg" id="3_bp884"]
@@ -80,6 +80,7 @@ alignment = 1
 [node name="PagePrevious" type="Button" parent="Split/Gallery/TopArea/Navigation/MarginContainer/Pagination"]
 unique_name_in_owner = true
 layout_mode = 2
+disabled = true
 icon = ExtResource("4_d4enq")
 
 [node name="Pages" type="HBoxContainer" parent="Split/Gallery/TopArea/Navigation/MarginContainer/Pagination"]
