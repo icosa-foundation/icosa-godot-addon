@@ -15,6 +15,8 @@ var user_tab : IcosaUserTab
 #var upload_tab = load("res://addons/icosa/upload.tscn")
 var is_setup = false
 
+var download_queue: DownloadQueue
+
 var access_token = ""
 @onready var root_directory = "res://" if Engine.is_editor_hint() else "user://"
 var token_path = "res://addons/icosa/cookie.cfg"
@@ -65,29 +67,38 @@ func setup_tabs():
 	# make it easier.
 	drag_to_rearrange_enabled = false
 
+	# Initialize the master download queue
+	download_queue = preload("res://addons/icosa/browser/download_queue.gd").new()
+	add_child(download_queue)
+
 	tab_button_pressed.connect(on_tab_button_pressed)
 	tab_selected.connect(on_tab_selected)
 	tab_clicked.connect(on_tab_clicked)
+
+	var user = user_tab_scene.instantiate() as IcosaUserTab
+	user.logged_in.connect(get_user_token)
+	user_tab = user
+	add_child(user)
+	set_tab_title(0, "Login")
+	set_tab_icon(0, key_icon)
+	# User tab cannot be closed (no button icon)
 
 	var search = search_tab_scene.instantiate() as IcosaSearchTab
 	search.search_requested.connect(update_search_tab_title)
 	add_child(search)
 	search.owner = self
-	search.tab_index = 0
-	set_tab_title(0, "Search")
-	set_tab_button_icon(0, cross_icon)
-	set_tab_icon(0, magnify_icon)
-	var user = user_tab_scene.instantiate() as IcosaUserTab
-	user.logged_in.connect(get_user_token)
-	user_tab = user
-	add_child(user)
-	set_tab_title(1, "Login")
-	set_tab_icon(1, key_icon)
+	search.tab_index = 1
+	set_tab_title(1, "Search")
+	set_tab_button_icon(1, cross_icon)
+	set_tab_icon(1, magnify_icon)
+
 	# this could contain an empty scene, to tell the user to add a tab to search. etc.
-	add_child(add_tab_button) 
+	add_child(add_tab_button)
 	set_tab_title(2, "")
-	#set_tab_button_icon(1, plus_icon)
 	set_tab_icon(2, plus_icon)
+
+	# Default to showing the first Search tab
+	current_tab = 1
 	is_setup = true
 
 func get_user_token(token):
@@ -151,3 +162,7 @@ func add_thumbnail_tab(thumbnail : IcosaThumbnail, title : String):
 
 func _on_downloads_tree_exited():
 	pass
+
+
+func _on_user_settings_do_not_show_delete_confirm_window_toggled(toggled_on):
+	pass # Replace with function body.

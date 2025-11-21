@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://d15wcrmaekds2"]
+[gd_scene load_steps=6 format=3 uid="uid://d15wcrmaekds2"]
 
 [ext_resource type="Script" uid="uid://ciyjsctdmpdcx" path="res://addons/icosa/browser/browser.gd" id="1_v1e32"]
 [ext_resource type="Texture2D" uid="uid://bwqa7sodpxksf" path="res://addons/icosa/icons/cog.svg" id="2_0gaid"]
+[ext_resource type="Texture2D" uid="uid://c03tts2cec4pr" path="res://addons/icosa/icons/folder.svg" id="3_5x70h"]
 
 [sub_resource type="SystemFont" id="SystemFont_v1e32"]
 font_names = PackedStringArray("Arial")
@@ -49,6 +50,69 @@ initial_position = 1
 size = Vector2i(550, 300)
 visible = false
 
+[node name="TabContainer" type="TabContainer" parent="SettingsWindow"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+current_tab = 0
+
+[node name="Downloads" type="PanelContainer" parent="SettingsWindow/TabContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+metadata/_tab_index = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="SettingsWindow/TabContainer/Downloads"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsWindow/TabContainer/Downloads/MarginContainer"]
+layout_mode = 2
+
+[node name="DownloadsPath" type="HBoxContainer" parent="SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer/DownloadsPath"]
+layout_mode = 2
+text = "Downloads Path:"
+
+[node name="DownloadsPath" type="LineEdit" parent="SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer/DownloadsPath"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DownloadsPath" type="FileDialog" parent="SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer/DownloadsPath/DownloadsPath"]
+
+[node name="SelectDownloadsPath" type="Button" parent="SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer/DownloadsPath"]
+layout_mode = 2
+icon = ExtResource("3_5x70h")
+
+[node name="UserSettingsDoNotShowDeleteConfirmWindow" type="CheckBox" parent="SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 12
+text = "Hide confirmation when deleting an asset"
+
+[node name="PanelContainer" type="PanelContainer" parent="SettingsWindow/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="UserSettingsWindow" type="AcceptDialog" parent="SettingsWindow"]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "User Settings"
+initial_position = 2
+size = Vector2i(302, 178)
+ok_button_text = "Done"
+
 [node name="Downloads" type="Node" parent="."]
 
+[connection signal="toggled" from="SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer/UserSettingsDoNotShowDeleteConfirmWindow" to="IcosaBrowser" method="_on_user_settings_do_not_show_delete_confirm_window_toggled"]
 [connection signal="tree_exited" from="Downloads" to="IcosaBrowser" method="_on_downloads_tree_exited"]

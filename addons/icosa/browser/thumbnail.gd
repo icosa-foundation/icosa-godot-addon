@@ -8,9 +8,8 @@ var thumbnail_request := HTTPRequest.new()
 var asset : IcosaAsset
 var is_preview = false
 
-var download : IcosaDownload
 var download_urls: Array
-var current_download_url:= 1 
+var current_download_url:= 1
 var download_urls_size: int
 signal download_requested(urls : Array)
 signal delete_requested(asset_url)
@@ -108,8 +107,8 @@ func downlad_failed():
 func update_progress():
 	if !download_urls.is_empty():
 		%FilesDownloaded.value = current_download_url
-		%FilesDownloaded.max_value = download.url_queue.size()
-		%ProgressLabel.text = "%s/%s" % [current_download_url, download.url_queue.size()]
+		%FilesDownloaded.max_value = download_urls_size
+		%ProgressLabel.text = "%s/%s" % [current_download_url, download_urls_size]
 
 	else:
 		_on_download_queue_completed()
@@ -129,23 +128,34 @@ func _on_download_pressed():
 	var formats = Dictionary(asset.formats)
 	var gltf_urls = formats["GLTF2"]
 	download_urls = gltf_urls
-	
-	download = IcosaDownload.new()
-	owner.owner.owner.get_node("Downloads").add_child(download)
-	
-	download.url_queue = download_urls
-	download.asset_name = asset.display_name
-	download.asset_id = asset.id.replace("assets/", "")
+
+	# Get the browser instance and use its download queue
+	var browser = owner.owner.owner as IcosaBrowser
 	download_urls_size = download_urls.size()
-	download.download_queue_completed.connect(_on_queue_downloaded)
-	download.file_downloaded_to_path.connect(_on_file_downloaded)
-	download.start_next_download()
+
+	# Connect to download queue signals
+	if not browser.download_queue.download_completed.is_connected(_on_queue_downloaded):
+		browser.download_queue.download_completed.connect(_on_queue_downloaded)
+	if not browser.download_queue.file_downloaded.is_connected(_on_file_downloaded):
+		browser.download_queue.file_downloaded.connect(_on_file_downloaded)
+
+	# Add this download to the queue
+	browser.download_queue.queue_download(
+		self,
+		gltf_urls,
+		asset.display_name,
+		asset.id.replace("assets/", "")
+	)
+
 	start_download_progress()
 	update_progress()
 
-func _on_file_downloaded(path : String):
+func _on_file_downloaded(thumbnail: IcosaThumbnail, path : String):
+	if thumbnail != self:
+		return
 	if path.ends_with(".gltf"):
 		preview_scene_path = path
+	current_download_url += 1
 	update_progress()
 
 func load_license_sticker():
@@ -166,15 +176,16 @@ func load_license_sticker():
 	%License.tooltip_text = asset.license
 	%License.texture = load("res://addons/icosa/icons/cc/"+sticker_table[asset.license]+".svg")
 
-func _on_queue_downloaded(model_file):
+func _on_queue_downloaded(thumbnail: IcosaThumbnail):
+	if thumbnail != self:
+		return
 	is_downloaded = true
 	_on_download_queue_completed()
 	await get_tree().process_frame
 	if Engine.is_editor_hint():
 		await EditorInterface.get_resource_filesystem().scan()
 		var toaster = EditorInterface.get_editor_toaster()
-		toaster.push_toast("Downloaded: ", model_file)
-	download.queue_free()
+		toaster.push_toast("Downloaded: ", preview_scene_path)
 	
 	## TODO: 3D preview code (terrible, but working)
 	#if is_preview:
