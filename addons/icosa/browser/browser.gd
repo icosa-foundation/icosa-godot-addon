@@ -166,7 +166,7 @@ func add_thumbnail_tab(thumbnail : IcosaThumbnail, title : String):
 
 
 ## Update overall download progress UI
-func _on_queue_progress_updated(completed_files: int, total_files: int, completed_assets: int, total_assets: int):
+func _on_queue_progress_updated(completed_files: int, total_files: int, completed_assets: int, total_assets: int, total_bytes: int, completed_bytes: int):
 	var progress_container = get_parent().get_node("DownloadProgressBars")
 
 	# Show progress container if there are downloads
@@ -179,9 +179,20 @@ func _on_queue_progress_updated(completed_files: int, total_files: int, complete
 	# Update total progress label and bar
 	var total_label = %TotalDownloadsLabel
 	var total_progress = %TotalDownloadsProgress
-	total_label.text = "%d/%d assets - %d/%d files" % [completed_assets, total_assets, completed_files, total_files]
-	total_progress.max_value = total_files if total_files > 0 else 1
-	total_progress.value = completed_files
+
+	# Format total bytes for display
+	var total_mb = total_bytes / (1024.0 * 1024.0)
+	var completed_mb = completed_bytes / (1024.0 * 1024.0)
+
+	# Show total size information
+	if total_bytes > 0:
+		total_label.text = "%d/%d assets - %d/%d files - %.1f/%.1f MB" % [completed_assets, total_assets, completed_files, total_files, completed_mb, total_mb]
+		total_progress.max_value = total_bytes
+		total_progress.value = completed_bytes
+	else:
+		total_label.text = "%d/%d assets - %d/%d files" % [completed_assets, total_assets, completed_files, total_files]
+		total_progress.max_value = total_files if total_files > 0 else 1
+		total_progress.value = completed_files
 
 	# Hide progress when all downloads complete
 	if completed_files == total_files and total_files > 0:
