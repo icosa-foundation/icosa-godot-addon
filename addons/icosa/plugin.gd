@@ -1,9 +1,9 @@
 @tool
 extends EditorPlugin
 func _get_plugin_name(): return "Icosa Gallery"
-#
-#@onready var icon = preload("res://addons/icosa/icons/key.svg")
-func _get_plugin_icon(): return EditorInterface.get_editor_theme().get_icon("HTTPRequest", "EditorIcons") 
+func _get_plugin_icon(): return EditorInterface.get_editor_theme().get_icon("GridMap", "EditorIcons")
+
+
 const MainPanel = preload("res://addons/icosa/browser/browser.tscn")
 const LightSync = preload("res://addons/icosa/open_brush/icosa_light_sync.gd")
 const FixOriginTool = preload("res://addons/icosa/misc/fix_origin.gd")
