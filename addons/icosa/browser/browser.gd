@@ -16,6 +16,7 @@ var user_tab : IcosaUserTab
 var is_setup = false
 
 var download_queue: DownloadQueue
+var current_downloading_asset_name = ""  # Track which asset is being downloaded
 
 var access_token = ""
 @onready var root_directory = "res://" if Engine.is_editor_hint() else "user://"
@@ -184,13 +185,14 @@ func _on_queue_progress_updated(completed_files: int, total_files: int, complete
 	var total_mb = total_bytes / (1024.0 * 1024.0)
 	var completed_mb = completed_bytes / (1024.0 * 1024.0)
 
-	# Show total size information
+	# Show total size information with current asset name
+	var asset_info = current_downloading_asset_name if current_downloading_asset_name != "" else "Preparing..."
 	if total_bytes > 0:
-		total_label.text = "%d/%d assets - %d/%d files - %.1f/%.1f MB" % [completed_assets, total_assets, completed_files, total_files, completed_mb, total_mb]
+		total_label.text = "%s: %d/%d assets - %d/%d files - %.1f/%.1f MB" % [asset_info, completed_assets, total_assets, completed_files, total_files, completed_mb, total_mb]
 		total_progress.max_value = total_bytes
 		total_progress.value = completed_bytes
 	else:
-		total_label.text = "%d/%d assets - %d/%d files" % [completed_assets, total_assets, completed_files, total_files]
+		total_label.text = "%s: %d/%d assets - %d/%d files" % [asset_info, completed_assets, total_assets, completed_files, total_files]
 		total_progress.max_value = total_files if total_files > 0 else 1
 		total_progress.value = completed_files
 
@@ -200,7 +202,7 @@ func _on_queue_progress_updated(completed_files: int, total_files: int, complete
 		progress_container.hide()
 
 ## Update current file download progress (bytes)
-func _on_download_progress(current_bytes: int, total_bytes: int, thumbnail: IcosaThumbnail):
+func _on_download_progress(current_bytes: int, total_bytes: int, thumbnail: IcosaThumbnail, filename: String):
 	var progress_bar = %CurrentDownloadProgress
 	var label = %CurrentlDownloadLabel
 	var progress_container = get_parent().get_node("DownloadProgressBars")
@@ -209,16 +211,18 @@ func _on_download_progress(current_bytes: int, total_bytes: int, thumbnail: Icos
 
 	# Display asset and current file information
 	var asset_name = thumbnail.asset.display_name if thumbnail else "Unknown"
+	# Update the asset name being tracked for the total label
+	current_downloading_asset_name = asset_name
 
 	# Handle case where content length is unknown
 	if total_bytes <= 0:
 		# Show what's been downloaded so far without estimation
 		if current_bytes > 0:
-			label.text = "%s: %.2f MB downloaded (size unknown)" % [asset_name, current_mb]
+			label.text = "%s > %s: %.2f MB downloaded (size unknown)" % [asset_name, filename, current_mb]
 			progress_bar.max_value = 1
 			progress_bar.value = 0
 		else:
-			label.text = "%s: 0.00 MB (connecting...)" % asset_name
+			label.text = "%s > %s: 0.00 MB (connecting...)" % [asset_name, filename]
 			progress_bar.max_value = 1
 			progress_bar.value = 0
 		return
@@ -229,7 +233,7 @@ func _on_download_progress(current_bytes: int, total_bytes: int, thumbnail: Icos
 	# Format bytes for display
 	var total_mb = total_bytes / (1024.0 * 1024.0)
 	var percent = (float(current_bytes) / float(total_bytes)) * 100.0
-	label.text = "%s: %.2f / %.2f MB (%.0f%%)" % [asset_name, current_mb, total_mb, percent]
+	label.text = "%s > %s: %.2f / %.2f MB (%.0f%%)" % [asset_name, filename, current_mb, total_mb, percent]
 
 	# Reset progress bar color to normal
 	progress_bar.self_modulate = Color.WHITE

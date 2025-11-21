@@ -9,7 +9,7 @@ var content_length: int = -1
 var head_request := HTTPRequest.new()
 
 signal files_downloaded(files, total_files)
-signal download_progress(current_bytes, total_bytes)
+signal download_progress(current_bytes, total_bytes, current_file_name)
 signal download_queue_completed(model_file)
 signal download_failed(error_message)
 signal host_offline
@@ -87,8 +87,8 @@ func update_progress():
 	if current_bytes > 0 or file_size_bytes > 0:
 		print("Progress: %d / %d bytes, file exists: %s" % [current_bytes, file_size_bytes, FileAccess.file_exists(pending_download_file)])
 
-	# Emit signal with progress information
-	emit_signal("download_progress", current_bytes, file_size_bytes)
+	# Emit signal with progress information (including current filename)
+	emit_signal("download_progress", current_bytes, file_size_bytes, current_file_name)
 
 	# Also emit the current file number and total files
 	emit_signal("files_downloaded", current_queue_index, total_queue_size)

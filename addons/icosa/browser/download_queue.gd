@@ -13,7 +13,7 @@ var completed_files = 0
 var total_bytes_to_download = 0  # Total size of all files
 var completed_bytes = 0  # Bytes downloaded so far
 
-signal download_progress(current_bytes: int, total_bytes: int, thumbnail: IcosaThumbnail)
+signal download_progress(current_bytes: int, total_bytes: int, thumbnail: IcosaThumbnail, filename: String)
 signal file_downloaded(thumbnail: IcosaThumbnail, path: String)
 signal download_completed(thumbnail: IcosaThumbnail)
 signal download_failed(thumbnail: IcosaThumbnail, error_message: String)
@@ -117,8 +117,8 @@ func _on_file_downloaded(path: String, thumbnail: IcosaThumbnail):
 	queue_progress_updated.emit(completed_files, total_files, completed_assets, total_assets, total_bytes_to_download, completed_bytes)
 	file_downloaded.emit(thumbnail, path)
 
-func _on_download_progress(current_bytes: int, total_bytes: int, thumbnail: IcosaThumbnail):
-	download_progress.emit(current_bytes, total_bytes, thumbnail)
+func _on_download_progress(current_bytes: int, total_bytes: int, filename: String, thumbnail: IcosaThumbnail):
+	download_progress.emit(current_bytes, total_bytes, thumbnail, filename)
 
 func _on_download_failed(error_message: String, thumbnail: IcosaThumbnail):
 	print("Download failed for: ", thumbnail.asset.display_name, " - ", error_message)
