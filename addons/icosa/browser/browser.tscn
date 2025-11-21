@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://d15wcrmaekds2"]
+[gd_scene load_steps=7 format=3 uid="uid://d15wcrmaekds2"]
 
 [ext_resource type="Script" uid="uid://ciyjsctdmpdcx" path="res://addons/icosa/browser/browser.gd" id="1_v1e32"]
 [ext_resource type="Texture2D" uid="uid://bwqa7sodpxksf" path="res://addons/icosa/icons/cog.svg" id="2_0gaid"]
+[ext_resource type="Texture2D" uid="uid://cegfltvs7kyjw" path="res://addons/icosa/icons/trash_cross.svg" id="2_si3j3"]
 [ext_resource type="Texture2D" uid="uid://c03tts2cec4pr" path="res://addons/icosa/icons/folder.svg" id="3_5x70h"]
 
 [sub_resource type="SystemFont" id="SystemFont_v1e32"]
@@ -23,17 +24,71 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = SubResource("Theme_0gaid")
 
-[node name="IcosaBrowser" type="TabContainer" parent="."]
+[node name="Browser" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="IcosaBrowser" type="TabContainer" parent="Browser"]
+layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/side_margin = 32
 current_tab = 0
 tab_focus_mode = 0
 script = ExtResource("1_v1e32")
+
+[node name="DownloadProgressBars" type="VBoxContainer" parent="Browser"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Browser/DownloadProgressBars"]
+layout_mode = 2
+
+[node name="TotalDownloadsProgress" type="ProgressBar" parent="Browser/DownloadProgressBars/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+show_percentage = false
+
+[node name="CenterContainer" type="CenterContainer" parent="Browser/DownloadProgressBars/HBoxContainer/TotalDownloadsProgress"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TotalDownloadsLabel" type="Label" parent="Browser/DownloadProgressBars/HBoxContainer/TotalDownloadsProgress/CenterContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0 assets / 0 files"
+
+[node name="CancelAllDownloads" type="Button" parent="Browser/DownloadProgressBars/HBoxContainer"]
+layout_mode = 2
+icon = ExtResource("2_si3j3")
+
+[node name="CurrentDownloadProgress" type="ProgressBar" parent="Browser/DownloadProgressBars"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+show_percentage = false
+
+[node name="CenterContainer" type="CenterContainer" parent="Browser/DownloadProgressBars/CurrentDownloadProgress"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CurrentlDownloadLabel" type="Label" parent="Browser/DownloadProgressBars/CurrentDownloadProgress/CenterContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "downloading.."
 
 [node name="Settings" type="Button" parent="."]
 visible = false
@@ -112,7 +167,5 @@ initial_position = 2
 size = Vector2i(302, 178)
 ok_button_text = "Done"
 
-[node name="Downloads" type="Node" parent="."]
-
-[connection signal="toggled" from="SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer/UserSettingsDoNotShowDeleteConfirmWindow" to="IcosaBrowser" method="_on_user_settings_do_not_show_delete_confirm_window_toggled"]
-[connection signal="tree_exited" from="Downloads" to="IcosaBrowser" method="_on_downloads_tree_exited"]
+[connection signal="pressed" from="Browser/DownloadProgressBars/HBoxContainer/CancelAllDownloads" to="Browser/IcosaBrowser" method="_on_cancel_all_downloads_pressed"]
+[connection signal="toggled" from="SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer/UserSettingsDoNotShowDeleteConfirmWindow" to="Browser/IcosaBrowser" method="_on_user_settings_do_not_show_delete_confirm_window_toggled"]

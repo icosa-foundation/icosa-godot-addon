@@ -71,6 +71,11 @@ func setup_tabs():
 	download_queue = preload("res://addons/icosa/browser/download_queue.gd").new()
 	add_child(download_queue)
 
+	# Connect download queue signals
+	download_queue.queue_progress_updated.connect(_on_queue_progress_updated)
+	download_queue.download_progress.connect(_on_download_progress)
+	download_queue.download_failed.connect(_on_download_failed)
+
 	tab_button_pressed.connect(on_tab_button_pressed)
 	tab_selected.connect(on_tab_selected)
 	tab_clicked.connect(on_tab_clicked)
@@ -160,9 +165,89 @@ func add_thumbnail_tab(thumbnail : IcosaThumbnail, title : String):
 	move_child(add_tab_button, get_child_count()-1)
 
 
-func _on_downloads_tree_exited():
-	pass
+## Update overall download progress UI
+func _on_queue_progress_updated(completed_files: int, total_files: int, completed_assets: int, total_assets: int):
+	var progress_container = get_parent().get_node("DownloadProgressBars")
+
+	# Show progress container if there are downloads
+	if total_assets > 0:
+		progress_container.show()
+	else:
+		progress_container.hide()
+		return
+
+	# Update total progress label and bar
+	var total_label = %TotalDownloadsLabel
+	var total_progress = %TotalDownloadsProgress
+	total_label.text = "%d/%d assets - %d/%d files" % [completed_assets, total_assets, completed_files, total_files]
+	total_progress.max_value = total_files if total_files > 0 else 1
+	total_progress.value = completed_files
+
+	# Hide progress when all downloads complete
+	if completed_files == total_files and total_files > 0:
+		await get_tree().process_frame
+		progress_container.hide()
+
+## Update current file download progress (bytes)
+func _on_download_progress(current_bytes: int, total_bytes: int, thumbnail: IcosaThumbnail):
+	var progress_bar = %CurrentDownloadProgress
+	var label = %CurrentlDownloadLabel
+	var progress_container = get_parent().get_node("DownloadProgressBars")
+
+	var current_mb = current_bytes / (1024.0 * 1024.0)
+
+	# Display asset and current file information
+	var asset_name = thumbnail.asset.display_name if thumbnail else "Unknown"
+
+	# Handle case where content length is unknown
+	if total_bytes <= 0:
+		# Show what's been downloaded so far without estimation
+		if current_bytes > 0:
+			label.text = "%s: %.2f MB downloaded (size unknown)" % [asset_name, current_mb]
+			progress_bar.max_value = 1
+			progress_bar.value = 0
+		else:
+			label.text = "%s: 0.00 MB (connecting...)" % asset_name
+			progress_bar.max_value = 1
+			progress_bar.value = 0
+		return
+
+	progress_bar.max_value = total_bytes
+	progress_bar.value = current_bytes
+
+	# Format bytes for display
+	var total_mb = total_bytes / (1024.0 * 1024.0)
+	var percent = (float(current_bytes) / float(total_bytes)) * 100.0
+	label.text = "%s: %.2f / %.2f MB (%.0f%%)" % [asset_name, current_mb, total_mb, percent]
+
+	# Reset progress bar color to normal
+	progress_bar.self_modulate = Color.WHITE
+
+
+func _on_download_failed(thumbnail: IcosaThumbnail, error_message: String):
+	var progress_bar = %CurrentDownloadProgress
+	var label = %CurrentlDownloadLabel
+	var progress_container = get_parent().get_node("DownloadProgressBars")
+
+	# Display error message with asset name
+	var asset_name = thumbnail.asset.display_name if thumbnail else "Unknown"
+	label.text = "❌ %s: %s" % [asset_name, error_message]
+
+	# Modulate progress bar red to indicate error
+	progress_bar.self_modulate = Color.RED
+
+	print("Download failed for %s: %s" % [asset_name, error_message])
 
 
 func _on_user_settings_do_not_show_delete_confirm_window_toggled(toggled_on):
 	pass # Replace with function body.
+
+
+func _on_cancel_all_downloads_pressed():
+	if download_queue:
+		download_queue.cancel_all_downloads()
+		var label = %CurrentlDownloadLabel
+		label.text = "Downloads cancelled"
+		var progress_container = get_parent().get_node("DownloadProgressBars")
+		await get_tree().process_frame
+		progress_container.hide()

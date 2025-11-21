@@ -97,7 +97,7 @@ func thumbnail_request_completed(result, response_code, headers, body : PackedBy
 	
 func _on_download_queue_completed():
 	%Progress.hide()
-	%BufferingIcon.hide()
+#	%BufferingIcon.hide()
 	%Download.hide()
 	%DownloadFinished.show()
 	
@@ -129,8 +129,12 @@ func _on_download_pressed():
 	var gltf_urls = formats["GLTF2"]
 	download_urls = gltf_urls
 
-	# Get the browser instance and use its download queue
-	var browser = owner.owner.owner as IcosaBrowser
+	# Get the browser instance by searching up the tree
+	var browser = get_tree().root.find_child("IcosaBrowser", true, false) as IcosaBrowser
+	if not browser:
+		push_error("Could not find IcosaBrowser in the scene tree")
+		return
+
 	download_urls_size = download_urls.size()
 
 	# Connect to download queue signals
