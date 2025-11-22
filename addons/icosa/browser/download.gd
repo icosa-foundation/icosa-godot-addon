@@ -210,6 +210,13 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 				add_child(head_redirect_request)
 
 				head_redirect_request.request_completed.connect(func(res_head, code_head, hdrs_head, bdy_head):
+					# Check if HEAD request to redirect URL was successful
+					if res_head != HTTPRequest.RESULT_SUCCESS:
+						print("HEAD request to redirect URL failed: result=%d, code=%d" % [res_head, code_head])
+						download_failed.emit("Failed to get redirect file info (HTTP %d)" % code_head)
+						head_redirect_request.queue_free()
+						return
+
 					# Extract Content-Length from HEAD response before streaming starts
 					var redirect_content_length = extract_content_length(hdrs_head)
 					if redirect_content_length > 0:
@@ -231,9 +238,9 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 							# Start the next download
 							start_next_download()
 						else:
-							print("Redirect download failed with response code: ", code_get)
+							print("Redirect GET request failed: result=%d, code=%d" % [res_get, code_get])
 							# Fail the entire asset if redirect download fails
-							download_failed.emit("Failed to download %s from redirect (response code: %d)" % [current_file_name, code_get])
+							download_failed.emit("Failed to download %s from redirect" % current_file_name)
 
 						# Remove the temporary GET request node
 						redirect_get_request.queue_free()
