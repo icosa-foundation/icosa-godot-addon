@@ -212,8 +212,11 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 				head_redirect_request.request_completed.connect(func(res_head, code_head, hdrs_head, bdy_head):
 					# Check if HEAD request to redirect URL was successful
 					if res_head != HTTPRequest.RESULT_SUCCESS:
-						print("HEAD request to redirect URL failed: result=%d, code=%d" % [res_head, code_head])
-						download_failed.emit("Failed to get redirect file info (HTTP %d)" % code_head)
+						print("❌ HEAD request to redirect URL FAILED!")
+						print("   URL: ", redirect_url)
+						print("   Result code: %d (0=success, 1=chunked, 2=body_size_exceeded, 3=body_size_mismatch, 4=redirect_limit, 5=timeout, 6=failed)" % res_head)
+						print("   HTTP code: ", code_head)
+						download_failed.emit("HEAD request failed (result: %d, HTTP: %d) for %s" % [res_head, code_head, current_file_name])
 						head_redirect_request.queue_free()
 						return
 
@@ -221,7 +224,9 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 					var redirect_content_length = extract_content_length(hdrs_head)
 					if redirect_content_length > 0:
 						content_length = redirect_content_length
-						print("Content-Length from redirect HEAD: ", content_length)
+						print("✓ Content-Length from redirect HEAD: ", content_length)
+					else:
+						print("⚠ No Content-Length header in redirect HEAD response")
 
 					# Step 2: Now make GET request with streaming (content_length is already set)
 					var redirect_get_request = HTTPRequest.new()
