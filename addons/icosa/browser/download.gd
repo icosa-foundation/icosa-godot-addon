@@ -6,14 +6,14 @@ var bytes_ticker := Timer.new()
 var download_start_time: float = 0.0
 var last_reported_bytes: int = 0
 var content_length: int = -1
-var head_request := HTTPRequest.new()
+var last_request_end_time: float = 0.0  # Track when last request completed for rate limiting
 
-signal files_downloaded(files, total_files)
-signal download_progress(current_bytes, total_bytes, current_file_name)
-signal download_queue_completed(model_file)
-signal download_failed(error_message)
+signal files_downloaded(files: int, total_files: int)
+signal download_progress(current_bytes: int, total_bytes: int, current_file_name: String)
+signal download_queue_completed(model_file: String)
+signal download_failed(error_message: String)
 signal host_offline
-signal file_downloaded_to_path(path)
+signal file_downloaded_to_path(path: String)
 
 var url_queue = []
 var current_queue_index = 0
@@ -24,19 +24,22 @@ var asset_id = ""
 var pending_download_file = ""  # Store the intended file path
 var current_file_name = ""  # Current file being downloaded
 var should_cancel = false  # Flag to cancel all downloads
+var session_start_time: float = 0.0  # When user clicked download button (from queue)
+var retry_count = 0  # Track retry attempts for current file
+const MAX_RETRIES = 3  # Maximum number of retries per file
 
 @onready var root_directory = "res://" if Engine.is_editor_hint() else "user://"
 
 
 func _ready():
 	add_child(bytes_ticker)
-	add_child(head_request)
 	# This must be 0 for 302 redirects!
 	max_redirects = 0
 	request_completed.connect(on_request_completed)
-	head_request.request_completed.connect(on_head_request_completed)
 	bytes_ticker.wait_time = 0.1
 	bytes_ticker.timeout.connect(update_progress)
+	# Cleanup when node is freed
+	tree_exited.connect(func(): bytes_ticker.stop())
 
 	# Create downloads directory if it doesn't exist
 	var dir = DirAccess.open(root_directory)
@@ -62,10 +65,29 @@ func cancel_all():
 	should_cancel = true
 	bytes_ticker.stop()
 	cancel_request()
-	head_request.cancel_request()
+
+
+## Retry the current download with exponential backoff
+func retry_current_download():
+	if retry_count >= MAX_RETRIES:
+		return false
+
+	retry_count += 1
+	var backoff_time = pow(2.0, retry_count)  # 2^retry_count: 2s, 4s, 8s
+	var session_elapsed = Time.get_ticks_msec() / 1000.0 - session_start_time
+	print("[%6.1fs]   ⏳ Retry %d/%d: waiting %.1f seconds before retry" % [session_elapsed, retry_count, MAX_RETRIES, backoff_time])
+
+	await get_tree().create_timer(backoff_time).timeout
+	# Retry the same file without incrementing the queue index
+	start_next_download()
+	return true
 
 
 func update_progress():
+	# Safety check: don't emit signals if node is queued for deletion
+	if is_queued_for_deletion():
+		return
+
 	# Get actual file size from disk (like browsers do)
 	var current_bytes = 0
 	if pending_download_file != "":
@@ -82,10 +104,6 @@ func update_progress():
 		var body_size = get_body_size()
 		if body_size > 0:
 			file_size_bytes = body_size
-
-	# Debug: log progress
-	if current_bytes > 0 or file_size_bytes > 0:
-		print("Progress: %d / %d bytes, file exists: %s" % [current_bytes, file_size_bytes, FileAccess.file_exists(pending_download_file)])
 
 	# Emit signal with progress information (including current filename)
 	emit_signal("download_progress", current_bytes, file_size_bytes, current_file_name)
@@ -156,6 +174,7 @@ func start_next_download():
 	var url = url_queue[current_queue_index]
 	var final_filename = file_from_url(url)
 	current_file_name = final_filename  # Track current file name
+	retry_count = 0  # Reset retry counter for new file
 
 	# Create asset directory with format: {asset_name}_{asset_id}
 	var asset_path = ""
@@ -174,13 +193,33 @@ func start_next_download():
 	# Reset content length for new download
 	content_length = -1
 
-	# Make HEAD request first to get Content-Length header
-	var error = head_request.request(url, [], HTTPClient.METHOD_HEAD)
+	# Apply rate limiting: ensure 6 seconds between request starts (archive.org: 15 req/min)
+	# Increased from 4s to account for server recovery time after large file downloads
+	var current_time = Time.get_ticks_msec() / 1000.0
+	if current_queue_index > 0:
+		var time_since_last = current_time - last_request_end_time
+		var remaining_wait = 6.0 - time_since_last
+		if remaining_wait > 0:
+			var session_elapsed = current_time - session_start_time
+			print("[%6.1fs]   ⏳ Rate limit: waiting %.1f seconds" % [session_elapsed, remaining_wait])
+			await get_tree().create_timer(remaining_wait).timeout
+			current_time = Time.get_ticks_msec() / 1000.0
+
+	download_start_time = current_time
+	var session_elapsed = download_start_time - session_start_time
+	print("[%6.1fs] 📥 FILE START [%d/%d]: %s" % [session_elapsed, current_queue_index + 1, total_queue_size, final_filename])
+
+	# Skip HEAD request and go straight to GET (download directly)
+	print("[%6.1fs]   📤 GET: started" % [session_elapsed])
+	var error = request(url)
 	if error != OK:
-		push_error("An error occurred in the HEAD request.")
-		# Fail the entire asset download if HEAD request fails
-		download_failed.emit("Failed to get file information: " + final_filename)
+		push_error("An error occurred in the GET request.")
+		# Fail the entire asset download if GET request fails
+		download_failed.emit("Failed to download: " + final_filename)
 		return
+
+	# Start the progress ticker
+	bytes_ticker.start()
 
 
 func on_request_completed(result, response_code, headers: Array[String], body):
@@ -199,86 +238,73 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 		for header in headers:
 			if header.begins_with("location: "):
 				var redirect_url = header.split("location: ")[1]
-				print("Location redirect found: ", redirect_url)
+				var session_elapsed_redir = Time.get_ticks_msec() / 1000.0 - session_start_time
+				print("[%6.1fs]   🔄 REDIRECT: %s" % [session_elapsed_redir, redirect_url])
 				var original_file_path = pending_download_file
-				print("Original file path: ", original_file_path)
 				pending_download_file = original_file_path  # Keep original path for streaming
 				cancel_request()
 
-				# Step 1: Make HEAD request to redirect URL to get Content-Length BEFORE streaming
-				var head_redirect_request = HTTPRequest.new()
-				add_child(head_redirect_request)
+				# Skip HEAD and go straight to GET (redirect is also streamed directly)
+				var redirect_get_request = HTTPRequest.new()
+				redirect_get_request.download_file = original_file_path
+				redirect_get_request.download_chunk_size = 1048576  # 1 MB chunks
+				add_child(redirect_get_request)
 
-				head_redirect_request.request_completed.connect(func(res_head, code_head, hdrs_head, bdy_head):
-					# Check if HEAD request to redirect URL was successful
-					if res_head != HTTPRequest.RESULT_SUCCESS:
-						print("❌ HEAD request to redirect URL FAILED!")
-						print("   URL: ", redirect_url)
-						print("   Result code: %d (0=success, 1=chunked, 2=body_size_exceeded, 3=body_size_mismatch, 4=redirect_limit, 5=timeout, 6=failed)" % res_head)
-						print("   HTTP code: ", code_head)
-						download_failed.emit("HEAD request failed (result: %d, HTTP: %d) for %s" % [res_head, code_head, current_file_name])
-						head_redirect_request.queue_free()
-						return
+				redirect_get_request.request_completed.connect(func(res_get, code_get, hdrs_get, bdy_get):
+					var redirect_get_end_time = Time.get_ticks_msec() / 1000.0
+					var redirect_get_elapsed = redirect_get_end_time - download_start_time
+					var session_elapsed_redirect_get = redirect_get_end_time - session_start_time
 
-					# Extract Content-Length from HEAD response before streaming starts
-					var redirect_content_length = extract_content_length(hdrs_head)
-					if redirect_content_length > 0:
-						content_length = redirect_content_length
-						print("✓ Content-Length from redirect HEAD: ", content_length)
+					if res_get == HTTPRequest.RESULT_SUCCESS:
+						print("[%6.1fs]   ✓ REDIRECT GET: complete in %.1fs" % [session_elapsed_redirect_get, redirect_get_elapsed])
+						file_downloaded_to_path.emit(original_file_path)
+						current_queue_index += 1
+						# Update progress
+						emit_signal("files_downloaded", current_queue_index, total_queue_size)
+						# Start the next download
+						start_next_download()
 					else:
-						print("⚠ No Content-Length header in redirect HEAD response")
+						var result_str = {
+							0: "success",
+							1: "chunked_body_size_mismatch",
+							2: "cant_connect",
+							3: "body_size_mismatch",
+							4: "redirect_limit_reached",
+							5: "timeout",
+							6: "failed"
+						}.get(res_get, "unknown")
+						print("[%6.1fs]   ❌ REDIRECT GET failed" % [session_elapsed_redirect_get])
+						print("      Result: %s (%d)" % [result_str, res_get])
+						print("      HTTP Code: %d" % [code_get])
+						print("      File: %s" % [current_file_name])
+						# Fail the entire asset if redirect download fails
+						download_failed.emit("Failed to download %s from redirect (result: %s, HTTP: %d)" % [current_file_name, result_str, code_get])
 
-					# Step 2: Now make GET request with streaming (content_length is already set)
-					var redirect_get_request = HTTPRequest.new()
-					add_child(redirect_get_request)
-					redirect_get_request.download_file = original_file_path
-
-					redirect_get_request.request_completed.connect(func(res_get, code_get, hdrs_get, bdy_get):
-						if res_get == HTTPRequest.RESULT_SUCCESS:
-							print("Redirect download successful: ", original_file_path)
-							file_downloaded_to_path.emit(original_file_path)
-							current_queue_index += 1
-							# Update progress
-							emit_signal("files_downloaded", current_queue_index, total_queue_size)
-							# Start the next download
-							start_next_download()
-						else:
-							print("Redirect GET request failed: result=%d, code=%d" % [res_get, code_get])
-							# Fail the entire asset if redirect download fails
-							download_failed.emit("Failed to download %s from redirect" % current_file_name)
-
-						# Remove the temporary GET request node
-						redirect_get_request.queue_free()
-					)
-
-					# Make the GET request with streaming
-					var error = redirect_get_request.request(redirect_url)
-					if error != OK:
-						push_error("An error occurred in redirect GET request.")
-						download_failed.emit("Failed to initiate redirect download for %s" % current_file_name)
-						redirect_get_request.queue_free()
-
-					# Remove HEAD request node
-					head_redirect_request.queue_free()
+					# Remove the temporary GET request node
+					redirect_get_request.queue_free()
 				)
 
-				# Make HEAD request to redirect URL first
-				var error = head_redirect_request.request(redirect_url, [], HTTPClient.METHOD_HEAD)
+				# Make the GET request with streaming (skip HEAD entirely)
+				var error = redirect_get_request.request(redirect_url)
 				if error != OK:
-					push_error("An error occurred in redirect HEAD request.")
-					current_queue_index += 1
-					start_next_download()
-					head_redirect_request.queue_free()
+					push_error("An error occurred in redirect GET request.")
+					download_failed.emit("Failed to initiate redirect download for %s" % current_file_name)
+					redirect_get_request.queue_free()
 				return
 		return
 
-	print("### Handle download completion - response code: ", response_code)
 	# When using download_file parameter, file is saved to disk directly
 	# Check if file exists, which indicates successful download
 	var file_exists = FileAccess.file_exists(pending_download_file)
+	var get_end_time = Time.get_ticks_msec() / 1000.0
+	var get_elapsed = get_end_time - download_start_time
+	var session_elapsed_complete = get_end_time - session_start_time
+
+	# Track when this request completed for rate limiting
+	last_request_end_time = get_end_time
 
 	if result == HTTPRequest.RESULT_SUCCESS or (response_code == 0 and file_exists):
-		print("File downloaded and saved successfully: ", pending_download_file)
+		print("[%6.1fs]   ✓ GET: complete in %.1fs" % [session_elapsed_complete, get_elapsed])
 		file_downloaded_to_path.emit(pending_download_file)
 
 		# Move to the next file in the queue
@@ -288,27 +314,25 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 		# Start the next download
 		start_next_download()
 	else:
-		print("Download failed with response code: ", response_code)
+		var result_str = {
+			0: "success",
+			1: "chunked_body_size_mismatch",
+			2: "cant_connect",
+			3: "body_size_mismatch",
+			4: "redirect_limit_reached",
+			5: "timeout",
+			6: "failed"
+		}.get(result, "unknown")
+		print("[%6.1fs]   ❌ GET: failed after %.1fs" % [session_elapsed_complete, get_elapsed])
+		print("      Result: %s (%d)" % [result_str, result])
+		print("      HTTP Code: %d" % [response_code])
+		print("      File: %s" % [current_file_name])
+
+		# Retry on connection failure (result code 2: RESULT_CANT_CONNECT)
+		if result == HTTPRequest.RESULT_CANT_CONNECT:
+			var should_retry = await retry_current_download()
+			if should_retry:
+				return  # Retry is in progress
+
 		# Fail the entire asset if any file fails
-		download_failed.emit("Failed to download %s (response code: %d)" % [current_file_name, response_code])
-
-
-func on_head_request_completed(result, response_code, headers: Array[String], body):
-	# Extract Content-Length from HEAD request response
-	if result == HTTPRequest.RESULT_SUCCESS:
-		content_length = extract_content_length(headers)
-		if content_length > 0:
-			print("Content-Length found: ", content_length)
-
-	# Now make the actual GET request to download the file
-	var url = url_queue[current_queue_index]
-	download_start_time = Time.get_ticks_msec() / 1000.0
-	var error = request(url)
-	if error != OK:
-		push_error("An error occurred in the HTTP request.")
-		current_queue_index += 1
-		start_next_download()
-		return
-
-	# Start the progress ticker
-	bytes_ticker.start()
+		download_failed.emit("Failed to download %s (result: %s, HTTP: %d)" % [current_file_name, result_str, response_code])

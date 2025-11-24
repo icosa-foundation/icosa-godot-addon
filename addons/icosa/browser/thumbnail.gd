@@ -154,8 +154,8 @@ func _on_download_pressed():
 	start_download_progress()
 	update_progress()
 
-func _on_file_downloaded(thumbnail: IcosaThumbnail, path : String):
-	if thumbnail != self:
+func _on_file_downloaded(asset_name: String, path : String):
+	if asset_name != asset.display_name:
 		return
 	if path.ends_with(".gltf"):
 		preview_scene_path = path
@@ -180,8 +180,8 @@ func load_license_sticker():
 	%License.tooltip_text = asset.license
 	%License.texture = load("res://addons/icosa/icons/cc/"+sticker_table[asset.license]+".svg")
 
-func _on_queue_downloaded(thumbnail: IcosaThumbnail):
-	if thumbnail != self:
+func _on_queue_downloaded(asset_name: String):
+	if asset_name != asset.display_name:
 		return
 	is_downloaded = true
 	_on_download_queue_completed()

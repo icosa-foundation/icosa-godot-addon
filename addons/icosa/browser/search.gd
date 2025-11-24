@@ -8,6 +8,7 @@ const HEADER_AGENT := "User-Agent: Icosa Gallery Godot Engine / 1.0"
 const HEADER_APP = 'accept: application/json'
 var search_endpoint = 'https://api.icosa.gallery/v1/assets'
 var thumbnail_scene = load("res://addons/icosa/browser/thumbnail.tscn")
+var search_tab_scene = preload("res://addons/icosa/browser/search.tscn")
 
 var up_icon = load("res://addons/icosa/icons/arrow_up.svg")
 var down_icon = load("res://addons/icosa/icons/arrow_down.svg")
@@ -30,6 +31,9 @@ signal search_requested(tab_index : int, search_term : String)
 var on_author_profile = false
 var author_profile_id = ""
 var author_profile_name = ""
+
+# Flag to skip initial search in _ready() for author profile tabs
+var skip_initial_search = false
 
 ## pagination
 var current_page_tokens : Array[String] = [""]  # Start with empty token for first page
@@ -186,15 +190,19 @@ func _ready():
 	
 	# Hide author page elements initially
 	%AuthorPage.hide()
-	
-	_on_keywords_text_submitted("")
+
+	# Skip initial search if this is an author profile tab (will be set up later)
+	if !skip_initial_search:
+		_on_keywords_text_submitted("")
 
 func execute_search():
 	%NoAssetsFound.hide()
 	"""Execute a search using the current_search object"""
 	var query = current_search.build_query()
-	print(query)
-	http.request(search_endpoint + query, [HEADER_AGENT, HEADER_APP], HTTPClient.METHOD_GET)
+	var full_url = search_endpoint + query
+	print("SEARCH URL: ", full_url)
+	print("Author ID in search: '%s'" % current_search.author_id)
+	http.request(full_url, [HEADER_AGENT, HEADER_APP], HTTPClient.METHOD_GET)
 
 func build_query(keywords):
 	var query = "?"
@@ -296,27 +304,57 @@ func update_pagination_ui():
 func goto_page(page_index: int):
 	if page_index < 0 or page_index >= current_page_tokens.size():
 		return
-	
+
 	current_page_index = page_index
-	current_search.page_token = current_page_tokens[page_index]
+	var page_token = current_page_tokens[page_index]
 	clear_gallery()
+
+	# Update page token and execute search (works for both regular and author profile searches)
+	current_search.page_token = page_token
 	execute_search()
 
 ## for this state we want to display some information..
 func search_author_id(id, author_name):
-	var search = Search.new()
-	search.author_id = id
-	current_search = search
-	on_author_profile = true
-	author_profile_id = id
-	author_profile_name = author_name
-	
-	# Reset pagination
-	current_page_tokens = [""]
-	current_page_index = 0
-	
-	clear_gallery()
-	execute_search()
+	print("DEBUG: search_author_id called with id='%s', author_name='%s'" % [id, author_name])
+
+	# Create a new search tab for this author's profile
+	var new_search_tab = search_tab_scene.instantiate() as IcosaSearchTab
+	new_search_tab.search_requested.connect(browser.update_search_tab_title)
+
+	# Set flag to skip initial search - we'll do it ourselves with author_id set
+	new_search_tab.skip_initial_search = true
+
+	# Determine if this is the user's own profile (could check against current user if needed)
+	var is_self = false  # This could be enhanced to check if id matches logged-in user
+
+	# Create the tab with the author's name and appropriate icon
+	browser.create_author_tab(new_search_tab, id, author_name, is_self)
+
+	# Wait for _ready() to complete before configuring
+	print("DEBUG: Waiting for process_frame to allow _ready() to complete...")
+	await new_search_tab.get_tree().process_frame
+	print("DEBUG: process_frame complete, setting author parameters...")
+
+	# Set up the author-specific properties and search parameters
+	new_search_tab.on_author_profile = true
+	new_search_tab.author_profile_id = id
+	new_search_tab.author_profile_name = author_name
+
+	# Set the authorId in the search to filter by this author
+	new_search_tab.current_search.author_id = id
+	# Clear keywords to avoid interfering with author search
+	new_search_tab.current_search.keywords = ""
+
+	print("DEBUG: Set author_id to '%s' in current_search" % new_search_tab.current_search.author_id)
+
+	# Reset pagination and execute the search
+	new_search_tab.current_page_tokens.clear()
+	new_search_tab.current_page_tokens.append("")
+	new_search_tab.current_page_index = 0
+	new_search_tab.clear_gallery()
+	print("DEBUG: About to execute search...")
+	new_search_tab.execute_search()
+	print("DEBUG: execute_search() called")
 
 func add_thumbnail_tab(thumbnail : IcosaThumbnail, title : String):
 	thumbnail.is_preview = true

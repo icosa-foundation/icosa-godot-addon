@@ -6,9 +6,13 @@ var plus_icon = preload("res://addons/icosa/icons/plus.svg")
 var cross_icon = preload("res://addons/icosa/icons/cross.svg")
 var key_icon = preload("res://addons/icosa/icons/key.svg")
 var magnify_icon = preload("res://addons/icosa/icons/magnify.svg")
-
+var user_icon = preload("res://addons/icosa/icons/person.svg") # for user self
+var user_search_icon = preload("res://addons/icosa/icons/person_search.svg") # for other users
+var document_search = preload("res://addons/icosa/icons/document_search.svg")
+var folder = preload("res://addons/icosa/icons/folder.svg")
+var folder_stack = preload("res://addons/icosa/icons/folder_copy.svg")
 var search_tab_scene = preload("res://addons/icosa/browser/search.tscn")
-var add_tab_button = Control.new() # dummy node for tabs managment
+var add_tab_button: Control
 
 var user_tab_scene = load("res://addons/icosa/browser/user.tscn")
 var user_tab : IcosaUserTab
@@ -18,9 +22,76 @@ var is_setup = false
 var download_queue: DownloadQueue
 var current_downloading_asset_name = ""  # Track which asset is being downloaded
 
+# Tab structure: [0: User] [1...n: Content] [n+1: Plus Button]
+const USER_TAB_INDEX = 0
+var plus_button_index: int = -1  # Will be set during setup
+var _suppress_tab_selection = false  # Prevent recursive selection
+
 var access_token = ""
 @onready var root_directory = "res://" if Engine.is_editor_hint() else "user://"
 var token_path = "res://addons/icosa/cookie.cfg"
+
+# ============================================================================
+# TAB HELPER FUNCTIONS - Safe tab management
+# ============================================================================
+
+## Check if a tab index is the reserved user tab
+func is_user_tab(index: int) -> bool:
+	return index == USER_TAB_INDEX
+
+## Check if a tab index is the reserved plus button tab
+func is_plus_button_tab(index: int) -> bool:
+	return index == plus_button_index
+
+## Check if a tab index is a content tab (between user and plus button)
+func is_content_tab(index: int) -> bool:
+	return index > USER_TAB_INDEX and index < plus_button_index
+
+## Get the index of the first content tab (or -1 if none exist)
+func get_first_content_tab() -> int:
+	if plus_button_index > USER_TAB_INDEX + 1:
+		return USER_TAB_INDEX + 1
+	return -1
+
+## Get the last content tab index (or -1 if none exist)
+func get_last_content_tab() -> int:
+	if plus_button_index > USER_TAB_INDEX + 1:
+		return plus_button_index - 1
+	return -1
+
+## Switch to a safe content tab (used when reserved tabs are accidentally selected)
+## Never shows the user tab; creates a new tab if needed
+func switch_to_safe_tab():
+	var safe_tab = get_first_content_tab()
+	if safe_tab >= 0:
+		_suppress_tab_selection = true
+		current_tab = safe_tab
+		_suppress_tab_selection = false
+	else:
+		# No content tabs exist - create one (shouldn't happen with tab closing guards)
+		on_add_tab_pressed()
+
+## Add a content tab before the plus button and return its index
+func add_content_tab(node: Node, title: String, icon: Texture2D = null) -> int:
+	add_child(node)
+	node.owner = self
+
+	# Move plus button to the very end (only if it exists)
+	if add_tab_button:
+		move_child(add_tab_button, -1)
+		plus_button_index = get_tab_count() - 1
+
+	# New tab is now before plus button (or at the end if plus button doesn't exist yet)
+	var tab_index = get_tab_count() - 1
+	if add_tab_button:
+		tab_index = plus_button_index - 1
+
+	set_tab_title(tab_index, title)
+	set_tab_button_icon(tab_index, cross_icon)
+	if icon:
+		set_tab_icon(tab_index, icon)
+
+	return tab_index
 
 func save_token():
 	if !access_token.is_empty():
@@ -77,34 +148,37 @@ func setup_tabs():
 	download_queue.download_progress.connect(_on_download_progress)
 	download_queue.download_failed.connect(_on_download_failed)
 
+	# Connect tab signals
 	tab_button_pressed.connect(on_tab_button_pressed)
 	tab_selected.connect(on_tab_selected)
-	tab_clicked.connect(on_tab_clicked)
 
+	# Setup user tab at index 0
 	var user = user_tab_scene.instantiate() as IcosaUserTab
 	user.logged_in.connect(get_user_token)
 	user_tab = user
 	add_child(user)
-	set_tab_title(0, "Login")
-	set_tab_icon(0, key_icon)
+	set_tab_title(USER_TAB_INDEX, "Login")
+	set_tab_icon(USER_TAB_INDEX, user_icon)
 	# User tab cannot be closed (no button icon)
 
+	# Setup first search tab at index 1
 	var search = search_tab_scene.instantiate() as IcosaSearchTab
 	search.search_requested.connect(update_search_tab_title)
-	add_child(search)
-	search.owner = self
 	search.tab_index = 1
-	set_tab_title(1, "Search")
-	set_tab_button_icon(1, cross_icon)
-	set_tab_icon(1, magnify_icon)
+	add_content_tab(search, "Search", magnify_icon)
 
-	# this could contain an empty scene, to tell the user to add a tab to search. etc.
+	# Setup plus button (will be at the end after add_content_tab)
+	add_tab_button = Control.new()
+	add_tab_button.name = "AddTabButton"
 	add_child(add_tab_button)
-	set_tab_title(2, "")
-	set_tab_icon(2, plus_icon)
+	plus_button_index = get_tab_count() - 1
+	set_tab_title(plus_button_index, "")  # Empty title for + button
+	set_tab_icon(plus_button_index, plus_icon)
 
 	# Default to showing the first Search tab
-	current_tab = 1
+	_suppress_tab_selection = true
+	current_tab = get_first_content_tab()
+	_suppress_tab_selection = false
 	is_setup = true
 
 func get_user_token(token):
@@ -114,56 +188,92 @@ func get_user_token(token):
 		if tab.name == "Login":
 			tab.name = "User"
 
-func on_tab_button_pressed(tab):
-	get_child(tab).queue_free()
+func on_tab_button_pressed(tab: int):
+	# Don't allow closing the user tab or plus button
+	if is_user_tab(tab) or is_plus_button_tab(tab):
+		return
 
-func on_tab_selected(tab):
-	pass
+	# Save reference to node BEFORE doing anything
+	var node_to_remove = get_tab_control(tab)
 
-func on_tab_clicked(tab):
-	get_previous_tab()
+	# Remove the node
+	remove_child(node_to_remove)
+	node_to_remove.queue_free()
 
+	# Recalculate plus_button_index since indices have shifted
+	plus_button_index = get_tab_count() - 1
+
+	# After removal, ensure current_tab points to a valid tab
+	# If we removed the current tab, switch to a valid one
+	if current_tab >= get_tab_count():
+		_suppress_tab_selection = true
+		var safe_tab = get_first_content_tab()
+		if safe_tab >= 0:
+			current_tab = safe_tab
+		else:
+			# No content tabs left, switch to user tab
+			current_tab = USER_TAB_INDEX
+		_suppress_tab_selection = false
+
+func on_tab_selected(tab: int):
+	# Ignore tab selection if we're programmatically changing tabs
+	if _suppress_tab_selection:
+		return
+
+	# If the plus button tab was selected, create a new tab instead
+	if is_plus_button_tab(tab):
+		on_add_tab_pressed()
+		return
+
+	# User tab and content tabs can be selected normally - no special handling needed
+
+## Called when the "+" button is pressed to add a new search tab
+func on_add_tab_pressed():
 	if !is_setup:
 		return
 
-	var last_tab = get_tab_count()-1
-	if tab == last_tab:
-		var search = search_tab_scene.instantiate() as IcosaSearchTab
-		search.search_requested.connect(update_search_tab_title)
-		add_child(search)
-		search.owner = self
-		move_child(search, last_tab)
-		search.tab_index = last_tab
-		set_tab_title(last_tab, "Search")
-		set_tab_icon(last_tab, magnify_icon)
-		set_tab_button_icon(last_tab, cross_icon)
-		# Move the "+" button to the end to maintain tab order invariant
-		move_child(add_tab_button, get_child_count()-1)
-		set_tab_icon(get_tab_count()-1, plus_icon)
-		get_child(get_previous_tab()).show()
-	
+	var search = search_tab_scene.instantiate() as IcosaSearchTab
+	search.search_requested.connect(update_search_tab_title)
+
+	var tab_index = add_content_tab(search, "Search", magnify_icon)
+	search.tab_index = tab_index
+	_suppress_tab_selection = true
+	current_tab = tab_index
+	_suppress_tab_selection = false
+
 func update_search_tab_title(index, new_title):
 	await get_tree().process_frame
 	set_tab_title(index, "Search - " + new_title)
 
 func add_thumbnail_tab(thumbnail : IcosaThumbnail, title : String):
-	var selected_tab : Control
-	for child in get_children():
-		if child.visible:
-			selected_tab = child
-
 	var thumbnail_copy = thumbnail.duplicate()
+	thumbnail_copy.name = title
 	thumbnail_copy.asset = thumbnail.asset
 	thumbnail_copy.is_preview = true
-	add_child(thumbnail_copy)
-	thumbnail_copy.owner = self
 	thumbnail_copy.disabled = true
-	var place = selected_tab.get_index()+1
-	move_child(thumbnail_copy, place)
-	set_tab_title(place, title)
-	set_tab_button_icon(place, cross_icon)
-	# Move the "+" button to the end to maintain tab order invariant
-	move_child(add_tab_button, get_child_count()-1)
+
+	var tab_index = add_content_tab(thumbnail_copy, title, document_search)
+	# Switch to the newly created tab
+	_suppress_tab_selection = true
+	current_tab = tab_index
+	_suppress_tab_selection = false
+
+func create_author_tab(search_tab: IcosaSearchTab, author_id: String, author_name: String, is_self: bool) -> int:
+	"""Create a new tab for browsing an author's profile"""
+	# Configure the search tab for author browsing
+	search_tab.author_profile_id = author_id
+	search_tab.author_profile_name = author_name
+	search_tab.on_author_profile = true
+
+	var tab_index = add_content_tab(search_tab, author_name, user_icon if is_self else user_search_icon)
+	search_tab.tab_index = tab_index
+
+	# Switch to the new tab
+	_suppress_tab_selection = true
+	current_tab = tab_index
+	_suppress_tab_selection = false
+
+	return tab_index
 
 
 ## Update overall download progress UI
@@ -196,13 +306,17 @@ func _on_queue_progress_updated(completed_files: int, total_files: int, complete
 		total_progress.max_value = total_files if total_files > 0 else 1
 		total_progress.value = completed_files
 
-	# Hide progress when all downloads complete
+	# Hide progress when all downloads complete and clear the gallery
 	if completed_files == total_files and total_files > 0:
 		await get_tree().process_frame
 		progress_container.hide()
+		# Clear the asset list in the current search tab
+		var current_tab_node = get_tab_control(current_tab)
+		if current_tab_node and current_tab_node is IcosaSearchTab:
+			(current_tab_node as IcosaSearchTab).clear_gallery()
 
 ## Update current file download progress (bytes)
-func _on_download_progress(current_bytes: int, total_bytes: int, thumbnail: IcosaThumbnail, filename: String):
+func _on_download_progress(current_bytes: int, total_bytes: int, asset_name: String, filename: String):
 	var progress_bar = %CurrentDownloadProgress
 	var label = %CurrentlDownloadLabel
 	var progress_container = get_parent().get_node("DownloadProgressBars")
@@ -210,7 +324,7 @@ func _on_download_progress(current_bytes: int, total_bytes: int, thumbnail: Icos
 	var current_mb = current_bytes / (1024.0 * 1024.0)
 
 	# Display asset and current file information
-	var asset_name = thumbnail.asset.display_name if thumbnail else "Unknown"
+	# asset_name is now passed directly as a String
 	# Update the asset name being tracked for the total label
 	current_downloading_asset_name = asset_name
 
@@ -239,13 +353,12 @@ func _on_download_progress(current_bytes: int, total_bytes: int, thumbnail: Icos
 	progress_bar.self_modulate = Color.WHITE
 
 
-func _on_download_failed(thumbnail: IcosaThumbnail, error_message: String):
+func _on_download_failed(asset_name: String, error_message: String):
 	var progress_bar = %CurrentDownloadProgress
 	var label = %CurrentlDownloadLabel
 	var progress_container = get_parent().get_node("DownloadProgressBars")
 
 	# Display error message with asset name
-	var asset_name = thumbnail.asset.display_name if thumbnail else "Unknown"
 	label.text = "❌ %s: %s" % [asset_name, error_message]
 
 	# Modulate progress bar red to indicate error

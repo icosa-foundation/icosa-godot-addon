@@ -1,9 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://d15wcrmaekds2"]
+[gd_scene load_steps=8 format=3 uid="uid://d15wcrmaekds2"]
 
 [ext_resource type="Script" uid="uid://ciyjsctdmpdcx" path="res://addons/icosa/browser/browser.gd" id="1_v1e32"]
 [ext_resource type="Texture2D" uid="uid://bwqa7sodpxksf" path="res://addons/icosa/icons/cog.svg" id="2_0gaid"]
 [ext_resource type="Texture2D" uid="uid://cegfltvs7kyjw" path="res://addons/icosa/icons/trash_cross.svg" id="2_si3j3"]
-[ext_resource type="Texture2D" uid="uid://c03tts2cec4pr" path="res://addons/icosa/icons/folder.svg" id="3_5x70h"]
+[ext_resource type="Script" uid="uid://bbbc1ict32pjm" path="res://addons/icosa/browser/settings.gd" id="4_si3j3"]
 
 [sub_resource type="SystemFont" id="SystemFont_v1e32"]
 font_names = PackedStringArray("Arial")
@@ -12,6 +12,9 @@ subpixel_positioning = 0
 [sub_resource type="Theme" id="Theme_0gaid"]
 default_font = SubResource("SystemFont_v1e32")
 default_font_size = 16
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_5x70h"]
+load_path = "res://.godot/imported/folder.svg-e3ca22fb82fbe99a00a84527c335c1e4.ctex"
 
 [node name="Icosa" type="Control"]
 layout_mode = 3
@@ -41,6 +44,8 @@ tab_focus_mode = 0
 script = ExtResource("1_v1e32")
 
 [node name="DownloadProgressBars" type="VBoxContainer" parent="Browser"]
+unique_name_in_owner = true
+visible = false
 layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Browser/DownloadProgressBars"]
@@ -67,6 +72,7 @@ layout_mode = 2
 text = "0 assets / 0 files"
 
 [node name="CancelAllDownloads" type="Button" parent="Browser/DownloadProgressBars/HBoxContainer"]
+visible = false
 layout_mode = 2
 icon = ExtResource("2_si3j3")
 
@@ -91,24 +97,29 @@ layout_mode = 2
 text = "downloading.."
 
 [node name="Settings" type="Button" parent="."]
-visible = false
 layout_mode = 1
 offset_right = 32.0
 offset_bottom = 32.0
 toggle_mode = true
 icon = ExtResource("2_0gaid")
 
-[node name="SettingsWindow" type="Window" parent="."]
+[node name="SettingsWindow" type="AcceptDialog" parent="."]
 oversampling_override = 1.0
 title = "⚙️ Icosa Settings"
 initial_position = 1
 size = Vector2i(550, 300)
-visible = false
+visible = true
+ok_button_text = "Done"
+script = ExtResource("4_si3j3")
 
 [node name="TabContainer" type="TabContainer" parent="SettingsWindow"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -45.0
 grow_horizontal = 2
 grow_vertical = 2
 current_tab = 0
@@ -145,27 +156,22 @@ size_flags_horizontal = 3
 
 [node name="SelectDownloadsPath" type="Button" parent="SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer/DownloadsPath"]
 layout_mode = 2
-icon = ExtResource("3_5x70h")
+icon = SubResource("CompressedTexture2D_5x70h")
 
-[node name="UserSettingsDoNotShowDeleteConfirmWindow" type="CheckBox" parent="SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer"]
+[node name="User" type="PanelContainer" parent="SettingsWindow/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsWindow/TabContainer/User"]
+layout_mode = 2
+
+[node name="UserSettingsDoNotShowDeleteConfirmWindow" type="CheckBox" parent="SettingsWindow/TabContainer/User/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 12
 text = "Hide confirmation when deleting an asset"
 
-[node name="PanelContainer" type="PanelContainer" parent="SettingsWindow/TabContainer"]
-visible = false
-layout_mode = 2
-metadata/_tab_index = 1
-
-[node name="UserSettingsWindow" type="AcceptDialog" parent="SettingsWindow"]
-unique_name_in_owner = true
-oversampling_override = 1.0
-title = "User Settings"
-initial_position = 2
-size = Vector2i(302, 178)
-ok_button_text = "Done"
-
 [connection signal="pressed" from="Browser/DownloadProgressBars/HBoxContainer/CancelAllDownloads" to="Browser/IcosaBrowser" method="_on_cancel_all_downloads_pressed"]
-[connection signal="toggled" from="SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer/UserSettingsDoNotShowDeleteConfirmWindow" to="Browser/IcosaBrowser" method="_on_user_settings_do_not_show_delete_confirm_window_toggled"]
+[connection signal="toggled" from="SettingsWindow/TabContainer/User/VBoxContainer/UserSettingsDoNotShowDeleteConfirmWindow" to="Browser/IcosaBrowser" method="_on_user_settings_do_not_show_delete_confirm_window_toggled"]

@@ -12,15 +12,18 @@ var total_files = 0
 var completed_files = 0
 var total_bytes_to_download = 0  # Total size of all files
 var completed_bytes = 0  # Bytes downloaded so far
+var download_session_start_time: float = 0.0  # When user clicked download button
 
-signal download_progress(current_bytes: int, total_bytes: int, thumbnail: IcosaThumbnail, filename: String)
-signal file_downloaded(thumbnail: IcosaThumbnail, path: String)
-signal download_completed(thumbnail: IcosaThumbnail)
-signal download_failed(thumbnail: IcosaThumbnail, error_message: String)
+signal download_progress(current_bytes: int, total_bytes: int, asset_name: String, filename: String)
+signal file_downloaded(asset_name: String, path: String)
+signal download_completed(asset_name: String)
+signal download_failed(asset_name: String, error_message: String)
 signal queue_progress_updated(completed_files: int, total_files: int, completed_assets: int, total_assets: int, total_bytes: int, completed_bytes: int)
 
 func _ready():
 	name = "DownloadQueue"
+	# Ensure downloads are cancelled when this node leaves the tree
+	tree_exited.connect(cancel_all_downloads)
 
 ## Add a download request to the queue
 func queue_download(thumbnail: IcosaThumbnail, urls: Array, asset_name: String, asset_id: String):
@@ -32,41 +35,20 @@ func queue_download(thumbnail: IcosaThumbnail, urls: Array, asset_name: String, 
 	}
 	queue.append(item)
 
+	# Record session start time on first queue
+	if total_assets == 0:
+		download_session_start_time = Time.get_ticks_msec() / 1000.0
+		print("\n⏱️  DOWNLOAD SESSION STARTED")
+
 	# Update total counts
 	total_assets += 1
 	total_files += urls.size()
 	queue_progress_updated.emit(completed_files, total_files, completed_assets, total_assets, total_bytes_to_download, completed_bytes)
 
-	# Fetch file sizes in parallel to get total upfront
-	_fetch_file_sizes_for_urls(urls)
-
 	# Start processing if not already downloading
 	if not is_downloading:
 		_process_queue()
 
-
-## Fetch all file sizes in parallel (non-blocking)
-func _fetch_file_sizes_for_urls(urls: Array):
-	for url in urls:
-		var head_request = HTTPRequest.new()
-		add_child(head_request)
-
-		head_request.request_completed.connect(func(result, code, headers, body):
-			if result == HTTPRequest.RESULT_SUCCESS:
-				# Extract Content-Length from headers
-				for header in headers:
-					if header.to_lower().begins_with("content-length: "):
-						var length_str = header.split(": ")[1]
-						if length_str.is_valid_int():
-							var file_size = int(length_str)
-							total_bytes_to_download += file_size
-							queue_progress_updated.emit(completed_files, total_files, completed_assets, total_assets, total_bytes_to_download, completed_bytes)
-						break
-			head_request.queue_free()
-		)
-
-		# Make HEAD request to get Content-Length
-		head_request.request(url, [], HTTPClient.METHOD_HEAD)
 
 ## Process the next item in the queue
 func _process_queue():
@@ -88,41 +70,53 @@ func _process_queue():
 	current_download.url_queue = urls
 	current_download.asset_name = asset_name
 	current_download.asset_id = asset_id
+	current_download.session_start_time = download_session_start_time
 
-	# Connect signals
-	current_download.download_queue_completed.connect(_on_download_completed.bind(thumbnail))
-	current_download.file_downloaded_to_path.connect(_on_file_downloaded.bind(thumbnail))
-	current_download.download_progress.connect(_on_download_progress.bind(thumbnail))
-	current_download.download_failed.connect(_on_download_failed.bind(thumbnail))
+	# Connect signals (pass asset_id instead of thumbnail to avoid stale references)
+	current_download.download_queue_completed.connect(_on_download_completed.bind(asset_id))
+	current_download.file_downloaded_to_path.connect(_on_file_downloaded.bind(asset_id))
+	current_download.download_progress.connect(_on_download_progress.bind(asset_id))
+	current_download.download_failed.connect(_on_download_failed.bind(asset_id))
 
 	# Start the download
 	current_download.start()
 
-func _on_download_completed(model_file: String, thumbnail: IcosaThumbnail):
-	print("Download completed for: ", thumbnail.asset.display_name)
-	download_completed.emit(thumbnail)
+func _on_download_completed(model_file: String, asset_id: String):
+	var elapsed = Time.get_ticks_msec() / 1000.0 - download_session_start_time
+	print("[%6.1fs] ✓ ASSET COMPLETE: %s" % [elapsed, asset_id])
+	# Emit with asset_id - UI can look up thumbnail if needed
+	if current_download and is_instance_valid(current_download):
+		download_completed.emit(current_download.asset_name)
 	completed_assets += 1
 	queue_progress_updated.emit(completed_files, total_files, completed_assets, total_assets, total_bytes_to_download, completed_bytes)
 	current_download.queue_free()
 	current_download = null
 	_process_queue()
 
-func _on_file_downloaded(path: String, thumbnail: IcosaThumbnail):
-	print("File downloaded: ", path)
+func _on_file_downloaded(path: String, asset_id: String):
+	var elapsed = Time.get_ticks_msec() / 1000.0 - download_session_start_time
+	print("[%6.1fs]   ✓ FILE WRITTEN: %s" % [elapsed, path.get_file()])
 	completed_files += 1
 	# Get file size to add to completed_bytes
 	var file = FileAccess.open(path, FileAccess.READ)
 	if file:
 		completed_bytes += file.get_length()
 	queue_progress_updated.emit(completed_files, total_files, completed_assets, total_assets, total_bytes_to_download, completed_bytes)
-	file_downloaded.emit(thumbnail, path)
+	# Emit with asset_id instead of thumbnail
+	if current_download and is_instance_valid(current_download):
+		file_downloaded.emit(current_download.asset_name, path)
 
-func _on_download_progress(current_bytes: int, total_bytes: int, filename: String, thumbnail: IcosaThumbnail):
-	download_progress.emit(current_bytes, total_bytes, thumbnail, filename)
+func _on_download_progress(current_bytes: int, total_bytes: int, filename: String, asset_id: String):
+	# Emit progress with asset info (no stale thumbnail reference)
+	if current_download and is_instance_valid(current_download):
+		download_progress.emit(current_bytes, total_bytes, current_download.asset_name, filename)
 
-func _on_download_failed(error_message: String, thumbnail: IcosaThumbnail):
-	print("Download failed for: ", thumbnail.asset.display_name, " - ", error_message)
-	download_failed.emit(thumbnail, error_message)
+func _on_download_failed(error_message: String, asset_id: String):
+	var elapsed = Time.get_ticks_msec() / 1000.0 - download_session_start_time
+	print("[%6.1fs] ❌ ASSET FAILED: %s - %s" % [elapsed, asset_id, error_message])
+	# Emit with asset_id instead of stale thumbnail
+	if current_download and is_instance_valid(current_download):
+		download_failed.emit(current_download.asset_name, error_message)
 	completed_assets += 1
 	queue_progress_updated.emit(completed_files, total_files, completed_assets, total_assets, total_bytes_to_download, completed_bytes)
 	current_download.queue_free()
