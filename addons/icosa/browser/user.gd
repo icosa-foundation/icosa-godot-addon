@@ -142,7 +142,6 @@ func _on_user_request(result: int, response_code: int, headers: PackedStringArra
 	var json := JSON.new()
 	if json.parse(body.get_string_from_utf8()) == OK:
 		var user_data = json.data
-		print("Logged in as:", user_data["displayName"])
 		recieved_user_data.emit(user_data)
 		%LoggedInAs.text = "Logged in as %s" % user_data["displayName"]
 
@@ -329,11 +328,13 @@ func _on_do_not_show_delete_confirm_window_toggled(toggled_on):
 
 
 func _on_settings_pressed():
-	var cookie = ConfigFile.new()
-	cookie.load(cookie_path)
-	var delete_confirm_value = cookie.get_value("user", "delete_confirm")
-	%UserSettingsDoNotShowDeleteConfirmWindow.set_pressed_no_signal(delete_confirm_value)
-	%UserSettingsWindow.show()
+	pass # settings have been moved to top level above tabs
+	
+	#var cookie = ConfigFile.new()
+	#cookie.load(cookie_path)
+	#var delete_confirm_value = cookie.get_value("user", "delete_confirm")
+	#%UserSettingsDoNotShowDeleteConfirmWindow.set_pressed_no_signal(delete_confirm_value)
+	#%UserSettingsWindow.show()
 
 func _on_settings_window_confirmed():
 	pass # Replace with function body.

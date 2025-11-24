@@ -2,6 +2,8 @@
 class_name IcosaDownload
 extends HTTPRequest
 
+@export var debug_print: bool = false  # Enable debug printing
+
 var bytes_ticker := Timer.new()
 var download_start_time: float = 0.0
 var last_reported_bytes: int = 0
@@ -75,7 +77,8 @@ func retry_current_download():
 	retry_count += 1
 	var backoff_time = pow(2.0, retry_count)  # 2^retry_count: 2s, 4s, 8s
 	var session_elapsed = Time.get_ticks_msec() / 1000.0 - session_start_time
-	print("[%6.1fs]   ⏳ Retry %d/%d: waiting %.1f seconds before retry" % [session_elapsed, retry_count, MAX_RETRIES, backoff_time])
+	if debug_print:
+		print("[%6.1fs]   ⏳ Retry %d/%d: waiting %.1f seconds before retry" % [session_elapsed, retry_count, MAX_RETRIES, backoff_time])
 
 	await get_tree().create_timer(backoff_time).timeout
 	# Retry the same file without incrementing the queue index
@@ -201,16 +204,19 @@ func start_next_download():
 		var remaining_wait = 6.0 - time_since_last
 		if remaining_wait > 0:
 			var session_elapsed = current_time - session_start_time
-			print("[%6.1fs]   ⏳ Rate limit: waiting %.1f seconds" % [session_elapsed, remaining_wait])
+			if debug_print:
+				print("[%6.1fs]   ⏳ Rate limit: waiting %.1f seconds" % [session_elapsed, remaining_wait])
 			await get_tree().create_timer(remaining_wait).timeout
 			current_time = Time.get_ticks_msec() / 1000.0
 
 	download_start_time = current_time
 	var session_elapsed = download_start_time - session_start_time
-	print("[%6.1fs] 📥 FILE START [%d/%d]: %s" % [session_elapsed, current_queue_index + 1, total_queue_size, final_filename])
+	if debug_print:
+		print("[%6.1fs] 📥 FILE START [%d/%d]: %s" % [session_elapsed, current_queue_index + 1, total_queue_size, final_filename])
 
 	# Skip HEAD request and go straight to GET (download directly)
-	print("[%6.1fs]   📤 GET: started" % [session_elapsed])
+	if debug_print:
+		print("[%6.1fs]   📤 GET: started" % [session_elapsed])
 	var error = request(url)
 	if error != OK:
 		push_error("An error occurred in the GET request.")
@@ -239,7 +245,8 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 			if header.begins_with("location: "):
 				var redirect_url = header.split("location: ")[1]
 				var session_elapsed_redir = Time.get_ticks_msec() / 1000.0 - session_start_time
-				print("[%6.1fs]   🔄 REDIRECT: %s" % [session_elapsed_redir, redirect_url])
+				if debug_print:
+					print("[%6.1fs]   🔄 REDIRECT: %s" % [session_elapsed_redir, redirect_url])
 				var original_file_path = pending_download_file
 				pending_download_file = original_file_path  # Keep original path for streaming
 				cancel_request()
@@ -256,7 +263,8 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 					var session_elapsed_redirect_get = redirect_get_end_time - session_start_time
 
 					if res_get == HTTPRequest.RESULT_SUCCESS:
-						print("[%6.1fs]   ✓ REDIRECT GET: complete in %.1fs" % [session_elapsed_redirect_get, redirect_get_elapsed])
+						if debug_print:
+							print("[%6.1fs]   ✓ REDIRECT GET: complete in %.1fs" % [session_elapsed_redirect_get, redirect_get_elapsed])
 						file_downloaded_to_path.emit(original_file_path)
 						current_queue_index += 1
 						# Update progress
@@ -273,10 +281,11 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 							5: "timeout",
 							6: "failed"
 						}.get(res_get, "unknown")
-						print("[%6.1fs]   ❌ REDIRECT GET failed" % [session_elapsed_redirect_get])
-						print("      Result: %s (%d)" % [result_str, res_get])
-						print("      HTTP Code: %d" % [code_get])
-						print("      File: %s" % [current_file_name])
+						if debug_print:
+							print("[%6.1fs]   ❌ REDIRECT GET failed" % [session_elapsed_redirect_get])
+							print("      Result: %s (%d)" % [result_str, res_get])
+							print("      HTTP Code: %d" % [code_get])
+							print("      File: %s" % [current_file_name])
 						# Fail the entire asset if redirect download fails
 						download_failed.emit("Failed to download %s from redirect (result: %s, HTTP: %d)" % [current_file_name, result_str, code_get])
 
@@ -304,7 +313,8 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 	last_request_end_time = get_end_time
 
 	if result == HTTPRequest.RESULT_SUCCESS or (response_code == 0 and file_exists):
-		print("[%6.1fs]   ✓ GET: complete in %.1fs" % [session_elapsed_complete, get_elapsed])
+		if debug_print:
+			print("[%6.1fs]   ✓ GET: complete in %.1fs" % [session_elapsed_complete, get_elapsed])
 		file_downloaded_to_path.emit(pending_download_file)
 
 		# Move to the next file in the queue
@@ -323,10 +333,11 @@ func on_request_completed(result, response_code, headers: Array[String], body):
 			5: "timeout",
 			6: "failed"
 		}.get(result, "unknown")
-		print("[%6.1fs]   ❌ GET: failed after %.1fs" % [session_elapsed_complete, get_elapsed])
-		print("      Result: %s (%d)" % [result_str, result])
-		print("      HTTP Code: %d" % [response_code])
-		print("      File: %s" % [current_file_name])
+		if debug_print:
+			print("[%6.1fs]   ❌ GET: failed after %.1fs" % [session_elapsed_complete, get_elapsed])
+			print("      Result: %s (%d)" % [result_str, result])
+			print("      HTTP Code: %d" % [response_code])
+			print("      File: %s" % [current_file_name])
 
 		# Retry on connection failure (result code 2: RESULT_CANT_CONNECT)
 		if result == HTTPRequest.RESULT_CANT_CONNECT:

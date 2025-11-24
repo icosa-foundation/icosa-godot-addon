@@ -13,6 +13,8 @@ var author_name: String
 var author_id: String
 var license: String
 var formats: Dictionary[String, Array] = {}
+var preferred_format: String = ""  # Format marked as preferred for download
+var supported_formats = ["GLTF2", "OBJ"]  # Only these formats are useful for Godot
 ## download & directory
 var root_directory = "res://" if Engine.is_editor_hint() else "user://"
 
@@ -51,6 +53,10 @@ func build(asset_data):
 				if "url" in root: # get the model file, last, so gltf is scanned after.
 					urls.append(root["url"])
 				formats.get_or_add(format_type, urls)
+				# Track the format marked as preferred for download (only if it's a supported format)
+				if "isPreferredForDownload" in format and format["isPreferredForDownload"]:
+					if format_type in supported_formats and preferred_format == "":
+						preferred_format = format_type
 
 func cache_asset(path_to_cache):
 	if thumbnail_image != null:

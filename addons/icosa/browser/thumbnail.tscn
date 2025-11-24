@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://c6qdcl0sg2mxy"]
+[gd_scene load_steps=30 format=3 uid="uid://c6qdcl0sg2mxy"]
 
 [ext_resource type="Script" uid="uid://bm22v3o2u7lln" path="res://addons/icosa/browser/thumbnail.gd" id="1_8pxhf"]
 [ext_resource type="Script" uid="uid://cbxuo7ms12d55" path="res://addons/icosa/misc/3d_preview.gd" id="2_yfmvu"]
@@ -34,6 +34,14 @@ sky = SubResource("Sky_yfmvu")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hjirf"]
 bg_color = Color(0.148922, 0.574047, 0.258045, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mk3ky"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_x15us"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fkpa0"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_28c6v"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rs5q6"]
 bg_color = Color(0, 0, 0, 0)
@@ -246,8 +254,13 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_mk3ky")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_x15us")
+theme_override_styles/background = SubResource("StyleBoxEmpty_fkpa0")
+theme_override_styles/fill = SubResource("StyleBoxEmpty_28c6v")
 bbcode_enabled = true
 text = "AuthorName"
+fit_content = true
 scroll_active = false
 autowrap_mode = 0
 vertical_alignment = 2

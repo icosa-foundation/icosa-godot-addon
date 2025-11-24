@@ -126,8 +126,27 @@ func start_download_progress():
 
 func _on_download_pressed():
 	var formats = Dictionary(asset.formats)
-	var gltf_urls = formats["GLTF2"]
-	download_urls = gltf_urls
+
+	# Determine which format to download
+	# Use preferred format if available and it's GLTF or OBJ, otherwise fall back to GLTF2
+	var format_to_download = "GLTF2"  # Default fallback
+	var supported_formats = ["GLTF2", "OBJ"]
+
+	# Prefer the marked format if it's one of the supported formats
+	if asset.preferred_format != "" and asset.preferred_format in formats and asset.preferred_format in supported_formats:
+		format_to_download = asset.preferred_format
+	# Otherwise use GLTF2 if available
+	elif "GLTF2" in formats:
+		format_to_download = "GLTF2"
+	# Fall back to OBJ if GLTF2 not available
+	elif "OBJ" in formats:
+		format_to_download = "OBJ"
+	else:
+		push_error("Neither GLTF2 nor OBJ format available for asset '%s'" % asset.display_name)
+		return
+
+	var download_urls_by_format = formats[format_to_download]
+	download_urls = download_urls_by_format
 
 	# Get the browser instance by searching up the tree
 	var browser = get_tree().root.find_child("IcosaBrowser", true, false) as IcosaBrowser
@@ -146,7 +165,7 @@ func _on_download_pressed():
 	# Add this download to the queue
 	browser.download_queue.queue_download(
 		self,
-		gltf_urls,
+		download_urls_by_format,
 		asset.display_name,
 		asset.id.replace("assets/", "")
 	)

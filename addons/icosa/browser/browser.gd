@@ -30,6 +30,7 @@ var _suppress_tab_selection = false  # Prevent recursive selection
 var access_token = ""
 @onready var root_directory = "res://" if Engine.is_editor_hint() else "user://"
 var token_path = "res://addons/icosa/cookie.cfg"
+var downloads_path = ""
 
 # ============================================================================
 # TAB HELPER FUNCTIONS - Safe tab management
@@ -112,12 +113,47 @@ func clear_saved_token():
 	var file = FileAccess.open(token_path, FileAccess.WRITE)
 	DirAccess.remove_absolute(file.get_path_absolute())
 	access_token = ""
-	
+
+func get_default_downloads_path() -> String:
+	if Engine.is_editor_hint():
+		# In editor - use a folder in the project root
+		return "res://Downloads"
+	else:
+		# In running project - use user:// directory
+		return "user://Downloads"
+
+func save_downloads_path():
+	if !downloads_path.is_empty():
+		var file = ConfigFile.new()
+		# Load existing config to preserve other values
+		if FileAccess.file_exists(token_path):
+			file.load(token_path)
+		file.set_value("downloads", "path", downloads_path)
+		file.save(token_path)
+
+func load_downloads_path():
+	if !FileAccess.file_exists(token_path):
+		downloads_path = get_default_downloads_path()
+		return
+	var file = ConfigFile.new()
+	file.load(token_path)
+	downloads_path = file.get_value("downloads", "path", get_default_downloads_path())
+
 	
 func _ready():
 	setup_tabs()
 	load_token()
-	print("token: ", access_token)
+	load_downloads_path()
+
+	# Update downloads path UI
+	%DownloadsPath.text = downloads_path
+
+	# Connect downloads path UI signals
+	var select_button = get_node_or_null("SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer/DownloadsPath/SelectDownloadsPath")
+	if select_button:
+		select_button.pressed.connect(_on_select_downloads_path_pressed)
+	%DownloadsPath.text_changed.connect(_on_downloads_path_text_changed)
+
 	if access_token == null:
 		return
 	if !access_token.is_empty():
@@ -306,14 +342,10 @@ func _on_queue_progress_updated(completed_files: int, total_files: int, complete
 		total_progress.max_value = total_files if total_files > 0 else 1
 		total_progress.value = completed_files
 
-	# Hide progress when all downloads complete and clear the gallery
+	# Hide progress when all downloads complete
 	if completed_files == total_files and total_files > 0:
 		await get_tree().process_frame
 		progress_container.hide()
-		# Clear the asset list in the current search tab
-		var current_tab_node = get_tab_control(current_tab)
-		if current_tab_node and current_tab_node is IcosaSearchTab:
-			(current_tab_node as IcosaSearchTab).clear_gallery()
 
 ## Update current file download progress (bytes)
 func _on_download_progress(current_bytes: int, total_bytes: int, asset_name: String, filename: String):
@@ -367,9 +399,6 @@ func _on_download_failed(asset_name: String, error_message: String):
 	print("Download failed for %s: %s" % [asset_name, error_message])
 
 
-func _on_user_settings_do_not_show_delete_confirm_window_toggled(toggled_on):
-	pass # Replace with function body.
-
 
 func _on_cancel_all_downloads_pressed():
 	if download_queue:
@@ -379,3 +408,35 @@ func _on_cancel_all_downloads_pressed():
 		var progress_container = get_parent().get_node("DownloadProgressBars")
 		await get_tree().process_frame
 		progress_container.hide()
+
+
+########################################
+## Settings ############################
+
+func _on_settings_toggled(toggled_on):
+	%SettingsWindow.show()
+
+func _on_user_settings_do_not_show_delete_confirm_window_toggled(toggled_on):
+	pass # Replace with function body.
+
+func _on_settings_window_confirmed():
+	%Settings.set_pressed_no_signal(false)
+
+func _on_settings_window_canceled():
+	%Settings.set_pressed_no_signal(false)
+	
+
+
+func _on_downloads_path_dialog_dir_selected(dir: String):
+	downloads_path = dir
+	%DownloadsPath.text = downloads_path
+	save_downloads_path()
+
+func _on_select_downloads_path_pressed():
+	var downloads_dialog = %DownloadsPathDialog as FileDialog
+	if downloads_dialog:
+		downloads_dialog.current_dir = downloads_path
+		downloads_dialog.popup_centered_ratio(0.7)
+
+func _on_downloads_path_text_changed(new_text: String):
+	downloads_path = new_text

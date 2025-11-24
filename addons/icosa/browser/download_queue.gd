@@ -3,6 +3,8 @@
 class_name DownloadQueue
 extends Node
 
+@export var debug_print: bool = false  # Enable debug printing
+
 var queue: Array = []
 var current_download: IcosaDownload = null
 var is_downloading = false
@@ -38,7 +40,8 @@ func queue_download(thumbnail: IcosaThumbnail, urls: Array, asset_name: String, 
 	# Record session start time on first queue
 	if total_assets == 0:
 		download_session_start_time = Time.get_ticks_msec() / 1000.0
-		print("\n⏱️  DOWNLOAD SESSION STARTED")
+		if debug_print:
+			print("\n⏱️  DOWNLOAD SESSION STARTED")
 
 	# Update total counts
 	total_assets += 1
@@ -54,6 +57,13 @@ func queue_download(thumbnail: IcosaThumbnail, urls: Array, asset_name: String, 
 func _process_queue():
 	if queue.is_empty():
 		is_downloading = false
+		# Reset counters when all downloads are complete
+		total_assets = 0
+		completed_assets = 0
+		total_files = 0
+		completed_files = 0
+		total_bytes_to_download = 0
+		completed_bytes = 0
 		return
 
 	is_downloading = true
@@ -83,7 +93,8 @@ func _process_queue():
 
 func _on_download_completed(model_file: String, asset_id: String):
 	var elapsed = Time.get_ticks_msec() / 1000.0 - download_session_start_time
-	print("[%6.1fs] ✓ ASSET COMPLETE: %s" % [elapsed, asset_id])
+	if debug_print:
+		print("[%6.1fs] ✓ ASSET COMPLETE: %s" % [elapsed, asset_id])
 	# Emit with asset_id - UI can look up thumbnail if needed
 	if current_download and is_instance_valid(current_download):
 		download_completed.emit(current_download.asset_name)
@@ -95,7 +106,8 @@ func _on_download_completed(model_file: String, asset_id: String):
 
 func _on_file_downloaded(path: String, asset_id: String):
 	var elapsed = Time.get_ticks_msec() / 1000.0 - download_session_start_time
-	print("[%6.1fs]   ✓ FILE WRITTEN: %s" % [elapsed, path.get_file()])
+	if debug_print:
+		print("[%6.1fs]   ✓ FILE WRITTEN: %s" % [elapsed, path.get_file()])
 	completed_files += 1
 	# Get file size to add to completed_bytes
 	var file = FileAccess.open(path, FileAccess.READ)
@@ -113,7 +125,8 @@ func _on_download_progress(current_bytes: int, total_bytes: int, filename: Strin
 
 func _on_download_failed(error_message: String, asset_id: String):
 	var elapsed = Time.get_ticks_msec() / 1000.0 - download_session_start_time
-	print("[%6.1fs] ❌ ASSET FAILED: %s - %s" % [elapsed, asset_id, error_message])
+	if debug_print:
+		print("[%6.1fs] ❌ ASSET FAILED: %s - %s" % [elapsed, asset_id, error_message])
 	# Emit with asset_id instead of stale thumbnail
 	if current_download and is_instance_valid(current_download):
 		download_failed.emit(current_download.asset_name, error_message)
