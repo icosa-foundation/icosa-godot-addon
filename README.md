@@ -1,6 +1,6 @@
 ﻿# Icosa Gallery - Godot Addon
 
-A Godot 4.5+ plugin that lets you browse the [Icosa Gallery](https://icosa.gallery) of curated 3D assets, download ready-to-use glTF packages, and keep the imported content aligned with Icosa's lighting setup without leaving the editor.
+A Godot 4.5+ plugin that lets you browse the [Icosa Gallery](https://icosa.gallery), a gallery of curated 3D assets, download ready-to-use glTF meshes without leaving the editor.
 
 ![browser.png](docs/images/browser.png)
 
