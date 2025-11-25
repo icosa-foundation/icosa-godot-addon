@@ -16,9 +16,13 @@ A Godot 4.5+ plugin that lets you browse the [Icosa Gallery](https://icosa.galle
 
 ## Installation
 
+### Godot Editor
+If you have Godot Editor open, go to the AssetLib and search "icosa", download and install the addon and enable it.
+
+### Otherwise..
 1. Download or clone this repository.
 2. Copy the `addons/icosa` folder into your project's `res://addons` directory if it is not already there.
-3. Open your project in Godot 4.5 or newer (Forward+ renderer is recommended, matching the demo project settings).
+3. Open your project in the Godot Editor.
 4. In the **Project > Project Settings > Plugins** tab, enable the **Icosa Gallery** plugin.
 
 ## Usage
