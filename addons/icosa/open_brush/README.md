@@ -2,7 +2,7 @@
 
 <explain open brush here to godot users>
 
-![brushes.png](docs/images/brushes.png)
+![brushes.png](../../../docs/images/brushes.png)
 
 * There are some global issues with color and contrast that need working on. This may or may not affect you depending on your use case.
 * The shaders support two directional lights plus a global ambient light color. We try and automatically select the correct lights from your scene and track their settings in realtime. 
