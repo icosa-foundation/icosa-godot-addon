@@ -40,7 +40,7 @@ If you have Godot Editor open, go to the AssetLib and search "icosa", download a
 
 ## Roadmap
 
-Open brush support: 
+Open brush support: [see here](addons/icosa/open_brush/README.md)
 
 ## Building & Contributing
 
