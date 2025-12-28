@@ -4,8 +4,8 @@ render_mode blend_mix, cull_back;
 // LightWire shader - Emissive wire with animated colored lights
 // Based on LightWire-4391aaaa-df81-4396-9e33-31e4e4930b27
 
-#include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
-#include "res://addons/icosa/brush_materials/_includes/surface_shader.gdshaderinc"
+#include "res://addons/icosa/open_brush/brush_materials/_includes/fog_functions.gdshaderinc"
+#include "res://addons/icosa/open_brush/brush_materials/_includes/surface_shader.gdshaderinc"
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform vec3 u_SpecColor : source_color = vec3(0.3);

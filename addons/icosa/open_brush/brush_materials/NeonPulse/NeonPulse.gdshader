@@ -1,7 +1,7 @@
 shader_type spatial;
 render_mode blend_add, cull_back;
 
-#include "res://addons/icosa/brush_materials/_includes/surface_shader.gdshaderinc"
+#include "res://addons/icosa/open_brush/brush_materials/_includes/surface_shader.gdshaderinc"
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform vec3 u_SpecColor : source_color = vec3(0.05);

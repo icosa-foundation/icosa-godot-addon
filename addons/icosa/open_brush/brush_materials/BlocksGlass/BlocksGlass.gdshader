@@ -1,7 +1,7 @@
 shader_type spatial;
 render_mode blend_add, cull_disabled;
 
-#include "res://addons/icosa/brush_materials/_includes/surface_shader.gdshaderinc"
+#include "res://addons/icosa/open_brush/brush_materials/_includes/surface_shader.gdshaderinc"
 
 uniform float u_Shininess : hint_range(0.0, 1.0) = 0.8;
 uniform float u_RimIntensity : hint_range(0.0, 5.0) = 1.0;

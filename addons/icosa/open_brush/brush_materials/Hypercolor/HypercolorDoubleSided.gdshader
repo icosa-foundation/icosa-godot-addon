@@ -2,9 +2,9 @@ shader_type spatial;
 render_mode blend_mix, cull_disabled;
 
 // Include shared functions
-#include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
-#include "res://addons/icosa/brush_materials/_includes/normal_map.gdshaderinc"
-#include "res://addons/icosa/brush_materials/_includes/surface_shader.gdshaderinc"
+#include "res://addons/icosa/open_brush/brush_materials/_includes/fog_functions.gdshaderinc"
+#include "res://addons/icosa/open_brush/brush_materials/_includes/normal_map.gdshaderinc"
+#include "res://addons/icosa/open_brush/brush_materials/_includes/surface_shader.gdshaderinc"
 
 // Material properties
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;

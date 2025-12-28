@@ -1,7 +1,7 @@
 shader_type spatial;
 render_mode blend_mix, depth_draw_opaque, cull_disabled, unshaded;
 
-#include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
+#include "res://addons/icosa/open_brush/brush_materials/_includes/fog_functions.gdshaderinc"
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform vec4 u_TintColor : source_color = vec4(0.5, 0.5, 0.5, 0.5);

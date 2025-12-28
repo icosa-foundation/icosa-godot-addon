@@ -2,7 +2,7 @@
 shader_type spatial;
 render_mode unshaded, cull_front, depth_draw_never;
 
-#include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
+#include "res://addons/icosa/open_brush/brush_materials/_includes/fog_functions.gdshaderinc"
 
 uniform float u_OutlineMax : hint_range(0.0, 0.5) = 0.005;
 

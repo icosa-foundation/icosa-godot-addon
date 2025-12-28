@@ -1,7 +1,7 @@
 [gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://b01ogc4uoglto"]
 
-[ext_resource type="Shader" uid="uid://30e7rnk8rj2q" path="res://addons/icosa/brush_materials/Embers/Embers.gdshader" id="1"]
-[ext_resource type="Texture2D" uid="uid://1ntw5364cyi0" path="res://addons/icosa/brush_materials/Embers/Embers-02ffb866-7fb2-4d15-b761-1012cefb1360-v10.0-MainTex.png" id="2_w2uab"]
+[ext_resource type="Shader" uid="uid://30e7rnk8rj2q" path="res://addons/icosa/open_brush/brush_materials/Embers/Embers.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://1ntw5364cyi0" path="res://addons/icosa/open_brush/brush_materials/Embers/Embers-02ffb866-7fb2-4d15-b761-1012cefb1360-v10.0-MainTex.png" id="2_w2uab"]
 
 [resource]
 resource_name = "Embers"

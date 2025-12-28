@@ -1,8 +1,8 @@
 shader_type spatial;
 render_mode blend_mix, cull_back;
 
-#include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
-#include "res://addons/icosa/brush_materials/_includes/surface_shader.gdshaderinc"
+#include "res://addons/icosa/open_brush/brush_materials/_includes/fog_functions.gdshaderinc"
+#include "res://addons/icosa/open_brush/brush_materials/_includes/surface_shader.gdshaderinc"
 
 uniform float u_Shininess : hint_range(0.0, 1.0) = 0.8;
 uniform vec3 u_SpecColor : source_color = vec3(0.5);

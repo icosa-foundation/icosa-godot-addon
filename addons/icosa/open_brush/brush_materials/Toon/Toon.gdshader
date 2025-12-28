@@ -2,7 +2,7 @@
 shader_type spatial;
 render_mode unshaded, depth_draw_always, cull_back;
 
-#include "res://addons/icosa/brush_materials/_includes/fog_functions.gdshaderinc"
+#include "res://addons/icosa/open_brush/brush_materials/_includes/fog_functions.gdshaderinc"
 
 varying vec3 v_world_normal;
 varying float v_fog_coord;
