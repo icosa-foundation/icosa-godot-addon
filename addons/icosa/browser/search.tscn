@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://fmieafew1yqi"]
+[gd_scene format=3 uid="uid://fmieafew1yqi"]
 
 [ext_resource type="Script" uid="uid://caqjd16i2dp01" path="res://addons/icosa/browser/search.gd" id="1_ot4t0"]
 [ext_resource type="Texture2D" uid="uid://4ova4wsdy5x8" path="res://addons/icosa/icons/magnify.svg" id="2_ottfe"]
@@ -6,9 +6,23 @@
 [ext_resource type="Texture2D" uid="uid://ccmeocu15nk48" path="res://addons/icosa/icons/plus.svg" id="3_bp884"]
 [ext_resource type="Texture2D" uid="uid://c3fwlyhb8aouh" path="res://addons/icosa/icons/arrow_left.svg" id="4_d4enq"]
 [ext_resource type="Texture2D" uid="uid://b64swhbw03k8b" path="res://addons/icosa/icons/arrow_right.svg" id="5_bivqy"]
+[ext_resource type="PackedScene" uid="uid://c6qdcl0sg2mxy" path="res://addons/icosa/browser/thumbnail.tscn" id="6_0hemr"]
 [ext_resource type="Texture2D" uid="uid://4uo3pd7erdcj" path="res://addons/icosa/icons/arrow_down.svg" id="7_d4enq"]
+[ext_resource type="Script" uid="uid://bm22v3o2u7lln" path="res://addons/icosa/browser/thumbnail.gd" id="7_ymbbd"]
 
-[node name="Search" type="VBoxContainer"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3vp83"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.039981965, 0.039981965, 0.039981965, 0.80784315)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="Search" type="VBoxContainer" unique_id=2010591217]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -17,31 +31,31 @@ grow_vertical = 2
 script = ExtResource("1_ot4t0")
 metadata/_tab_index = 0
 
-[node name="Keywords" type="LineEdit" parent="."]
+[node name="Keywords" type="LineEdit" parent="." unique_id=500478212]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 placeholder_text = "Search for assets..."
 right_icon = ExtResource("2_ottfe")
 
-[node name="Split" type="HSplitContainer" parent="."]
+[node name="Split" type="HSplitContainer" parent="." unique_id=1952668235]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Gallery" type="PanelContainer" parent="Split"]
+[node name="Gallery" type="PanelContainer" parent="Split" unique_id=1446102324]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="TopArea" type="VBoxContainer" parent="Split/Gallery"]
+[node name="TopArea" type="VBoxContainer" parent="Split/Gallery" unique_id=1187466500]
 layout_mode = 2
 
-[node name="AuthorPage" type="VBoxContainer" parent="Split/Gallery/TopArea"]
+[node name="AuthorPage" type="VBoxContainer" parent="Split/Gallery/TopArea" unique_id=1275032570]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="AuthorPageTitle" type="RichTextLabel" parent="Split/Gallery/TopArea/AuthorPage"]
+[node name="AuthorPageTitle" type="RichTextLabel" parent="Split/Gallery/TopArea/AuthorPage" unique_id=951522896]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 44
@@ -49,7 +63,7 @@ text = "User"
 fit_content = true
 horizontal_alignment = 1
 
-[node name="AuthorPageAssetsFound" type="RichTextLabel" parent="Split/Gallery/TopArea/AuthorPage"]
+[node name="AuthorPageAssetsFound" type="RichTextLabel" parent="Split/Gallery/TopArea/AuthorPage" unique_id=1416295322]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 21
@@ -57,84 +71,204 @@ text = "%d assets found."
 fit_content = true
 horizontal_alignment = 1
 
-[node name="AuthorPageGoBack" type="Button" parent="Split/Gallery/TopArea/AuthorPage"]
+[node name="AuthorPageGoBack" type="Button" parent="Split/Gallery/TopArea/AuthorPage" unique_id=1100353022]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Back To Search"
 icon = ExtResource("3_b5aqq")
 
-[node name="Navigation" type="VBoxContainer" parent="Split/Gallery/TopArea"]
+[node name="Navigation" type="VBoxContainer" parent="Split/Gallery/TopArea" unique_id=668039237]
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="Split/Gallery/TopArea/Navigation"]
+[node name="MarginContainer" type="MarginContainer" parent="Split/Gallery/TopArea/Navigation" unique_id=1074917290]
 layout_mode = 2
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="Pagination" type="HBoxContainer" parent="Split/Gallery/TopArea/Navigation/MarginContainer"]
+[node name="Pagination" type="HBoxContainer" parent="Split/Gallery/TopArea/Navigation/MarginContainer" unique_id=503138750]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="PagePrevious" type="Button" parent="Split/Gallery/TopArea/Navigation/MarginContainer/Pagination"]
+[node name="PagePrevious" type="Button" parent="Split/Gallery/TopArea/Navigation/MarginContainer/Pagination" unique_id=1966226680]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 icon = ExtResource("4_d4enq")
 
-[node name="Pages" type="HBoxContainer" parent="Split/Gallery/TopArea/Navigation/MarginContainer/Pagination"]
+[node name="Pages" type="HBoxContainer" parent="Split/Gallery/TopArea/Navigation/MarginContainer/Pagination" unique_id=181372506]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="PageNext" type="Button" parent="Split/Gallery/TopArea/Navigation/MarginContainer/Pagination"]
+[node name="PageNext" type="Button" parent="Split/Gallery/TopArea/Navigation/MarginContainer/Pagination" unique_id=31070900]
 unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("5_bivqy")
 
-[node name="Scroll" type="ScrollContainer" parent="Split/Gallery/TopArea"]
+[node name="Scroll" type="ScrollContainer" parent="Split/Gallery/TopArea" unique_id=1873610857]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Assets" type="FlowContainer" parent="Split/Gallery/TopArea/Scroll"]
+[node name="Assets" type="FlowContainer" parent="Split/Gallery/TopArea/Scroll" unique_id=1074213178]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 1
 
-[node name="CenterContainer" type="CenterContainer" parent="Split/Gallery"]
+[node name="Thumbnail" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=1018163684 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48133" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=230780853 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48142" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=446250620 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48151" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=14358580 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48160" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=1071976268 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48169" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=1167985037 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48178" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=2063052657 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48187" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=1842523456 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48196" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=1381707527 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48205" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=117975729 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48214" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=1716246392 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48223" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=1398228982 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48232" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=1669294788 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48241" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=1112019525 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48250" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=1051317095 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48259" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=501936617 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48268" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=772158007 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48277" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=1253926363 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48286" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=1835159611 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="@Button@48295" type="Button" parent="Split/Gallery/TopArea/Scroll/Assets" unique_id=341518379 instance=ExtResource("6_0hemr")]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+script = ExtResource("7_ymbbd")
+
+[node name="CenterContainer" type="CenterContainer" parent="Split/Gallery" unique_id=2044213572]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="NoAssetsFound" type="Label" parent="Split/Gallery/CenterContainer"]
+[node name="NoAssetsFound" type="Label" parent="Split/Gallery/CenterContainer" unique_id=1241154690]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 text = "No assets found! Try another search."
 
-[node name="SearchOptions" type="MarginContainer" parent="Split"]
+[node name="SearchOptions" type="MarginContainer" parent="Split" unique_id=1445804574]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(240, 0)
+custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="Split/SearchOptions"]
+[node name="PanelContainer" type="PanelContainer" parent="Split/SearchOptions" unique_id=688330030]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer" unique_id=686777367]
 layout_mode = 2
 
-[node name="Title" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer"]
+[node name="Title" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer" unique_id=787292594]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Title"]
+[node name="Label" type="Label" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Title" unique_id=1544156828]
 layout_mode = 2
 text = "Search Options"
 horizontal_alignment = 1
 
-[node name="Options" type="MarginContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer"]
+[node name="Options" type="MarginContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer" unique_id=1795171590]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 8
@@ -142,97 +276,97 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options"]
+[node name="ScrollContainer" type="ScrollContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options" unique_id=1651821723]
 layout_mode = 2
 
-[node name="OptionsPanels" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer"]
+[node name="OptionsPanels" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer" unique_id=355847669]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
 
-[node name="AssetPanel" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels"]
+[node name="AssetPanel" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels" unique_id=890958494]
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel" unique_id=449697526]
 layout_mode = 2
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer" unique_id=778297108]
 layout_mode = 2
 
-[node name="Title" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2"]
+[node name="Title" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2" unique_id=1220906986]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2/Title"]
+[node name="Label" type="Label" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2/Title" unique_id=1673975036]
 layout_mode = 2
 text = "Asset"
 horizontal_alignment = 1
 
-[node name="AuthorName" type="LineEdit" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2"]
+[node name="AuthorName" type="LineEdit" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2" unique_id=1891472033]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Author name.."
 
-[node name="DisplayName" type="LineEdit" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2"]
+[node name="DisplayName" type="LineEdit" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2" unique_id=1004858990]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Asset Name.."
 
-[node name="TagInput" type="HBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2"]
+[node name="TagInput" type="HBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2" unique_id=1363416919]
 visible = false
 layout_mode = 2
 
-[node name="Tag" type="LineEdit" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2/TagInput"]
+[node name="Tag" type="LineEdit" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2/TagInput" unique_id=1530689397]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "add tag"
 
-[node name="AddTag" type="Button" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2/TagInput"]
+[node name="AddTag" type="Button" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2/TagInput" unique_id=241103898]
 layout_mode = 2
 icon = ExtResource("3_bp884")
 
-[node name="Tags" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2"]
+[node name="Tags" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2" unique_id=1182411811]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="FiltersPanel" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels"]
+[node name="FiltersPanel" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels" unique_id=1739796504]
 layout_mode = 2
 
-[node name="MarginContainer2" type="MarginContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel"]
+[node name="MarginContainer2" type="MarginContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel" unique_id=279979474]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2" unique_id=1081738952]
 layout_mode = 2
 
-[node name="Title" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer"]
+[node name="Title" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer" unique_id=96184087]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer/Title"]
+[node name="Label" type="Label" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer/Title" unique_id=1878278613]
 layout_mode = 2
 text = "Filters"
 horizontal_alignment = 1
 
-[node name="Curated" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer"]
+[node name="Curated" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer" unique_id=1388974935]
 unique_name_in_owner = true
 layout_mode = 2
 button_pressed = true
 text = "curated"
 
-[node name="PanelContainer" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer" unique_id=52757771]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer/PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer/PanelContainer" unique_id=118085342]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer/PanelContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer/PanelContainer/VBoxContainer" unique_id=801473205]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Order by:"
 clip_text = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer/PanelContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer/PanelContainer/VBoxContainer" unique_id=243284303]
 layout_mode = 2
 
-[node name="OrderBy" type="OptionButton" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="OrderBy" type="OptionButton" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer" unique_id=1481217286]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -293,79 +427,79 @@ popup/item_18/text = "Author Name"
 popup/item_18/icon = ExtResource("7_d4enq")
 popup/item_18/id = 18
 
-[node name="FormatsPanel" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels"]
+[node name="FormatsPanel" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels" unique_id=81373121]
 layout_mode = 2
 
-[node name="MarginContainer3" type="MarginContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel"]
+[node name="MarginContainer3" type="MarginContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel" unique_id=494250538]
 layout_mode = 2
 
-[node name="VBoxContainer3" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel/MarginContainer3"]
+[node name="VBoxContainer3" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel/MarginContainer3" unique_id=737519937]
 layout_mode = 2
 
-[node name="Title" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel/MarginContainer3/VBoxContainer3"]
+[node name="Title" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel/MarginContainer3/VBoxContainer3" unique_id=535134113]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel/MarginContainer3/VBoxContainer3/Title"]
+[node name="Label" type="Label" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel/MarginContainer3/VBoxContainer3/Title" unique_id=1226206974]
 layout_mode = 2
 text = "Formats"
 horizontal_alignment = 1
 
-[node name="GLTF" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel/MarginContainer3/VBoxContainer3"]
+[node name="GLTF" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel/MarginContainer3/VBoxContainer3" unique_id=149704358]
 unique_name_in_owner = true
 layout_mode = 2
 button_pressed = true
 text = "GLTF"
 
-[node name="OBJ" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel/MarginContainer3/VBoxContainer3"]
+[node name="OBJ" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel/MarginContainer3/VBoxContainer3" unique_id=1590217399]
 unique_name_in_owner = true
 layout_mode = 2
 text = "OBJ"
 
-[node name="FBX" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel/MarginContainer3/VBoxContainer3"]
+[node name="FBX" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel/MarginContainer3/VBoxContainer3" unique_id=228590866]
 unique_name_in_owner = true
 layout_mode = 2
 text = "FBX"
 
-[node name="TILT" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel/MarginContainer3/VBoxContainer3"]
+[node name="TILT" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FormatsPanel/MarginContainer3/VBoxContainer3" unique_id=364519861]
 unique_name_in_owner = true
 layout_mode = 2
 text = "TILT"
 
-[node name="LicensePanel" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels"]
+[node name="LicensePanel" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels" unique_id=1465007803]
 layout_mode = 2
 
-[node name="MarginContainer3" type="MarginContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel"]
+[node name="MarginContainer3" type="MarginContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel" unique_id=985558262]
 layout_mode = 2
 
-[node name="VBoxContainer3" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3"]
+[node name="VBoxContainer3" type="VBoxContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3" unique_id=1867169075]
 layout_mode = 2
 
-[node name="Title" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3/VBoxContainer3"]
+[node name="Title" type="PanelContainer" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3/VBoxContainer3" unique_id=1545920185]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3/VBoxContainer3/Title"]
+[node name="Label" type="Label" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3/VBoxContainer3/Title" unique_id=885755924]
 layout_mode = 2
 text = "License"
 horizontal_alignment = 1
 
-[node name="REMIXABLE" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3/VBoxContainer3"]
+[node name="REMIXABLE" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3/VBoxContainer3" unique_id=1128220265]
 layout_mode = 2
 button_pressed = true
 text = "Remixable"
 
-[node name="CC0" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3/VBoxContainer3"]
+[node name="CC0" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3/VBoxContainer3" unique_id=1179225050]
 layout_mode = 2
 text = "CC0"
 
-[node name="CCBY" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3/VBoxContainer3"]
+[node name="CCBY" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3/VBoxContainer3" unique_id=106853495]
 layout_mode = 2
 text = "CC BY"
 
-[node name="ALL_CC" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3/VBoxContainer3"]
+[node name="ALL_CC" type="CheckBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/LicensePanel/MarginContainer3/VBoxContainer3" unique_id=595280072]
 layout_mode = 2
 text = "ALL CC"
 
-[node name="PageSize" type="SpinBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels"]
+[node name="PageSize" type="SpinBox" parent="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels" unique_id=2046769436]
 unique_name_in_owner = true
 layout_mode = 2
 prefix = "show assets"
@@ -375,6 +509,26 @@ prefix = "show assets"
 [connection signal="pressed" from="Split/Gallery/TopArea/AuthorPage/AuthorPageGoBack" to="." method="_on_author_page_go_back_pressed"]
 [connection signal="pressed" from="Split/Gallery/TopArea/Navigation/MarginContainer/Pagination/PagePrevious" to="." method="_on_page_previous_pressed"]
 [connection signal="pressed" from="Split/Gallery/TopArea/Navigation/MarginContainer/Pagination/PageNext" to="." method="_on_page_next_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/Thumbnail" to="Split/Gallery/TopArea/Scroll/Assets/Thumbnail" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48133" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48133" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48142" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48142" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48151" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48151" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48160" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48160" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48169" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48169" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48178" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48178" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48187" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48187" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48196" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48196" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48205" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48205" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48214" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48214" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48223" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48223" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48232" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48232" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48241" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48241" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48250" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48250" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48259" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48259" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48268" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48268" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48277" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48277" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48286" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48286" method="_on_pressed"]
+[connection signal="pressed" from="Split/Gallery/TopArea/Scroll/Assets/@Button@48295" to="Split/Gallery/TopArea/Scroll/Assets/@Button@48295" method="_on_pressed"]
 [connection signal="text_submitted" from="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2/AuthorName" to="." method="_on_author_name_text_submitted"]
 [connection signal="text_submitted" from="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/AssetPanel/MarginContainer/VBoxContainer2/DisplayName" to="." method="_on_display_name_text_submitted"]
 [connection signal="toggled" from="Split/SearchOptions/PanelContainer/VBoxContainer/Options/ScrollContainer/OptionsPanels/FiltersPanel/MarginContainer2/VBoxContainer/Curated" to="." method="_on_curated_toggled"]

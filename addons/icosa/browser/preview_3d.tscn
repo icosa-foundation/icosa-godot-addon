@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://d0jv7374474kd"]
+
+[ext_resource type="Script" uid="uid://cbxuo7ms12d55" path="res://addons/icosa/misc/3d_preview.gd" id="1_wtp87"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_prrh0"]
+
+[sub_resource type="Sky" id="Sky_yfmvu"]
+sky_material = SubResource("ProceduralSkyMaterial_prrh0")
+
+[sub_resource type="Environment" id="Environment_3vp83"]
+background_mode = 1
+sky = SubResource("Sky_yfmvu")
+
+[node name="Preview3D" type="SubViewport" unique_id=498161584]
+handle_input_locally = false
+size = Vector2i(2, 2)
+size_2d_override_stretch = true
+render_target_update_mode = 0
+script = ExtResource("1_wtp87")
+
+[node name="Root3D" type="Node3D" parent="." unique_id=923020355]
+unique_name_in_owner = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=868369076]
+environment = SubResource("Environment_3vp83")
+
+[node name="Orbit" type="Node3D" parent="." unique_id=447450217]
+unique_name_in_owner = true
+
+[node name="DummyCam" type="Camera3D" parent="Orbit" unique_id=1644737760]

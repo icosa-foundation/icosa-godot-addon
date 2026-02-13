@@ -314,12 +314,24 @@ func create_author_tab(search_tab: IcosaSearchTab, author_id: String, author_nam
 
 ## Update overall download progress UI
 func _on_queue_progress_updated(completed_files: int, total_files: int, completed_assets: int, total_assets: int, total_bytes: int, completed_bytes: int):
-	var progress_container = get_parent().get_node("DownloadProgressBars")
+	if not has_node("%DownloadProgressBars"):
+		return
+
+	var progress_container = %DownloadProgressBars
+
+	if not progress_container:
+		return
+
+	print("[IcosaBrowser] Progress update: assets=%d/%d files=%d/%d" % [completed_assets, total_assets, completed_files, total_files])
 
 	# Show progress container if there are downloads
 	if total_assets > 0:
+		print("[IcosaBrowser] Showing progress container (total_assets=%d)" % total_assets)
 		progress_container.show()
+		if not progress_container.visible:
+			push_error("[IcosaBrowser] Failed to show progress container! visible=%s" % progress_container.visible)
 	else:
+		print("[IcosaBrowser] Hiding progress container (total_assets=%d)" % total_assets)
 		progress_container.hide()
 		return
 
@@ -349,9 +361,15 @@ func _on_queue_progress_updated(completed_files: int, total_files: int, complete
 
 ## Update current file download progress (bytes)
 func _on_download_progress(current_bytes: int, total_bytes: int, asset_name: String, filename: String):
+	if not has_node("%DownloadProgressBars"):
+		return
+
 	var progress_bar = %CurrentDownloadProgress
 	var label = %CurrentlDownloadLabel
-	var progress_container = get_parent().get_node("DownloadProgressBars")
+	var progress_container = %DownloadProgressBars
+
+	print("[IcosaBrowser] Download progress: %s > %s: %d/%d bytes" % [asset_name, filename, current_bytes, total_bytes])
+	print("[IcosaBrowser] Progress bar visible: %s, Container visible: %s" % [progress_bar.visible, progress_container.visible])
 
 	var current_mb = current_bytes / (1024.0 * 1024.0)
 
@@ -386,9 +404,12 @@ func _on_download_progress(current_bytes: int, total_bytes: int, asset_name: Str
 
 
 func _on_download_failed(asset_name: String, error_message: String):
+	if not has_node("%DownloadProgressBars"):
+		return
+
 	var progress_bar = %CurrentDownloadProgress
 	var label = %CurrentlDownloadLabel
-	var progress_container = get_parent().get_node("DownloadProgressBars")
+	var progress_container = %DownloadProgressBars
 
 	# Display error message with asset name
 	label.text = "❌ %s: %s" % [asset_name, error_message]
@@ -403,11 +424,13 @@ func _on_download_failed(asset_name: String, error_message: String):
 func _on_cancel_all_downloads_pressed():
 	if download_queue:
 		download_queue.cancel_all_downloads()
-		var label = %CurrentlDownloadLabel
-		label.text = "Downloads cancelled"
-		var progress_container = get_parent().get_node("DownloadProgressBars")
-		await get_tree().process_frame
-		progress_container.hide()
+		if has_node("%CurrentlDownloadLabel"):
+			var label = %CurrentlDownloadLabel
+			label.text = "Downloads cancelled"
+		if has_node("%DownloadProgressBars"):
+			var progress_container = %DownloadProgressBars
+			await get_tree().process_frame
+			progress_container.hide()
 
 
 ########################################

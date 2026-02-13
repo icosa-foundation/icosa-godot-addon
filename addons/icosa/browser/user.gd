@@ -30,11 +30,24 @@ var is_logged_in := false
 
 var user_do_not_show_delete_prompt = false
 
+# Collection management
+var collection_manager: IcosaCollectionManager
+var user_collections: Array[IcosaAssetCollection] = []
+
 func _ready() -> void:
 	add_child(http_login)
 	add_child(http_user)
 	add_child(http_assets)
 	add_child(http_liked_assets)
+
+	# Initialize collection manager
+	collection_manager = IcosaCollectionManager.new()
+	add_child(collection_manager)
+	collection_manager.collections_loaded.connect(_on_collections_loaded)
+	collection_manager.collection_created.connect(_on_collection_created)
+	collection_manager.collection_updated.connect(_on_collection_updated)
+	collection_manager.collection_deleted.connect(_on_collection_deleted)
+	collection_manager.error_occurred.connect(_on_collection_error)
 
 	%LoginStatus.text = DEFAULT_MESSAGE
 
@@ -111,6 +124,10 @@ func _login_success() -> void:
 	_user_request(token)
 	_user_assets_request(token)
 	_user_liked_assets_request(token)
+
+	# Load user's collections
+	collection_manager.access_token = token
+	collection_manager.get_my_collections()
 
 func logout():
 	%LoginDetails.show()
@@ -210,25 +227,19 @@ func _on_logout_pressed():
 func _on_upload_pressed():
 	%UploadAssetWindow.show()
 
+
+## NOTE: this upload method is now deprecated, however it could be useful for later. do not remove.
 func _on_upload_asset_file_selected(path):
 	var file = FileAccess.open(path, FileAccess.READ)
 	if not file:
 		push_error("Could not open file: %s" % path)
 		return
-
-	# Read entire file as bytes
 	var file_bytes: PackedByteArray = file.get_buffer(file.get_length())
 	file.close()
-
-	# Create HTTPRequest node (must be in the scene tree!)
 	var upload_http := HTTPRequest.new()
-	add_child(upload_http)  # Important: needs to be inside the tree
-
-	# Create multipart/form-data body
+	add_child(upload_http)
 	var boundary := "----GodotFormBoundary" + str(Time.get_ticks_msec())
 	var body := PackedByteArray()
-	
-	# Add form field for file
 	body.append_array(("--" + boundary + "\r\n").to_utf8_buffer())
 	body.append_array(("Content-Disposition: form-data; name=\"files\"; filename=\"" + path.get_file() + "\"\r\n").to_utf8_buffer())
 	body.append_array("Content-Type: application/zip\r\n\r\n".to_utf8_buffer())
@@ -328,7 +339,7 @@ func _on_do_not_show_delete_confirm_window_toggled(toggled_on):
 
 
 func _on_settings_pressed():
-	pass # settings have been moved to top level above tabs
+	pass # settings have been moved to top level of browser..
 	
 	#var cookie = ConfigFile.new()
 	#cookie.load(cookie_path)
@@ -341,3 +352,66 @@ func _on_settings_window_confirmed():
 
 func _on_settings_window_canceled():
 	pass # Replace with function body.
+
+# Collection handlers
+
+func _on_collections_loaded(collections: Array[IcosaAssetCollection]):
+	user_collections = collections
+	_display_collections()
+
+func _display_collections():
+	# Clear existing collection items
+	for child in %UserCollections.get_children():
+		child.queue_free()
+
+	# Add each collection as a thumbnail-like button
+	for collection in user_collections:
+		var collection_btn = Button.new()
+		collection_btn.text = collection.collection_name
+		collection_btn.custom_minimum_size = Vector2(200, 200)
+		collection_btn.pressed.connect(_on_collection_clicked.bind(collection))
+		%UserCollections.add_child(collection_btn)
+
+func _on_collection_clicked(collection: IcosaAssetCollection):
+	print("Clicked collection: ", collection.collection_name)
+	# TODO: Open collection editor/viewer
+
+func _on_collection_created(collection: IcosaAssetCollection):
+	print("Collection created: ", collection.collection_name)
+	user_collections.append(collection)
+	_display_collections()
+
+func _on_collection_updated(collection: IcosaAssetCollection):
+	print("Collection updated: ", collection.collection_name)
+	# Find and update the collection in the list
+	for i in range(user_collections.size()):
+		if user_collections[i].collection_id == collection.collection_id:
+			user_collections[i] = collection
+			break
+	_display_collections()
+
+func _on_collection_deleted(collection_url: String):
+	print("Collection deleted: ", collection_url)
+	# Remove from list
+	for i in range(user_collections.size()):
+		if user_collections[i].collection_id == collection_url:
+			user_collections.remove_at(i)
+			break
+	_display_collections()
+
+func _on_collection_error(error_message: String):
+	printerr("Collection error: ", error_message)
+
+## Get user collections for populating menus (called from thumbnails)
+func get_user_collections() -> Array[IcosaAssetCollection]:
+	return user_collections
+
+## Add an asset to a collection (called from thumbnails)
+func add_asset_to_collection(asset_url: String, collection: IcosaAssetCollection):
+	if not collection.assets.has(asset_url):
+		var asset_urls = []
+		for asset in collection.assets:
+			asset_urls.append(asset.id)
+		asset_urls.append(asset_url)
+
+		collection_manager.set_collection_assets(collection.collection_id, asset_urls)

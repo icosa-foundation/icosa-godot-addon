@@ -26,17 +26,22 @@ func init(chosen_asset : IcosaAsset):
 	asset = chosen_asset
 
 func _ready():
-	
+
 	load_license_sticker()
-	
+
 	%AssetName.text = asset.display_name
 	var url_bbcode = "[url=%s]%s[url]"
 	var author_link = url_bbcode % [asset.author_id, asset.author_name]
 	%AuthorName.text = author_link
 	%Description.text = asset.description
-	
+
 	if asset.user_asset:
 		%DeleteAsset.show()
+
+	# Connect the AddToCollection menu button
+	if has_node("%AddToCollection"):
+		var menu_button = %AddToCollection as MenuButton
+		menu_button.about_to_popup.connect(_on_add_to_collection_about_to_popup)
 	
 	if is_preview:
 		disabled = true
@@ -249,3 +254,64 @@ func _on_author_name_meta_clicked(meta):
 ## no endpoint for this, it could be nice though.
 func _on_like_pressed():
 	pass # Replace with function body.
+
+func _on_add_to_collection_about_to_popup():
+	var menu_button = %AddToCollection as MenuButton
+	var popup = menu_button.get_popup()
+	popup.clear()
+
+	# Get the browser (same way as download button does)
+	var browser = get_tree().root.find_child("IcosaBrowser", true, false) as IcosaBrowser
+	if not browser:
+		popup.add_item("Browser not found")
+		popup.set_item_disabled(0, true)
+		return
+
+	# Find IcosaUserTab in the browser's children recursively
+	var user_tab: IcosaUserTab = _find_user_tab(browser)
+	if not user_tab:
+		popup.add_item("Not logged in")
+		popup.set_item_disabled(0, true)
+		return
+
+	var collections = user_tab.get_user_collections()
+	if collections.is_empty():
+		popup.add_item("No collections yet")
+		popup.set_item_disabled(0, true)
+		return
+
+	# Add each collection to the menu
+	for i in range(collections.size()):
+		var collection = collections[i]
+		popup.add_item(collection.collection_name, i)
+
+	# Connect the menu item selection
+	if not popup.id_pressed.is_connected(_on_collection_selected):
+		popup.id_pressed.connect(_on_collection_selected)
+
+func _on_collection_selected(id: int):
+	var browser = get_tree().root.find_child("IcosaBrowser", true, false) as IcosaBrowser
+	if not browser:
+		return
+
+	var user_tab: IcosaUserTab = _find_user_tab(browser)
+	if not user_tab:
+		return
+
+	var collections = user_tab.get_user_collections()
+	if id < collections.size():
+		var collection = collections[id]
+		print("Adding asset ", asset.display_name, " to collection ", collection.collection_name)
+		user_tab.add_asset_to_collection(asset.id, collection)
+
+func _find_user_tab(node: Node) -> IcosaUserTab:
+	"""Recursively find the IcosaUserTab node"""
+	if node is IcosaUserTab:
+		return node
+
+	for child in node.get_children():
+		var result = _find_user_tab(child)
+		if result:
+			return result
+
+	return null

@@ -1,0 +1,266 @@
+[gd_scene format=3 uid="uid://difp7rrpykxmn"]
+
+[ext_resource type="Script" uid="uid://5e5qhvf4erpq" path="res://addons/icosa/upload/upload_studio.gd" id="1_bdwng"]
+[ext_resource type="Script" uid="uid://btidima0j4673" path="res://addons/icosa/misc/orbit-controls/orbit-controls.gd" id="1_jakiu"]
+[ext_resource type="Texture2D" uid="uid://dqrwususeuk7s" path="res://addons/icosa/icons/cross.svg" id="4_0ttf6"]
+[ext_resource type="Texture2D" uid="uid://crwohipg2c7nq" path="res://addons/icosa/icons/camera.svg" id="4_48ckl"]
+
+[sub_resource type="Environment" id="Environment_mp1ey"]
+background_mode = 1
+background_color = Color(0.98156685, 0.38900807, 0.38900807, 1)
+
+[node name="UploadStudio" type="Control" unique_id=717389259]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_bdwng")
+
+[node name="HSplitContainer" type="HSplitContainer" parent="." unique_id=1346248184]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offsets = PackedInt32Array(250)
+split_offset = 250
+
+[node name="PanelContainer" type="PanelContainer" parent="HSplitContainer" unique_id=1518802327]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="HSplitContainer/PanelContainer" unique_id=1762080557]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="HSplitContainer/PanelContainer/MarginContainer" unique_id=1676098363]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="HSplitContainer/PanelContainer/MarginContainer/SubViewportContainer" unique_id=1877489885]
+unique_name_in_owner = true
+own_world_3d = true
+handle_input_locally = false
+gui_embed_subwindows = true
+size = Vector2i(858, 616)
+render_target_update_mode = 4
+
+[node name="Setup" type="Node3D" parent="HSplitContainer/PanelContainer/MarginContainer/SubViewportContainer/SubViewport" unique_id=243125045]
+
+[node name="Scene" type="Node3D" parent="HSplitContainer/PanelContainer/MarginContainer/SubViewportContainer/SubViewport/Setup" unique_id=1195453095]
+unique_name_in_owner = true
+
+[node name="Studio" type="Node3D" parent="HSplitContainer/PanelContainer/MarginContainer/SubViewportContainer/SubViewport/Setup" unique_id=2070135177]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="HSplitContainer/PanelContainer/MarginContainer/SubViewportContainer/SubViewport/Setup/Studio" unique_id=773110289]
+unique_name_in_owner = true
+environment = SubResource("Environment_mp1ey")
+
+[node name="OrbitControl" type="Node3D" parent="HSplitContainer/PanelContainer/MarginContainer/SubViewportContainer/SubViewport/Setup/Studio" unique_id=701573004]
+script = ExtResource("1_jakiu")
+_camera = NodePath("Camera3D")
+
+[node name="Camera3D" type="Camera3D" parent="HSplitContainer/PanelContainer/MarginContainer/SubViewportContainer/SubViewport/Setup/Studio/OrbitControl" unique_id=980386808]
+unique_name_in_owner = true
+transform = Transform3D(0.86570233, 0, 0.50055915, 0, 1, 0, -0.50055915, 0, 0.86570233, 2.215078, 0.20037937, 3.9488335)
+current = true
+
+[node name="SceneLight1" type="DirectionalLight3D" parent="HSplitContainer/PanelContainer/MarginContainer/SubViewportContainer/SubViewport/Setup/Studio" unique_id=1749457339]
+unique_name_in_owner = true
+
+[node name="SceneLight2" type="DirectionalLight3D" parent="HSplitContainer/PanelContainer/MarginContainer/SubViewportContainer/SubViewport/Setup/Studio" unique_id=1205456377]
+unique_name_in_owner = true
+transform = Transform3D(-0.50439006, 0.06963347, 0.86066365, 0.147002, 0.98911726, 0.006123979, -0.8508708, 0.12960815, -0.50913715, 3.762815, -1.40288, 0)
+light_energy = 0.2
+
+[node name="Menu" type="PanelContainer" parent="HSplitContainer" unique_id=838571996]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+
+[node name="Elements" type="VBoxContainer" parent="HSplitContainer/Menu" unique_id=535462503]
+layout_mode = 2
+
+[node name="MenuTitle" type="PanelContainer" parent="HSplitContainer/Menu/Elements" unique_id=1521180338]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="HSplitContainer/Menu/Elements/MenuTitle" unique_id=537692086]
+layout_mode = 2
+theme_override_constants/outline_size = 5
+text = "Upload to Icosa Gallery"
+horizontal_alignment = 1
+
+[node name="ColorPicker" type="HBoxContainer" parent="HSplitContainer/Menu/Elements" unique_id=666611311]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HSplitContainer/Menu/Elements/ColorPicker" unique_id=1024680113]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Background Color:"
+horizontal_alignment = 2
+
+[node name="BackgroundColor" type="ColorPickerButton" parent="HSplitContainer/Menu/Elements/ColorPicker" unique_id=2052176982]
+custom_minimum_size = Vector2(23, 0)
+layout_mode = 2
+
+[node name="ColorPicker2" type="HBoxContainer" parent="HSplitContainer/Menu/Elements" unique_id=272376464]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HSplitContainer/Menu/Elements/ColorPicker2" unique_id=1170325459]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Light Color:"
+horizontal_alignment = 2
+
+[node name="LightColor" type="ColorPickerButton" parent="HSplitContainer/Menu/Elements/ColorPicker2" unique_id=379474855]
+custom_minimum_size = Vector2(23, 0)
+layout_mode = 2
+color = Color(1, 1, 1, 1)
+
+[node name="LightEnergy" type="SpinBox" parent="HSplitContainer/Menu/Elements" unique_id=912932851]
+layout_mode = 2
+step = 0.01
+value = 1.0
+alignment = 2
+prefix = "Energy"
+
+[node name="ColorPicker3" type="HBoxContainer" parent="HSplitContainer/Menu/Elements" unique_id=104776807]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HSplitContainer/Menu/Elements/ColorPicker3" unique_id=790137805]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Ambient Light Color:"
+horizontal_alignment = 2
+
+[node name="AmbientLightColor" type="ColorPickerButton" parent="HSplitContainer/Menu/Elements/ColorPicker3" unique_id=2019311915]
+custom_minimum_size = Vector2(23, 0)
+layout_mode = 2
+color = Color(1, 1, 1, 1)
+
+[node name="AmbientLightEnergy" type="SpinBox" parent="HSplitContainer/Menu/Elements" unique_id=1273645162]
+layout_mode = 2
+step = 0.01
+value = 0.2
+alignment = 2
+prefix = "Energy"
+
+[node name="LoadScene" type="Button" parent="HSplitContainer/Menu/Elements" unique_id=3867021]
+layout_mode = 2
+text = "Load Scene..."
+
+[node name="SnapThumbnail" type="Button" parent="HSplitContainer/Menu/Elements" unique_id=2769840]
+layout_mode = 2
+text = "Snap thumbnail
+"
+icon = ExtResource("4_48ckl")
+icon_alignment = 2
+expand_icon = true
+
+[node name="ThumbnailPanel" type="PanelContainer" parent="HSplitContainer/Menu/Elements" unique_id=1629341977]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="HSplitContainer/Menu/Elements/ThumbnailPanel" unique_id=1293401976]
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="HSplitContainer/Menu/Elements/ThumbnailPanel/CenterContainer" unique_id=510637127]
+custom_minimum_size = Vector2(240, 170)
+layout_mode = 2
+color = Color(0, 0, 0, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="HSplitContainer/Menu/Elements/ThumbnailPanel/CenterContainer/ColorRect" unique_id=1295508331]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="ThumbnailDisplay" type="TextureRect" parent="HSplitContainer/Menu/Elements/ThumbnailPanel/CenterContainer/ColorRect/MarginContainer" unique_id=524151331]
+unique_name_in_owner = true
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DeleteThumbnail" type="Button" parent="HSplitContainer/Menu/Elements/ThumbnailPanel/CenterContainer/ColorRect/MarginContainer/ThumbnailDisplay" unique_id=1968556704]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -8.0
+offset_bottom = 8.0
+grow_horizontal = 0
+tooltip_text = "Delete thumbnail"
+icon = ExtResource("4_0ttf6")
+
+[node name="SceneContentsPanel" type="PanelContainer" parent="HSplitContainer/Menu/Elements" unique_id=1968329010]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HSplitContainer/Menu/Elements/SceneContentsPanel" unique_id=1573326538]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HSplitContainer/Menu/Elements/SceneContentsPanel/VBoxContainer" unique_id=1375979732]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HSplitContainer/Menu/Elements/SceneContentsPanel/VBoxContainer/HBoxContainer" unique_id=2034128576]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Scene Contents"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="HSplitContainer/Menu/Elements/SceneContentsPanel/VBoxContainer" unique_id=683266733]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 7
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 7
+theme_override_constants/margin_bottom = 7
+
+[node name="FileList" type="Tree" parent="HSplitContainer/Menu/Elements/SceneContentsPanel/VBoxContainer/MarginContainer" unique_id=1243468028]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Upload" type="Button" parent="HSplitContainer/Menu/Elements" unique_id=956340842]
+layout_mode = 2
+text = "Upload..."
+
+[node name="StatusLabel" type="Label" parent="HSplitContainer/Menu/Elements" unique_id=1286608618]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Ready to upload"
+horizontal_alignment = 1
+
+[node name="SceneFileDialog" type="FileDialog" parent="." unique_id=1234567890]
+unique_name_in_owner = true
+title = "Open a File"
+size = Vector2i(800, 600)
+ok_button_text = "Load"
+file_mode = 0
+access = 2
+
+[connection signal="color_changed" from="HSplitContainer/Menu/Elements/ColorPicker/BackgroundColor" to="." method="_on_background_color_color_changed"]
+[connection signal="color_changed" from="HSplitContainer/Menu/Elements/ColorPicker2/LightColor" to="." method="_on_light_color_color_changed"]
+[connection signal="value_changed" from="HSplitContainer/Menu/Elements/LightEnergy" to="." method="_on_light_energy_value_changed"]
+[connection signal="color_changed" from="HSplitContainer/Menu/Elements/ColorPicker3/AmbientLightColor" to="." method="_on_ambient_light_color_color_changed"]
+[connection signal="value_changed" from="HSplitContainer/Menu/Elements/AmbientLightEnergy" to="." method="_on_ambient_light_energy_value_changed"]
+[connection signal="pressed" from="HSplitContainer/Menu/Elements/LoadScene" to="." method="_on_load_scene_pressed"]
+[connection signal="pressed" from="HSplitContainer/Menu/Elements/SnapThumbnail" to="." method="_on_snap_thumbnail_pressed"]
+[connection signal="pressed" from="HSplitContainer/Menu/Elements/ThumbnailPanel/CenterContainer/ColorRect/MarginContainer/ThumbnailDisplay/DeleteThumbnail" to="." method="_on_delete_thumbnail_pressed"]
+[connection signal="pressed" from="HSplitContainer/Menu/Elements/Upload" to="." method="_on_upload_pressed"]
+[connection signal="file_selected" from="SceneFileDialog" to="." method="_on_scene_file_selected"]

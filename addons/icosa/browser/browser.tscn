@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://d15wcrmaekds2"]
 
-[ext_resource type="Theme" path="res://addons/icosa/browser/browser.tres" id="1_oyiqb"]
+[ext_resource type="Theme" uid="uid://drhbaptj8uv7" path="res://addons/icosa/browser/browser_theme.tres" id="1_oyiqb"]
 [ext_resource type="Script" uid="uid://ciyjsctdmpdcx" path="res://addons/icosa/browser/browser.gd" id="1_v1e32"]
 [ext_resource type="Texture2D" uid="uid://bwqa7sodpxksf" path="res://addons/icosa/icons/cog.svg" id="2_0gaid"]
 [ext_resource type="Texture2D" uid="uid://cegfltvs7kyjw" path="res://addons/icosa/icons/trash_cross.svg" id="2_si3j3"]
@@ -34,7 +34,7 @@ grow_vertical = 2
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/side_margin = 32
-current_tab = 0
+current_tab = 1
 tab_focus_mode = 0
 script = ExtResource("1_v1e32")
 
@@ -51,6 +51,8 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_horizontal = 3
+max_value = 2.0
+value = 2.0
 show_percentage = false
 
 [node name="CenterContainer" type="CenterContainer" parent="Browser/DownloadProgressBars/HBoxContainer/TotalDownloadsProgress"]
@@ -64,7 +66,7 @@ grow_vertical = 2
 [node name="TotalDownloadsLabel" type="Label" parent="Browser/DownloadProgressBars/HBoxContainer/TotalDownloadsProgress/CenterContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "0 assets / 0 files"
+text = "Galactic Cat: 1/1 assets - 2/2 files"
 
 [node name="CancelAllDownloads" type="Button" parent="Browser/DownloadProgressBars/HBoxContainer"]
 visible = false
@@ -76,6 +78,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_horizontal = 3
+max_value = 1.0
 show_percentage = false
 
 [node name="CenterContainer" type="CenterContainer" parent="Browser/DownloadProgressBars/CurrentDownloadProgress"]
@@ -89,7 +92,7 @@ grow_vertical = 2
 [node name="CurrentlDownloadLabel" type="Label" parent="Browser/DownloadProgressBars/CurrentDownloadProgress/CenterContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "downloading.."
+text = "Galactic Cat > tmp1435adba.gltf: 0.00 MB (connecting...)"
 
 [node name="Settings" type="Button" parent="."]
 unique_name_in_owner = true
@@ -149,6 +152,7 @@ text = "Downloads Path:"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+text = "res://Downloads"
 
 [node name="DownloadsPathDialog" type="FileDialog" parent="SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer/DownloadsPath/DownloadsPath"]
 unique_name_in_owner = true
