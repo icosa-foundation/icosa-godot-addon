@@ -169,7 +169,8 @@ func on_logged_in(user_data):
 
 
 func token_too_old():
-	pass
+	clear_saved_token()
+	user_tab.logout()
 
 func setup_tabs():
 	# make it easier.

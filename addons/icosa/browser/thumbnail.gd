@@ -26,6 +26,8 @@ func init(chosen_asset : IcosaAsset):
 	asset = chosen_asset
 
 func _ready():
+	if asset == null:
+		return
 
 	load_license_sticker()
 
@@ -201,7 +203,7 @@ func load_license_sticker():
 		"CREATIVE_COMMONS_0"              : "zero",            
 		"CC0"                             : "zero",            
 	}
-	%License.tooltip_text = asset.license
+	%License.tooltip_text = asset.license.capitalize()
 	%License.texture = load("res://addons/icosa/icons/cc/"+sticker_table[asset.license]+".svg")
 
 func _on_queue_downloaded(asset_name: String):

@@ -20,6 +20,7 @@ signal recieved_user_data(user_data)
 signal user_token_too_old
 signal logged_out
 
+var user_data
 var http_login = HTTPRequest.new()
 var http_user = HTTPRequest.new()
 var http_assets = HTTPRequest.new()
@@ -80,11 +81,14 @@ func _on_login_code_text_changed(new_text: String) -> void:
 
 
 func _login_request(device_code: String) -> void:
+	var url = LOGIN_ENDPOINT + "?device_code=%s" % device_code
+	print("Login request: %s" % url)
 	http_login.request_completed.connect(_on_login_request)
 	http_login.request(
-		LOGIN_ENDPOINT + "?device_code=%s" % device_code,
+		url,
 		[HEADER_APP],
-		HTTPClient.METHOD_POST
+		HTTPClient.METHOD_POST,
+		" "
 	)
 
 
@@ -92,9 +96,10 @@ func _on_login_request(result: int, response_code: int, headers: PackedStringArr
 	http_login.request_completed.disconnect(_on_login_request)
 
 	if response_code != 200:
-		print("Login error:", response_code)
-		if response_code == 401:
-			_reset_login_ui()
+		var response_body = body.get_string_from_utf8()
+		print("Login error (HTTP %s): %s" % [response_code, response_body])
+		print("Login response headers: ", headers)
+		_reset_login_ui()
 		return
 
 	var json := JSON.new()
@@ -158,7 +163,7 @@ func _on_user_request(result: int, response_code: int, headers: PackedStringArra
 
 	var json := JSON.new()
 	if json.parse(body.get_string_from_utf8()) == OK:
-		var user_data = json.data
+		user_data = json.data
 		recieved_user_data.emit(user_data)
 		%LoggedInAs.text = "Logged in as %s" % user_data["displayName"]
 
@@ -360,21 +365,33 @@ func _on_collections_loaded(collections: Array[IcosaAssetCollection]):
 	_display_collections()
 
 func _display_collections():
-	# Clear existing collection items
 	for child in %UserCollections.get_children():
 		child.queue_free()
 
-	# Add each collection as a thumbnail-like button
+	var thumb_scene = load("res://addons/icosa/browser/collection_thumbnail.tscn")
+	if thumb_scene == null:
+		return
 	for collection in user_collections:
-		var collection_btn = Button.new()
-		collection_btn.text = collection.collection_name
-		collection_btn.custom_minimum_size = Vector2(200, 200)
-		collection_btn.pressed.connect(_on_collection_clicked.bind(collection))
-		%UserCollections.add_child(collection_btn)
+		var thumb = thumb_scene.instantiate()
+		thumb.collection = collection
+		thumb.pressed.connect(_on_collection_clicked.bind(collection))
+		%UserCollections.add_child(thumb)
 
 func _on_collection_clicked(collection: IcosaAssetCollection):
-	print("Clicked collection: ", collection.collection_name)
-	# TODO: Open collection editor/viewer
+	var browser = get_parent() as IcosaBrowser
+	if not browser:
+		return
+	var editor_scene = load("res://addons/icosa/browser/collection_editor.tscn")
+	if editor_scene == null:
+		return
+	var editor = editor_scene.instantiate()
+	editor.name = collection.collection_name
+	editor.collection = collection
+	editor.collection_manager = collection_manager
+	var tab_index = browser.add_content_tab(editor, collection.collection_name, browser.folder_stack)
+	browser._suppress_tab_selection = true
+	browser.current_tab = tab_index
+	browser._suppress_tab_selection = false
 
 func _on_collection_created(collection: IcosaAssetCollection):
 	print("Collection created: ", collection.collection_name)
@@ -401,17 +418,31 @@ func _on_collection_deleted(collection_url: String):
 
 func _on_collection_error(error_message: String):
 	printerr("Collection error: ", error_message)
+	if Engine.is_editor_hint():
+		EditorInterface.get_editor_toaster().push_toast(error_message, EditorToaster.SEVERITY_WARNING)
 
 ## Get user collections for populating menus (called from thumbnails)
 func get_user_collections() -> Array[IcosaAssetCollection]:
 	return user_collections
 
 ## Add an asset to a collection (called from thumbnails)
-func add_asset_to_collection(asset_url: String, collection: IcosaAssetCollection):
-	if not collection.assets.has(asset_url):
+func add_asset_to_collection(asset_id: String, collection: IcosaAssetCollection):
+	var already_in := false
+	for asset in collection.assets:
+		if asset.id == asset_id:
+			already_in = true
+			break
+	if not already_in:
 		var asset_urls = []
 		for asset in collection.assets:
-			asset_urls.append(asset.id)
-		asset_urls.append(asset_url)
-
+			asset_urls.append(asset.id.trim_prefix("assets/"))
+		asset_urls.append(asset_id.trim_prefix("assets/"))
 		collection_manager.set_collection_assets(collection.collection_id, asset_urls)
+
+
+func _on_create_collection_pressed():
+	collection_manager.create_collection("%s's Collection" % user_data["displayName"])
+
+
+func _on_user_tabs_tab_clicked(tab):
+	pass # Replace with function body.

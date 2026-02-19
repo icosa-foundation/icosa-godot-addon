@@ -1,0 +1,115 @@
+[gd_scene format=3 uid="uid://yq74hf4ejldv"]
+
+[ext_resource type="Script" path="res://addons/icosa/browser/collection_thumbnail.gd" id="1_d6aaw"]
+[ext_resource type="Texture2D" uid="uid://bjgk267oulq1j" path="res://addons/icosa/icons/logo/icosa_icon_square.png" id="2_281d5"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3vp83"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.039981965, 0.039981965, 0.039981965, 0.80784315)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8oa6n"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="CollectionThumbnail" type="Button" unique_id=1018163684]
+clip_contents = true
+custom_minimum_size = Vector2(200, 200)
+offset_right = 200.0
+offset_bottom = 200.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
+disabled = true
+script = ExtResource("1_d6aaw")
+
+[node name="Padding" type="MarginContainer" parent="." unique_id=481838584]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Info" type="VBoxContainer" parent="Padding" unique_id=1788482097]
+layout_mode = 2
+mouse_filter = 2
+alignment = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Padding/Info" unique_id=434277256]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Padding/Info/MarginContainer" unique_id=784473033]
+clip_contents = true
+layout_mode = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_8oa6n")
+
+[node name="Thumbnail" type="MarginContainer" parent="Padding/Info/MarginContainer/PanelContainer" unique_id=683986863]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="ThumbnailImage" type="TextureRect" parent="Padding/Info/MarginContainer/PanelContainer/Thumbnail" unique_id=542928005]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MissingImage" type="MarginContainer" parent="Padding/Info/MarginContainer/PanelContainer" unique_id=1447379925]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Texture" type="TextureRect" parent="Padding/Info/MarginContainer/PanelContainer/MissingImage" unique_id=418674135]
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_281d5")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="Details" type="HBoxContainer" parent="Padding/Info" unique_id=1398132690]
+layout_mode = 2
+
+[node name="Asset" type="VBoxContainer" parent="Padding/Info/Details" unique_id=437257374]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="AssetName" type="Label" parent="Padding/Info/Details/Asset" unique_id=1250975237]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_vertical = 3
+text = "Collection Name"
+horizontal_alignment = 1
+vertical_alignment = 2
+clip_text = true
+
+[node name="AuthorName" type="Label" parent="Padding/Info/Details/Asset" unique_id=65229807]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2

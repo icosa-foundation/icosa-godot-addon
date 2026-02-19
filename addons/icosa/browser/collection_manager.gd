@@ -97,6 +97,32 @@ func create_collection(name: String, description: String = "", visibility: Strin
 	if err != OK:
 		error_occurred.emit("Failed to send request: " + str(err))
 
+## Get a single collection by ID (returns full asset list)
+signal collection_fetched(collection: IcosaAssetCollection)
+
+func get_collection(collection_id: String):
+	if access_token.is_empty():
+		error_occurred.emit("Not authenticated. Please log in first.")
+		return
+
+	var url = USER_COLLECTIONS_ENDPOINT + "/" + collection_id
+	var http = HTTPRequest.new()
+	add_child(http)
+	http.request_completed.connect(func(result, response_code, headers, body):
+		http.queue_free()
+		if response_code != 200:
+			error_occurred.emit("Failed to fetch collection. Response code: " + str(response_code))
+			return
+		var json = JSON.new()
+		if json.parse(body.get_string_from_utf8()) != OK:
+			error_occurred.emit("Failed to parse collection JSON")
+			return
+		var collection = IcosaAssetCollection.new()
+		_populate_collection_from_data(collection, json.data)
+		collection_fetched.emit(collection)
+	)
+	http.request(url, [HEADER_AGENT, HEADER_APP, HEADER_AUTH % access_token], HTTPClient.METHOD_GET)
+
 ## Update an existing collection
 func update_collection(collection_url: String, name: String = "", description: String = "", visibility: String = ""):
 	if access_token.is_empty():
@@ -259,8 +285,15 @@ func _on_collection_updated(result: int, response_code: int, headers: PackedStri
 		error_occurred.emit("Failed to parse response JSON")
 		return
 
+	# set_assets and update_collection return { "collection": {...}, "rejectedAssetUrls": [...] }
+	var data = json.data
+	if data.has("rejectedAssetUrls") and data["rejectedAssetUrls"] and not data["rejectedAssetUrls"].is_empty():
+		error_occurred.emit("Some assets could not be added (you may only add your own assets to a collection).")
+	if data.has("collection"):
+		data = data["collection"]
+
 	var collection = IcosaAssetCollection.new()
-	_populate_collection_from_data(collection, json.data)
+	_populate_collection_from_data(collection, data)
 
 	collection_updated.emit(collection)
 
@@ -290,8 +323,11 @@ func _on_thumbnail_uploaded(result: int, response_code: int, headers: PackedStri
 
 func _populate_collection_from_data(collection: IcosaAssetCollection, data: Dictionary):
 	"""Helper to populate a collection object from API response data"""
-	if data.has("url"):
-		collection.collection_id = data["url"]
+	if data.has("collectionId"):
+		collection.collection_id = data["collectionId"]
+	elif data.has("url"):
+		# Fall back to extracting the ID from the URL path
+		collection.collection_id = data["url"].get_file()
 	if data.has("name"):
 		collection.collection_name = data["name"]
 	if data.has("description"):

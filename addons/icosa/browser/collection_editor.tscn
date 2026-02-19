@@ -1,0 +1,122 @@
+[gd_scene format=3 uid="uid://d8l7gtk20qh3"]
+
+[ext_resource type="Script" uid="uid://r1wo1hpltr3i" path="res://addons/icosa/browser/collection_editor.gd" id="1_w2k4h"]
+[ext_resource type="Texture2D" uid="uid://co58qk3c5owkk" path="res://addons/icosa/icons/key.svg" id="2_j3ycq"]
+[ext_resource type="Texture2D" uid="uid://4ova4wsdy5x8" path="res://addons/icosa/icons/magnify.svg" id="3_owf3a"]
+[ext_resource type="Texture2D" uid="uid://dd5rvv0yb61m3" path="res://addons/icosa/icons/document_search.svg" id="4_2tapj"]
+[ext_resource type="Texture2D" uid="uid://ccq5bibqvbefc" path="res://addons/icosa/icons/trash.svg" id="5_j3ycq"]
+
+[node name="CollectionEditor" type="PanelContainer" unique_id=1769978478]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_w2k4h")
+
+[node name="HSplitContainer" type="HSplitContainer" parent="." unique_id=922458931]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HSplitContainer" unique_id=1248338038]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Assets" type="FlowContainer" parent="HSplitContainer/ScrollContainer" unique_id=784611777]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Editor" type="ScrollContainer" parent="HSplitContainer" unique_id=807745272]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="EditorContents" type="VBoxContainer" parent="HSplitContainer/Editor" unique_id=44921627]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Title" type="Label" parent="HSplitContainer/Editor/EditorContents" unique_id=643687733]
+unique_name_in_owner = true
+layout_mode = 2
+text = "%s settings"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HSplitContainer/Editor/EditorContents" unique_id=1898341067]
+layout_mode = 2
+
+[node name="CollectionNameLabel" type="Label" parent="HSplitContainer/Editor/EditorContents/HBoxContainer" unique_id=1199955810]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Collection Name:"
+horizontal_alignment = 2
+
+[node name="CollectionName" type="LineEdit" parent="HSplitContainer/Editor/EditorContents/HBoxContainer" unique_id=1813480289]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "%s"
+
+[node name="HBoxContainer2" type="VBoxContainer" parent="HSplitContainer/Editor/EditorContents" unique_id=477128018]
+layout_mode = 2
+
+[node name="CollectionDescriptionLabel" type="Label" parent="HSplitContainer/Editor/EditorContents/HBoxContainer2" unique_id=1538234142]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Description"
+horizontal_alignment = 1
+
+[node name="CollectionDescription" type="TextEdit" parent="HSplitContainer/Editor/EditorContents/HBoxContainer2" unique_id=438655939]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+placeholder_text = "write something about your asset here.."
+wrap_mode = 1
+
+[node name="VisibilityList" type="FoldableContainer" parent="HSplitContainer/Editor/EditorContents" unique_id=1764076807]
+layout_mode = 2
+title = "Visibility"
+title_alignment = 1
+
+[node name="Visibility" type="ItemList" parent="HSplitContainer/Editor/EditorContents/VisibilityList" unique_id=1517562789]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+item_count = 3
+item_0/text = "Private"
+item_0/icon = ExtResource("2_j3ycq")
+item_1/text = "Public"
+item_1/icon = ExtResource("3_owf3a")
+item_2/text = "Unlisted"
+item_2/icon = ExtResource("4_2tapj")
+
+[node name="SaveCollection" type="Button" parent="HSplitContainer/Editor/EditorContents" unique_id=1944956988]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Save Collection"
+icon_alignment = 1
+
+[node name="DeleteCollection" type="Button" parent="HSplitContainer/Editor/EditorContents" unique_id=570111263]
+modulate = Color(1, 0.7, 0.7, 1)
+layout_mode = 2
+text = "Delete Collection"
+icon = ExtResource("5_j3ycq")
+
+[node name="DeleteCollectionConfirmation" type="ConfirmationDialog" parent="." unique_id=960482673]
+unique_name_in_owner = true
+oversampling_override = 1.0
+initial_position = 2
+ok_button_text = "Delete Forever"
+dialog_text = "Are you sure you want to delete this collection?"
+
+[connection signal="text_changed" from="HSplitContainer/Editor/EditorContents/HBoxContainer/CollectionName" to="." method="_on_asset_name_text_changed"]
+[connection signal="text_changed" from="HSplitContainer/Editor/EditorContents/HBoxContainer2/CollectionDescription" to="." method="_on_asset_description_text_changed"]
+[connection signal="item_selected" from="HSplitContainer/Editor/EditorContents/VisibilityList/Visibility" to="." method="_on_visibility_item_selected"]
+[connection signal="pressed" from="HSplitContainer/Editor/EditorContents/SaveCollection" to="." method="_on_save_collection_pressed"]
+[connection signal="pressed" from="HSplitContainer/Editor/EditorContents/DeleteCollection" to="." method="_on_delete_collection_pressed"]
+[connection signal="canceled" from="DeleteCollectionConfirmation" to="." method="_on_delete_collection_confirmation_canceled"]
+[connection signal="confirmed" from="DeleteCollectionConfirmation" to="." method="_on_delete_collection_confirmation_confirmed"]

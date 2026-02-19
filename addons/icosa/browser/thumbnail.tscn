@@ -45,24 +45,24 @@ bg_color = Color(0, 0, 0, 0)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8pxhf"]
 
-[sub_resource type="Gradient" id="Gradient_j7sax"]
+[sub_resource type="Gradient" id="Gradient_mk3ky"]
 offsets = PackedFloat32Array(0.3, 0.5, 0.7)
 colors = PackedColorArray(0.24696359, 0.24696359, 0.24696359, 0, 0.24696359, 0.24696359, 0.24696359, 0.8, 0.24696359, 0.24696359, 0.24696359, 0)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_mk3ky"]
-gradient = SubResource("Gradient_j7sax")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_x15us"]
+gradient = SubResource("Gradient_mk3ky")
 width = 32
 height = 32
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
-[sub_resource type="Gradient" id="Gradient_x15us"]
+[sub_resource type="Gradient" id="Gradient_fkpa0"]
 offsets = PackedFloat32Array(0.3, 0.5, 0.7)
 colors = PackedColorArray(0.6866236, 0.68662363, 0.6866236, 0, 0.6866236, 0.68662363, 0.6866236, 0.8, 0.6866236, 0.68662363, 0.6866236, 0)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_fkpa0"]
-gradient = SubResource("Gradient_x15us")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_28c6v"]
+gradient = SubResource("Gradient_fkpa0")
 width = 32
 height = 32
 fill = 1
@@ -76,8 +76,9 @@ fill_to = Vector2(1, 0.5)
 [sub_resource type="FontVariation" id="FontVariation_3qkbe"]
 
 [node name="Thumbnail" type="Button" unique_id=1018163684]
-custom_minimum_size = Vector2(300, 300)
-offset_right = 256.0
+clip_contents = true
+custom_minimum_size = Vector2(400, 400)
+offset_right = 300.0
 offset_bottom = 300.0
 theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
 disabled = true
@@ -110,6 +111,7 @@ theme_override_constants/margin_right = 2
 theme_override_constants/margin_bottom = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="Padding/Info/MarginContainer" unique_id=784473033]
+clip_contents = true
 layout_mode = 2
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_8oa6n")
@@ -124,13 +126,11 @@ theme_override_constants/margin_bottom = 8
 
 [node name="ThumbnailImage" type="TextureRect" parent="Padding/Info/MarginContainer/PanelContainer/Thumbnail" unique_id=542928005]
 unique_name_in_owner = true
-z_index = 2
-z_as_relative = false
-clip_contents = true
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 expand_mode = 1
+stretch_mode = 5
 
 [node name="Preview3D" type="SubViewportContainer" parent="Padding/Info/MarginContainer/PanelContainer" unique_id=846768868]
 unique_name_in_owner = true
@@ -288,8 +288,8 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 value = 0.0
 nine_patch_stretch = true
-texture_under = SubResource("GradientTexture2D_mk3ky")
-texture_progress = SubResource("GradientTexture2D_fkpa0")
+texture_under = SubResource("GradientTexture2D_x15us")
+texture_progress = SubResource("GradientTexture2D_28c6v")
 loop_time = 0.795
 rotation_speed = 0.105
 throbber_size = 32
@@ -358,7 +358,6 @@ theme_override_font_sizes/font_size = 18
 text = "❌"
 vertical_alignment = 1
 
-[connection signal="pressed" from="." to="." method="_on_pressed"]
 [connection signal="meta_clicked" from="Padding/Info/Details/Asset/AuthorName" to="." method="_on_author_name_meta_clicked"]
 [connection signal="pressed" from="Padding/Info/Details/Download/Download" to="." method="_on_download_pressed"]
 [connection signal="pressed" from="Padding/Info/Details/Download/Like" to="." method="_on_like_pressed"]

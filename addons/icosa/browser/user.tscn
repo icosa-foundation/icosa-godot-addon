@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bykpo4mvrl7i" path="res://addons/icosa/browser/user.gd" id="1_lwnh3"]
 [ext_resource type="PackedScene" uid="uid://c7yig47a2sqmr" path="res://addons/icosa/misc/loading_icon.tscn" id="2_blk5g"]
+[ext_resource type="Texture2D" uid="uid://ccmeocu15nk48" path="res://addons/icosa/icons/plus.svg" id="3_5bjak"]
 
 [sub_resource type="Gradient" id="Gradient_ywahy"]
 offsets = PackedFloat32Array(0.3, 0.5, 0.7)
@@ -206,16 +207,26 @@ layout_mode = 2
 text = "Collections"
 horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/Collections/Title" unique_id=1219451137]
-layout_mode = 0
+[node name="ScrollContainer" type="ScrollContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/Collections" unique_id=1219451137]
+layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UserCollections" type="FlowContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/Collections/Title/ScrollContainer" unique_id=381695660]
+[node name="UserCollections" type="FlowContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/Collections/ScrollContainer" unique_id=381695660]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 1
+
+[node name="CreateCollection" type="Button" parent="UserDetails/Assets/DisplayAssets/UserTabs/Collections" unique_id=1039581069]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+text = "Create new collection"
+icon = ExtResource("3_5bjak")
+icon_alignment = 1
+vertical_icon_alignment = 2
+expand_icon = true
 
 [node name="UploadAssetWindow" type="FileDialog" parent="." unique_id=1536313758]
 unique_name_in_owner = true
@@ -254,6 +265,8 @@ theme_override_font_sizes/font_size = 12
 text = "do not show again"
 
 [node name="ConfirmLogout" type="ConfirmationDialog" parent="." unique_id=819623213]
+oversampling_override = 1.0
+size = Vector2i(275, 100)
 ok_button_text = "Logout"
 dialog_text = "Are you sure you want to log out?"
 
@@ -261,6 +274,7 @@ dialog_text = "Are you sure you want to log out?"
 [connection signal="text_changed" from="LoginDetails/LoginCode" to="." method="_on_login_code_text_changed"]
 [connection signal="pressed" from="UserDetails/Assets/DisplayAssets/HBoxContainer/Upload" to="." method="_on_upload_pressed"]
 [connection signal="pressed" from="UserDetails/Assets/DisplayAssets/HBoxContainer/Logout" to="." method="_on_logout_pressed"]
+[connection signal="pressed" from="UserDetails/Assets/DisplayAssets/UserTabs/Collections/CreateCollection" to="." method="_on_create_collection_pressed"]
 [connection signal="file_selected" from="UploadAssetWindow" to="." method="_on_upload_asset_file_selected"]
 [connection signal="confirmed" from="DeleteAssetWindow" to="." method="_on_delete_asset_window_confirmed"]
 [connection signal="toggled" from="DeleteAssetWindow/VBoxContainer/DoNotShowDeleteConfirmWindow" to="." method="_on_do_not_show_delete_confirm_window_toggled"]

@@ -18,8 +18,10 @@ var supported_formats = ["GLTF2", "OBJ"]  # Only these formats are useful for Go
 ## download & directory
 var root_directory = "res://" if Engine.is_editor_hint() else "user://"
 
+## internal flag for user assets
 var user_asset = false
-## get a single asset json/dict and pass it in here
+
+## get a single asset json obj and pass it in here
 func _init(asset_data : Dictionary):
 	build(asset_data)
 
@@ -35,7 +37,7 @@ func build(asset_data):
 		description = asset_data["description"]
 	if "authorName" in asset_data: 
 		author_name = asset_data["authorName"]
-	if "name" in asset_data: 
+	if "name" in asset_data:
 		id = asset_data["name"]
 	if "authorId" in asset_data:
 		author_id = asset_data["authorId"]
@@ -57,6 +59,7 @@ func build(asset_data):
 				if "isPreferredForDownload" in format and format["isPreferredForDownload"]:
 					if format_type in supported_formats and preferred_format == "":
 						preferred_format = format_type
+
 
 func cache_asset(path_to_cache):
 	if thumbnail_image != null:
