@@ -5,19 +5,19 @@ func _get_plugin_icon(): return EditorInterface.get_editor_theme().get_icon("Gri
 
 
 const MainPanel = preload("res://addons/icosa/browser/browser.tscn")
-const LightSync = preload("res://addons/icosa/open_brush/icosa_light_sync.gd")
 const FixOriginTool = preload("res://addons/icosa/misc/fix_origin.gd")
 const UploadStudio = preload("res://addons/icosa/upload/upload_studio.tscn")
 var main_panel_instance
 
 var gltf : IcosaGLTF
-var light_sync_instance
 var fix_origin_tool : IcosaFixOriginTool
 var fix_origin_button : Button
 
 var upload_studio_instance : IcosaUploadStudio
 var upload_studio_window : Window
 var upload_asset_button : Button
+
+var _prev_distraction_free := false
 
 func _enter_tree():
 	main_panel_instance = MainPanel.instantiate()
@@ -30,13 +30,6 @@ func _enter_tree():
 
 	var settings = EditorInterface.get_editor_settings()
 	settings.set_setting("docks/filesystem/other_file_extensions", "ico,icns,bin")
-
-	# Register global shader parameters for Icosa brush lighting
-	_register_global_shader_parameters()
-
-	# Add light sync node to keep shader parameters updated
-	light_sync_instance = LightSync.new()
-	add_child(light_sync_instance)
 
 	fix_origin_button = Button.new()
 	fix_origin_button.text = "Fix Origin"
@@ -79,10 +72,6 @@ func _exit_tree():
 		main_panel_instance.queue_free()
 	GLTFDocument.unregister_gltf_document_extension(gltf)
 
-	# Clean up light sync
-	if light_sync_instance:
-		light_sync_instance.queue_free()
-
 	remove_tool_menu_item("Icosa/Fix Selected Mesh Origin")
 	remove_tool_menu_item("Icosa/Upload Scene to Gallery")
 
@@ -103,9 +92,6 @@ func _exit_tree():
 
 	if upload_studio_window:
 		upload_studio_window.queue_free()
-
-	# Remove global shader parameters
-	_unregister_global_shader_parameters()
 
 	var settings = EditorInterface.get_editor_settings()
 	settings.set_setting("docks/filesystem/other_file_extensions", "ico,icns")
@@ -146,36 +132,9 @@ func _has_main_screen():
 func _make_visible(visible):
 	if main_panel_instance:
 		main_panel_instance.visible = visible
-
-
-
-
-## TODO: make these parameters local.
-func _register_global_shader_parameters():
-	# Light 0 (main light)
-	if not RenderingServer.global_shader_parameter_get("u_SceneLight_0_direction"):
-		RenderingServer.global_shader_parameter_add("u_SceneLight_0_direction",
-			RenderingServer.GLOBAL_VAR_TYPE_VEC3, Vector3(0, -1, 0))
-	if not RenderingServer.global_shader_parameter_get("u_SceneLight_0_color"):
-		RenderingServer.global_shader_parameter_add("u_SceneLight_0_color",
-			RenderingServer.GLOBAL_VAR_TYPE_COLOR, Color.WHITE)
-
-	# Light 1 (secondary light)
-	if not RenderingServer.global_shader_parameter_get("u_SceneLight_1_direction"):
-		RenderingServer.global_shader_parameter_add("u_SceneLight_1_direction",
-			RenderingServer.GLOBAL_VAR_TYPE_VEC3, Vector3(0, 1, 0))
-	if not RenderingServer.global_shader_parameter_get("u_SceneLight_1_color"):
-		RenderingServer.global_shader_parameter_add("u_SceneLight_1_color",
-			RenderingServer.GLOBAL_VAR_TYPE_COLOR, Color(0.5, 0.5, 0.5, 1.0))
-
-	# Ambient light
-	if not RenderingServer.global_shader_parameter_get("u_ambient_light_color"):
-		RenderingServer.global_shader_parameter_add("u_ambient_light_color",
-			RenderingServer.GLOBAL_VAR_TYPE_COLOR, Color(0.2, 0.2, 0.2, 1.0))
-
-func _unregister_global_shader_parameters():
-	RenderingServer.global_shader_parameter_remove("u_SceneLight_0_direction")
-	RenderingServer.global_shader_parameter_remove("u_SceneLight_0_color")
-	RenderingServer.global_shader_parameter_remove("u_SceneLight_1_direction")
-	RenderingServer.global_shader_parameter_remove("u_SceneLight_1_color")
-	RenderingServer.global_shader_parameter_remove("u_ambient_light_color")
+	if visible:
+		_prev_distraction_free = EditorInterface.distraction_free_mode
+		EditorInterface.distraction_free_mode = true
+		hide_bottom_panel()
+	else:
+		EditorInterface.distraction_free_mode = _prev_distraction_free
