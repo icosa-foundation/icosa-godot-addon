@@ -18,6 +18,7 @@ var upload_studio_window : Window
 var upload_asset_button : Button
 
 var _prev_distraction_free := false
+var _scene_tabs: Control = null
 
 func _enter_tree():
 	main_panel_instance = MainPanel.instantiate()
@@ -93,6 +94,11 @@ func _exit_tree():
 	if upload_studio_window:
 		upload_studio_window.queue_free()
 
+	# Restore scene tabs if they were hidden
+	if _scene_tabs:
+		_scene_tabs.visible = true
+		_scene_tabs = null
+
 	var settings = EditorInterface.get_editor_settings()
 	settings.set_setting("docks/filesystem/other_file_extensions", "ico,icns")
 
@@ -126,15 +132,34 @@ func _on_upload_studio_close():
 	if upload_studio_window:
 		upload_studio_window.hide()
 
+func _find_scene_tabs() -> Control:
+	# EditorSceneTabs is a sibling of EditorMainScreen inside a VBoxContainer (depth 1 up from main screen).
+	# Layout: VBoxContainer -> [EditorSceneTabs, EditorMainScreen]
+	var main_screen = get_editor_interface().get_editor_main_screen()
+	# main_screen parent is EditorMainScreen, its parent is the VBoxContainer we want
+	var vbox = main_screen.get_parent().get_parent()
+	if vbox == null:
+		return null
+	for child in vbox.get_children():
+		if child.get_class() == "EditorSceneTabs":
+			return child as Control
+	return null
+
 func _has_main_screen():
 	return true
 
 func _make_visible(visible):
 	if main_panel_instance:
 		main_panel_instance.visible = visible
+	if _scene_tabs == null:
+		_scene_tabs = _find_scene_tabs()
 	if visible:
 		_prev_distraction_free = EditorInterface.distraction_free_mode
 		EditorInterface.distraction_free_mode = true
 		hide_bottom_panel()
+		if _scene_tabs:
+			_scene_tabs.visible = false
 	else:
 		EditorInterface.distraction_free_mode = _prev_distraction_free
+		if _scene_tabs:
+			_scene_tabs.visible = true
