@@ -386,6 +386,7 @@ func _display_collections():
 	for collection in user_collections:
 		var thumb = thumb_scene.instantiate()
 		thumb.collection = collection
+		thumb.collection_manager = collection_manager
 		thumb.pressed.connect(_on_collection_clicked.bind(collection))
 		%UserCollections.add_child(thumb)
 

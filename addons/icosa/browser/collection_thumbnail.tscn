@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://yq74hf4ejldv"]
 
-[ext_resource type="Script" path="res://addons/icosa/browser/collection_thumbnail.gd" id="1_d6aaw"]
+[ext_resource type="Script" uid="uid://cx4q8fmnt7vbp" path="res://addons/icosa/browser/collection_thumbnail.gd" id="1_d6aaw"]
 [ext_resource type="Texture2D" uid="uid://bjgk267oulq1j" path="res://addons/icosa/icons/logo/icosa_icon_square.png" id="2_281d5"]
+[ext_resource type="Texture2D" uid="uid://ccq5bibqvbefc" path="res://addons/icosa/icons/trash.svg" id="3_3a47t"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3vp83"]
 content_margin_left = 4.0
@@ -20,7 +21,7 @@ bg_color = Color(0, 0, 0, 1)
 
 [node name="CollectionThumbnail" type="Button" unique_id=1018163684]
 clip_contents = true
-custom_minimum_size = Vector2(200, 200)
+custom_minimum_size = Vector2(350, 350)
 offset_right = 200.0
 offset_bottom = 200.0
 theme_override_styles/normal = SubResource("StyleBoxFlat_3vp83")
@@ -106,10 +107,26 @@ layout_mode = 2
 size_flags_vertical = 3
 text = "Collection Name"
 horizontal_alignment = 1
-vertical_alignment = 2
+vertical_alignment = 1
 clip_text = true
 
 [node name="AuthorName" type="Label" parent="Padding/Info/Details/Asset" unique_id=65229807]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+
+[node name="DeleteCollection" type="Button" parent="Padding/Info/Details" unique_id=1048145384]
+modulate = Color(1, 0.56, 0.56, 1)
+layout_mode = 2
+icon = ExtResource("3_3a47t")
+icon_alignment = 1
+
+[node name="ConfirmDelete" type="ConfirmationDialog" parent="." unique_id=1100000002]
+unique_name_in_owner = true
+title = "Delete Collection"
+initial_position = 1
+ok_button_text = "Delete"
+dialog_text = "Are you sure you want to delete this collection?"
+
+[connection signal="pressed" from="Padding/Info/Details/DeleteCollection" to="." method="_on_delete_collection_pressed"]
+[connection signal="confirmed" from="ConfirmDelete" to="." method="_on_confirm_delete_confirmed"]

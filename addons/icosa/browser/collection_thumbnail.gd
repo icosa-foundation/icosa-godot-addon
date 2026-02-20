@@ -3,6 +3,7 @@ class_name IcosaCollectionThumbnail
 extends Button
 
 var collection: IcosaAssetCollection
+var collection_manager: IcosaCollectionManager
 var thumbnail_request := HTTPRequest.new()
 
 func _ready():
@@ -42,3 +43,11 @@ func _on_thumbnail_completed(result, response_code, headers, body: PackedByteArr
 		return
 
 	%ThumbnailImage.texture = ImageTexture.create_from_image(image)
+
+
+func _on_delete_collection_pressed():
+	%ConfirmDelete.popup_centered()
+
+func _on_confirm_delete_confirmed():
+	if collection_manager and collection:
+		collection_manager.delete_collection(collection.collection_id)
