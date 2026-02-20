@@ -1,5 +1,4 @@
-extends Node
-var name_mapping = {
+{
 	"0e87b49c-6546-3a34-3a44-8a556d7d6c3e": "BlocksPaper",
 	"232998f8-d357-47a2-993a-53415df9be10": "BlocksGem",
 	"3d813d82-5839-4450-8ddc-8e889ecd96c7": "BlocksGlass",

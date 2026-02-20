@@ -5,11 +5,11 @@ render_mode blend_add, cull_back;
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 
-global uniform vec4 u_ambient_light_color;
-global uniform vec4 u_SceneLight_0_color;
-global uniform vec4 u_SceneLight_1_color;
-global uniform vec3 u_SceneLight_0_direction;
-global uniform vec3 u_SceneLight_1_direction;
+uniform vec4 u_ambient_light_color;
+uniform vec4 u_SceneLight_0_color;
+uniform vec4 u_SceneLight_1_color;
+uniform vec3 u_SceneLight_0_direction;
+uniform vec3 u_SceneLight_1_direction;
 
 varying vec3 v_view_position;
 varying vec3 v_view_normal;

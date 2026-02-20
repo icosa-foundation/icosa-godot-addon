@@ -8,8 +8,8 @@ uniform float u_RimIntensity : hint_range(0.0, 5.0) = 1.0;
 uniform float u_RimPower : hint_range(0.0, 10.0) = 4.0;
 uniform vec4 u_Color : source_color = vec4(1.0);
 
-global uniform vec4 u_SceneLight_0_color;
-global uniform vec3 u_SceneLight_0_direction;
+uniform vec4 u_SceneLight_0_color;
+uniform vec3 u_SceneLight_0_direction;
 
 varying vec3 v_view_position;
 varying vec3 v_view_normal;

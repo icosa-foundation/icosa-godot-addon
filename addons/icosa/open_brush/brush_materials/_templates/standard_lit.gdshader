@@ -13,11 +13,11 @@ uniform float u_Shininess : hint_range(0.0, 1.0) = 0.4;
 uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
 
 // Lighting
-global uniform vec4 u_ambient_light_color;
-global uniform vec4 u_SceneLight_0_color;
-global uniform vec4 u_SceneLight_1_color;
-global uniform vec3 u_SceneLight_0_direction;
-global uniform vec3 u_SceneLight_1_direction;
+uniform vec4 u_ambient_light_color;
+uniform vec4 u_SceneLight_0_color;
+uniform vec4 u_SceneLight_1_color;
+uniform vec3 u_SceneLight_0_direction;
+uniform vec3 u_SceneLight_1_direction;
 
 // Varyings
 varying vec3 v_view_position;

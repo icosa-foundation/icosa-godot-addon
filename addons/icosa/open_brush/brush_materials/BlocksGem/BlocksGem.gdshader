@@ -10,8 +10,8 @@ uniform vec4 u_Color : source_color = vec4(1.0);
 uniform float u_Frequency : hint_range(0.0, 10.0) = 1.0;
 uniform float u_Jitter : hint_range(0.0, 1.0) = 0.9;
 
-global uniform vec4 u_SceneLight_0_color;
-global uniform vec3 u_SceneLight_0_direction;
+uniform vec4 u_SceneLight_0_color;
+uniform vec3 u_SceneLight_0_direction;
 
 varying vec3 v_view_position;
 varying vec3 v_view_normal;

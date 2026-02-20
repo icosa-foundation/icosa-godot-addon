@@ -10,6 +10,7 @@ const UploadStudio = preload("res://addons/icosa/upload/upload_studio.tscn")
 var main_panel_instance
 
 var gltf : IcosaGLTF
+var tilt_gltf : IcosaTiltGLTF
 var fix_origin_tool : IcosaFixOriginTool
 var fix_origin_button : Button
 
@@ -25,6 +26,8 @@ func _enter_tree():
 	get_editor_interface().get_editor_main_screen().add_child(main_panel_instance)
 	gltf = IcosaGLTF.new()
 	GLTFDocument.register_gltf_document_extension(gltf)
+	tilt_gltf = IcosaTiltGLTF.new()
+	GLTFDocument.register_gltf_document_extension(tilt_gltf)
 	main_panel_instance.visible = false
 
 	fix_origin_tool = FixOriginTool.new()
@@ -72,6 +75,7 @@ func _exit_tree():
 	if main_panel_instance:
 		main_panel_instance.queue_free()
 	GLTFDocument.unregister_gltf_document_extension(gltf)
+	GLTFDocument.unregister_gltf_document_extension(tilt_gltf)
 
 	remove_tool_menu_item("Icosa/Fix Selected Mesh Origin")
 	remove_tool_menu_item("Icosa/Upload Scene to Gallery")
