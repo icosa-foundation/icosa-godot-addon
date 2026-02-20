@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://bd4r7gwb72wxi"]
+
+[ext_resource type="PackedScene" uid="uid://bncvx1kw5or07" path="res://test_scenes/victorious_lucian_splash/sketch.gltf" id="1_2n4on"]
+[ext_resource type="Texture2D" uid="uid://bbiiq6hyvyind" path="res://test_scenes/victorious_lucian_splash/screenshot_OpenBrush_victorious_lucial_splash.webp" id="2_jk7we"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_2n4on"]
+sky_top_color = Color(0.49803922, 0.49803922, 0.59607846, 1)
+sky_horizon_color = Color(0.38039216, 0.35686275, 0.45882353, 1)
+ground_bottom_color = Color(0.07058824, 0.05490196, 0.05490196, 1)
+ground_horizon_color = Color(0.45490196, 0.3764706, 0.5372549, 1)
+sun_angle_max = 0.0
+use_debanding = false
+
+[sub_resource type="Sky" id="Sky_g0iyq"]
+sky_material = SubResource("ProceduralSkyMaterial_2n4on")
+
+[sub_resource type="Environment" id="Environment_2n4on"]
+background_mode = 2
+background_color = Color(0.16923234, 0.0564678, 0.26337764, 1)
+sky = SubResource("Sky_g0iyq")
+ambient_light_source = 3
+ambient_light_energy = 7.83
+reflected_light_source = 2
+tonemap_mode = 2
+tonemap_exposure = 1.75
+adjustment_enabled = true
+adjustment_contrast = 1.2
+adjustment_saturation = 1.5
+
+[sub_resource type="World3D" id="World3D_g0iyq"]
+environment = SubResource("Environment_2n4on")
+
+[node name="VisualComparison" type="Node3D" unique_id=1155957687]
+
+[node name="HSplitContainer" type="HSplitContainer" parent="." unique_id=1181613159]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offsets = PackedInt32Array(200)
+collapsed = true
+dragging_enabled = false
+dragger_visibility = 2
+split_offset = 200
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="HSplitContainer" unique_id=1933957529]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="HSplitContainer/SubViewportContainer" unique_id=314659319]
+world_3d = SubResource("World3D_g0iyq")
+handle_input_locally = false
+msaa_3d = 2
+screen_space_aa = 2
+mesh_lod_threshold = 0.0
+size = Vector2i(576, 648)
+render_target_update_mode = 4
+
+[node name="defaultScene" parent="HSplitContainer/SubViewportContainer/SubViewport" unique_id=828711800 instance=ExtResource("1_2n4on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="SpotLight3D" type="SpotLight3D" parent="HSplitContainer/SubViewportContainer/SubViewport" unique_id=640312480]
+transform = Transform3D(-0.30803815, -0.801066, 0.51323074, 0.77452713, 0.10211092, 0.62424445, -0.5524675, 0.5898022, 0.58899325, 0.8680439, 3.8447485, 1.8749316)
+light_color = Color(0.9684753, 0.8118291, 0.62693506, 1)
+light_energy = 4.0
+light_size = 0.01
+shadow_enabled = true
+
+[node name="TextureRect" type="TextureRect" parent="HSplitContainer" unique_id=1235481503]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+texture = ExtResource("2_jk7we")
+expand_mode = 5
+stretch_mode = 6
