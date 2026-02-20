@@ -4,22 +4,22 @@
 [ext_resource type="PackedScene" uid="uid://c7yig47a2sqmr" path="res://addons/icosa/misc/loading_icon.tscn" id="2_blk5g"]
 [ext_resource type="Texture2D" uid="uid://ccmeocu15nk48" path="res://addons/icosa/icons/plus.svg" id="3_5bjak"]
 
-[sub_resource type="Gradient" id="Gradient_ywahy"]
+[sub_resource type="Gradient" id="Gradient_5bjak"]
 offsets = PackedFloat32Array(0.3, 0.5, 0.7)
 colors = PackedColorArray(0.24696359, 0.24696359, 0.24696359, 0, 0.24696359, 0.24696359, 0.24696359, 0.8, 0.24696359, 0.24696359, 0.24696359, 0)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_5bjak"]
-gradient = SubResource("Gradient_ywahy")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_5d18b"]
+gradient = SubResource("Gradient_5bjak")
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
-[sub_resource type="Gradient" id="Gradient_5d18b"]
+[sub_resource type="Gradient" id="Gradient_w4hgs"]
 offsets = PackedFloat32Array(0.3, 0.5, 0.7)
 colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.8, 1, 1, 1, 0)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_w4hgs"]
-gradient = SubResource("Gradient_5d18b")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ctdmc"]
+gradient = SubResource("Gradient_w4hgs")
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
@@ -69,8 +69,15 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 value = 0.0
-texture_under = SubResource("GradientTexture2D_5bjak")
-texture_progress = SubResource("GradientTexture2D_w4hgs")
+texture_under = SubResource("GradientTexture2D_5d18b")
+texture_progress = SubResource("GradientTexture2D_ctdmc")
+
+[node name="CancelLogin" type="Button" parent="LoginDetails" unique_id=1100000001]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Cancel"
 
 [node name="UserDetails" type="PanelContainer" parent="." unique_id=1428422549]
 unique_name_in_owner = true
@@ -272,6 +279,7 @@ dialog_text = "Are you sure you want to log out?"
 
 [connection signal="meta_clicked" from="LoginDetails/LoginStatus" to="." method="_on_login_status_meta_clicked"]
 [connection signal="text_changed" from="LoginDetails/LoginCode" to="." method="_on_login_code_text_changed"]
+[connection signal="pressed" from="LoginDetails/CancelLogin" to="." method="_on_cancel_login_pressed"]
 [connection signal="pressed" from="UserDetails/Assets/DisplayAssets/HBoxContainer/Upload" to="." method="_on_upload_pressed"]
 [connection signal="pressed" from="UserDetails/Assets/DisplayAssets/HBoxContainer/Logout" to="." method="_on_logout_pressed"]
 [connection signal="pressed" from="UserDetails/Assets/DisplayAssets/UserTabs/Collections/CreateCollection" to="." method="_on_create_collection_pressed"]

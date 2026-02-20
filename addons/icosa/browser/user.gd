@@ -51,6 +51,7 @@ func _ready() -> void:
 	collection_manager.error_occurred.connect(_on_collection_error)
 
 	%LoginStatus.text = DEFAULT_MESSAGE
+	%LoggedInAs.text = ""
 
 
 func load_thumbnails(assets_data: Array, add_to: Control, user = false) -> void:
@@ -116,10 +117,13 @@ func _on_login_request(result: int, response_code: int, headers: PackedStringArr
 
 func _reset_login_ui() -> void:
 	%LoginStatus.text = DEFAULT_MESSAGE
+	%LoginCode.text = ""
 	%LoginCode.editable = true
 	%LoginCode.selecting_enabled = true
 	%LoginCode.modulate = Color.WHITE
+	%LoginCode.hide()
 	%Loading.visible = false
+	%CancelLogin.hide()
 
 
 func _login_success() -> void:
@@ -219,6 +223,14 @@ func _on_login_status_meta_clicked(meta: Variant) -> void:
 	%LoginStatus.text = "Please enter the code from your web browser:"
 	if not %LoginCode.visible:
 		%LoginCode.show()
+	%CancelLogin.show()
+
+
+func _on_cancel_login_pressed() -> void:
+	if http_login.request_completed.is_connected(_on_login_request):
+		http_login.request_completed.disconnect(_on_login_request)
+	http_login.cancel_request()
+	_reset_login_ui()
 
 
 func _on_logout_pressed():
