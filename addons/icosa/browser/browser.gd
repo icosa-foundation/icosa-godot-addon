@@ -323,16 +323,17 @@ func _on_queue_progress_updated(completed_files: int, total_files: int, complete
 	if not progress_container:
 		return
 
-	print("[IcosaBrowser] Progress update: assets=%d/%d files=%d/%d" % [completed_assets, total_assets, completed_files, total_files])
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaBrowser] Progress update: assets=%d/%d files=%d/%d" % [completed_assets, total_assets, completed_files, total_files])
 
 	# Show progress container if there are downloads
 	if total_assets > 0:
-		print("[IcosaBrowser] Showing progress container (total_assets=%d)" % total_assets)
+		if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+			print("[IcosaBrowser] Showing progress container (total_assets=%d)" % total_assets)
 		progress_container.show()
-		if not progress_container.visible:
-			push_error("[IcosaBrowser] Failed to show progress container! visible=%s" % progress_container.visible)
 	else:
-		print("[IcosaBrowser] Hiding progress container (total_assets=%d)" % total_assets)
+		if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+			print("[IcosaBrowser] Hiding progress container (total_assets=%d)" % total_assets)
 		progress_container.hide()
 		return
 
@@ -369,8 +370,8 @@ func _on_download_progress(current_bytes: int, total_bytes: int, asset_name: Str
 	var label = %CurrentlDownloadLabel
 	var progress_container = %DownloadProgressBars
 
-	print("[IcosaBrowser] Download progress: %s > %s: %d/%d bytes" % [asset_name, filename, current_bytes, total_bytes])
-	print("[IcosaBrowser] Progress bar visible: %s, Container visible: %s" % [progress_bar.visible, progress_container.visible])
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaBrowser] Download progress: %s > %s: %d/%d bytes" % [asset_name, filename, current_bytes, total_bytes])
 
 	var current_mb = current_bytes / (1024.0 * 1024.0)
 

@@ -21,6 +21,22 @@ var upload_asset_button : Button
 var _prev_distraction_free := false
 var _scene_tabs: Control = null
 
+var settings = {
+	"icosa/debug_print_requests"  : false,
+	"icosa/local_download_path"   : "res://icosa_downloads",
+	"icosa/runtime_download_path" : "user://icosa_downloads"
+}
+
+class ProjectSetting:
+	func _init(path: String, default: Variant):
+		if not ProjectSettings.has_setting(path):
+			ProjectSettings.set_setting(path, default)
+		ProjectSettings.set_initial_value(path, default)
+
+func build_project_settings():
+	for path in settings:
+		ProjectSetting.new(path, settings[path])
+
 func _enter_tree():
 	main_panel_instance = MainPanel.instantiate()
 	get_editor_interface().get_editor_main_screen().add_child(main_panel_instance)
@@ -68,7 +84,8 @@ func _enter_tree():
 	# Set the browser reference after the node is in the scene tree
 	var browser_node = main_panel_instance.get_node("Browser/IcosaBrowser")
 	upload_studio_instance.set("browser", browser_node)
-	
+
+	build_project_settings()
 
 
 func _exit_tree():

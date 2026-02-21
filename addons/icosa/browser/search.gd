@@ -200,6 +200,8 @@ func execute_search():
 	"""Execute a search using the current_search object"""
 	var query = current_search.build_query()
 	var full_url = search_endpoint + query
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaSearch] GET ", full_url)
 	http.request(full_url, [HEADER_AGENT, HEADER_APP], HTTPClient.METHOD_GET)
 
 func build_query(keywords):

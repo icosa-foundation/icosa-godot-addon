@@ -83,7 +83,8 @@ func _on_login_code_text_changed(new_text: String) -> void:
 
 func _login_request(device_code: String) -> void:
 	var url = LOGIN_ENDPOINT + "?device_code=%s" % device_code
-	print("Login request: %s" % url)
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaUser] POST ", url)
 	http_login.request_completed.connect(_on_login_request)
 	http_login.request(
 		url,
@@ -143,6 +144,8 @@ func logout():
 	%UserDetails.hide()
 	token = ""
 func _user_request(access_token: String) -> void:
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaUser] GET ", USER_INFO_ENDPOINT)
 	http_user.request_completed.connect(_on_user_request)
 	http_user.request(
 		USER_INFO_ENDPOINT,
@@ -173,6 +176,8 @@ func _on_user_request(result: int, response_code: int, headers: PackedStringArra
 
 
 func _user_assets_request(access_token: String) -> void:
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaUser] GET ", USER_ASSETS_ENDPOINT)
 	http_assets.request_completed.connect(_on_user_assets_request)
 	http_assets.request(
 		USER_ASSETS_ENDPOINT,
@@ -196,6 +201,8 @@ func _on_user_assets_request(result: int, response_code: int, headers: PackedStr
 
 
 func _user_liked_assets_request(access_token: String) -> void:
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaUser] GET ", USER_LIKED_ASSETS_ENDPOINT)
 	http_liked_assets.request_completed.connect(_on_user_liked_assets_request)
 	http_liked_assets.request(
 		USER_LIKED_ASSETS_ENDPOINT,
@@ -313,6 +320,8 @@ func _delete_asset(asset_id: String):
 		delete_url += "/"
 	delete_url += id
 	
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaUser] DELETE ", delete_url)
 	var error = http_user.request(
 		delete_url,
 		[HEADER_AGENT, HEADER_APP, HEADER_AUTH % token],
