@@ -100,8 +100,56 @@ func _import_post(gltf_state: GLTFState, root: Node) -> Error:
 	var gltf_json := _get_gltf_json(gltf_state)
 	_apply_lights(root, gltf_json)
 	_apply_brush_materials_to_meshes(gltf_state)
+	_rename_nodes(root)
 	_gltf_json_cache = {}
 	return OK
+
+
+func _rename_nodes(root: Node) -> void:
+	# Rename root node to OpenBrushScene.
+	root.name = "OpenBrushScene"
+
+	# GUID regex: 8-4-4-4-12 hex chars separated by hyphens.
+	var guid_regex := RegEx.new()
+	guid_regex.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
+
+	# Collect only the Node3D wrapper containers (not ImporterMeshInstance3D nodes).
+	# These are the outer node_* nodes whose children are the actual mesh nodes.
+	var containers := []
+	for node in root.find_children("*", "", true, false):
+		if (node.name as String).begins_with("node_") and node.get_class() == "Node3D":
+			containers.append(node)
+
+	for container in containers:
+		if not is_instance_valid(container):
+			continue
+		var node_name := container.name as String
+
+		# Determine the brush name from the GUID in the node name.
+		var brush_name := "Mesh"
+		var m := guid_regex.search(node_name)
+		if m != null:
+			var mapped: String = name_mapping.get(m.get_string(), "")
+			if not mapped.is_empty():
+				brush_name = mapped
+
+		var parent: Node = container.get_parent()
+		if parent == null:
+			continue
+
+		# Hoist all children up to the container's parent, then remove the container.
+		# Bake the container's transform into each child so nothing moves.
+		for child in container.get_children():
+			var child_node := child as Node3D
+			if child_node != null:
+				child_node.transform = container.transform * child_node.transform
+			container.remove_child(child)
+			parent.add_child(child)
+			child.owner = root
+			child.name = brush_name
+
+		parent.remove_child(container)
+		container.queue_free()
 
 
 func _apply_brush_materials_to_meshes(gltf_state: GLTFState) -> void:
@@ -496,7 +544,43 @@ func _apply_lights(root: Node, gltf_json: Dictionary) -> void:
 		light_1_dir = parsed_lights[1]["direction"]
 		light_1_col = parsed_lights[1]["color"]
 
+	_replace_scene_light_nodes(root, light_0_col, light_1_col)
 	_apply_light_uniforms_to_node(root, light_0_dir, light_0_col, light_1_dir, light_1_col, ambient_col)
+
+
+func _replace_scene_light_nodes(root: Node,
+		light_0_col: Color, light_1_col: Color) -> void:
+	# Remove legacy light nodes that some file versions include.
+	for node_name in ["keyLightNode", "headLightNode"]:
+		for node in root.find_children(node_name, "", true, false):
+			node.get_parent().remove_child(node)
+			node.queue_free()
+
+	# Replace node_SceneLight_* Node3D placeholders with DirectionalLight3D.
+	var replacements := [
+		["node_SceneLight_0", "u_SceneLight_0", light_0_col],
+		["node_SceneLight_1", "u_SceneLight_1", light_1_col],
+	]
+	for entry in replacements:
+		var prefix: String = entry[0]
+		var new_name: String = entry[1]
+		var col: Color = entry[2]
+		for node in root.find_children("*", "", true, false):
+			if not (node.name as String).begins_with(prefix):
+				continue
+			var light := DirectionalLight3D.new()
+			light.name = new_name
+			light.light_color = col
+			light.transform = node.transform
+			var parent := node.get_parent()
+			parent.add_child(light)
+			light.owner = root
+			parent.remove_child(node)
+			node.queue_free()
+
+	# Rename Camera to ThumbnailCamera.
+	for cam in root.find_children("Camera", "Camera3D", true, false):
+		cam.name = "ThumbnailCamera"
 
 
 func _parse_khr_lights(gltf_json: Dictionary) -> Array:
