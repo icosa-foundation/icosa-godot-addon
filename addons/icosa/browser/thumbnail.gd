@@ -21,6 +21,7 @@ var is_downloaded = false
 var preview_scene_path = ""
 var no_thumbnail_image = false
 var on_author_profile = false
+var in_collection = false
 
 func init(chosen_asset : IcosaAsset):
 	asset = chosen_asset
@@ -42,8 +43,11 @@ func _ready():
 
 	# Connect the AddToCollection menu button
 	if has_node("%AddToCollection"):
-		var menu_button = %AddToCollection as MenuButton
-		menu_button.about_to_popup.connect(_on_add_to_collection_about_to_popup)
+		if in_collection:
+			%AddToCollection.hide()
+		else:
+			var menu_button = %AddToCollection as MenuButton
+			menu_button.about_to_popup.connect(_on_add_to_collection_about_to_popup)
 	
 	if is_preview:
 		disabled = true

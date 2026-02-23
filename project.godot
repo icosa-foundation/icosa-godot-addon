@@ -26,9 +26,6 @@ project/assembly_name="icosa-gallery"
 
 enabled=PackedStringArray("res://addons/icosa/plugin.cfg")
 
-[shader_globals]
+[icosa]
 
-u_ambient_light_color={
-"type": "color",
-"value": Color(0.41832882, 0.4183289, 0.41832885, 1)
-}
+debug_print_requests=true

@@ -48,6 +48,9 @@ func _populate():
 	for asset in collection.assets:
 		var thumb = ThumbnailScene.instantiate() as IcosaThumbnail
 		thumb.asset = asset
+		thumb.asset.user_asset = true
+		thumb.in_collection = true
+		thumb.delete_requested.connect(_on_remove_asset_from_collection)
 		assets_container.add_child(thumb)
 
 
@@ -100,6 +103,16 @@ func _on_save_collection_pressed():
 		_pending_description,
 		_pending_visibility
 	)
+
+
+func _on_remove_asset_from_collection(asset_id: String):
+	if collection_manager == null or collection == null:
+		return
+	var asset_urls = []
+	for asset in collection.assets:
+		if asset.id != asset_id:
+			asset_urls.append(asset.id.trim_prefix("assets/"))
+	collection_manager.set_collection_assets(collection.collection_id, asset_urls)
 
 
 func _on_delete_collection_pressed():

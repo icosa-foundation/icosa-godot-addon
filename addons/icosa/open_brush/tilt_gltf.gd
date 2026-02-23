@@ -18,6 +18,26 @@ const DEFAULT_LIGHT_1_COLOR := Color(0.35, 0.4, 0.55, 1.0)
 const DEFAULT_AMBIENT_COLOR := Color(0.2, 0.2, 0.2, 1.0)
 
 
+func _is_tilt_brush(gltf_state: GLTFState) -> bool:
+	var json = gltf_state.json
+	if not json is Dictionary:
+		return false
+	var asset = json.get("asset")
+	if not asset is Dictionary:
+		return false
+	var generator: String = asset.get("generator", "")
+	return generator.begins_with("Tilt Brush") or generator.begins_with("Open Brush")
+
+
+func _get_gltf_json(gltf_state: GLTFState) -> Dictionary:
+	if not _gltf_json_cache.is_empty():
+		return _gltf_json_cache
+	var json = gltf_state.json
+	if json is Dictionary:
+		return json
+	return {}
+
+
 func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> Error:
 	var gltf_json_variant := gltf_state.json
 	if not (gltf_json_variant is Dictionary):
@@ -58,24 +78,48 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 
 	_map_custom_attributes_to_standard_slots(gltf_json)
 
+	# gltf_state.json returns a copy — write the modified dict back so Godot sees our changes.
+	gltf_state.json = gltf_json
+
 	return OK
 
 
 func _import_post_parse(gltf_state: GLTFState) -> Error:
-	if _gltf_json_cache.is_empty():
+	if not _is_tilt_brush(gltf_state):
 		return OK
-	_add_custom_data_to_brushes(gltf_state, _gltf_json_cache)
-	_replace_materials_with_brush_materials(gltf_state)
+	_ensure_loaded()
+	var gltf_json := _get_gltf_json(gltf_state)
+	_add_custom_data_to_brushes(gltf_state, gltf_json)
 	return OK
 
 
 func _import_post(gltf_state: GLTFState, root: Node) -> Error:
-	if _gltf_json_cache.is_empty():
+	if not _is_tilt_brush(gltf_state):
 		return OK
-	_apply_lights(root, _gltf_json_cache)
-	_apply_materials_to_importer_scene(root, gltf_state)
+	_ensure_loaded()
+	var gltf_json := _get_gltf_json(gltf_state)
+	_apply_lights(root, gltf_json)
+	_apply_brush_materials_to_meshes(gltf_state)
 	_gltf_json_cache = {}
 	return OK
+
+
+func _apply_brush_materials_to_meshes(gltf_state: GLTFState) -> void:
+	# At _import_post time the scene still has ImporterMeshInstance3D nodes.
+	# The ImporterMesh objects in GLTFState are the authoritative source —
+	# set brush materials on them directly so they bake into the final ArrayMesh.
+	var gltf_meshes := gltf_state.get_meshes()
+	for gltf_mesh in gltf_meshes:
+		var importer_mesh: ImporterMesh = gltf_mesh.mesh
+		if importer_mesh == null:
+			continue
+		for i in range(importer_mesh.get_surface_count()):
+			var mat: Material = importer_mesh.get_surface_material(i)
+			if mat == null or mat.resource_name.is_empty():
+				continue
+			var brush_mat: Material = _find_matching_brush_material(mat.resource_name)
+			if brush_mat != null:
+				importer_mesh.set_surface_material(i, brush_mat)
 
 
 func _ensure_loaded() -> void:
@@ -106,17 +150,6 @@ func _scan_directory_for_materials(dir_path: String) -> void:
 			found_material_in_dir = true
 		file_name = dir.get_next()
 
-
-func _replace_materials_with_brush_materials(gltf_state: GLTFState) -> void:
-	var materials := gltf_state.get_materials()
-	for i in range(materials.size()):
-		var mat := materials[i]
-		if mat == null or mat.resource_name.is_empty():
-			continue
-		var brush_mat := _find_matching_brush_material(mat.resource_name)
-		if brush_mat != null:
-			materials[i] = brush_mat
-	gltf_state.set_materials(materials)
 
 
 func _add_custom_data_to_brushes(gltf_state: GLTFState, gltf_json: Dictionary) -> void:
