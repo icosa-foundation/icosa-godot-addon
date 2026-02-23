@@ -1,4 +1,4 @@
-[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://crmof6au01o2e"]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://crmof6au01o2e"]
 
 [ext_resource type="Texture2D" uid="uid://diaeq8gxp1yfa" path="res://addons/icosa/open_brush/brush_materials/Marker/Marker-429ed64a-4e97-4466-84d3-145a861ef684-v10.0-MainTex.png" id="1"]
 
@@ -7,6 +7,7 @@ resource_name = "Marker"
 transparency = 2
 alpha_scissor_threshold = 0.067
 alpha_antialiasing_mode = 0
+cull_mode = 2
 shading_mode = 0
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true

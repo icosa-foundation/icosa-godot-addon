@@ -8,6 +8,7 @@ extends GLTFDocumentExtension
 var material_cache: Dictionary = {}
 var brush_materials: Dictionary = {}
 var name_mapping: Dictionary = {}
+var environment_data: Dictionary = {}
 var _gltf_json_cache: Dictionary = {}
 
 # Default Tilt Brush light rig used when the file doesn't specify lights.
@@ -101,8 +102,69 @@ func _import_post(gltf_state: GLTFState, root: Node) -> Error:
 	_apply_lights(root, gltf_json)
 	_apply_brush_materials_to_meshes(gltf_state)
 	_rename_nodes(root)
+	if ProjectSettings.get_setting("icosa/import_tilt_brush_environment", false):
+		_apply_environment(root, gltf_json)
 	_gltf_json_cache = {}
 	return OK
+
+
+func _apply_environment(root: Node, gltf_json: Dictionary) -> void:
+	# Read environment GUID from scene extras.
+	var scenes: Array = gltf_json.get("scenes", [])
+	if scenes.is_empty():
+		return
+	var extras: Dictionary = scenes[0].get("extras", {})
+	var env_guid: String = extras.get("TB_EnvironmentGuid", "")
+
+	var env_def: Dictionary = {}
+	if not env_guid.is_empty() and environment_data.has(env_guid):
+		env_def = environment_data[env_guid]
+	else:
+		# Fall back to matching by name from TB_Environment field.
+		var env_name: String = extras.get("TB_Environment", "")
+		for guid in environment_data:
+			if environment_data[guid].get("name", "") == env_name:
+				env_def = environment_data[guid]
+				break
+
+	if env_def.is_empty():
+		return
+
+	var c := func(arr: Array) -> Color:
+		return Color(arr[0], arr[1], arr[2]) if arr.size() >= 3 else Color.BLACK
+
+	# Build sky using gradient between sky_color_a (horizon) and sky_color_b (zenith).
+	var sky_mat := ProceduralSkyMaterial.new()
+	sky_mat.sky_horizon_color = c.call(env_def.get("sky_color_a", [0.0, 0.0, 0.0]))
+	sky_mat.sky_top_color = c.call(env_def.get("sky_color_b", [0.0, 0.0, 0.0]))
+	sky_mat.ground_horizon_color = c.call(env_def.get("sky_color_a", [0.0, 0.0, 0.0]))
+	sky_mat.ground_bottom_color = c.call(env_def.get("clear_color", [0.0, 0.0, 0.0]))
+	sky_mat.sky_energy_multiplier = 0.0 # this hides the sun in the sky
+
+	var sky := Sky.new()
+	sky.sky_material = sky_mat
+
+
+	var env := Environment.new()
+	env.sky = sky
+	env.background_mode = Environment.BG_SKY
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = c.call(env_def.get("ambient_color", [0.4, 0.4, 0.4]))
+	env.ambient_light_energy = 1.0
+
+	# Fog.
+	if env_def.get("fog_enabled", false) and env_def.get("fog_density", 0.0) > 0.0:
+		env.fog_enabled = true
+		env.fog_light_color = c.call(env_def.get("fog_color", [0.0, 0.0, 0.0]))
+		env.fog_density = env_def.get("fog_density", 0.0)
+	else:
+		env.fog_enabled = false
+
+	var world_env := WorldEnvironment.new()
+	world_env.name = "WorldEnvironment"
+	world_env.environment = env
+	root.add_child(world_env)
+	world_env.owner = root
 
 
 func _rename_nodes(root: Node) -> void:
@@ -180,6 +242,13 @@ func _ensure_loaded() -> void:
 			file.close()
 			if parsed is Dictionary:
 				name_mapping = parsed
+	if environment_data.is_empty():
+		var file := FileAccess.open("res://addons/icosa/open_brush/environments.json", FileAccess.READ)
+		if file != null:
+			var parsed := JSON.parse_string(file.get_as_text())
+			file.close()
+			if parsed is Dictionary:
+				environment_data = parsed
 
 
 func _scan_directory_for_materials(dir_path: String) -> void:

@@ -6,4 +6,4 @@
 
 # Ignore specific config file for icosa addon
 /addons/icosa/cookie.cfg
-**/cookie.cfg
+**/cookie.cfgaddons/icosa/open_brush/environments/

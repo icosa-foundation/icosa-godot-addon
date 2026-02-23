@@ -22,9 +22,11 @@ var _prev_distraction_free := false
 var _scene_tabs: Control = null
 
 var settings = {
-	"icosa/debug_print_requests"  : false,
-	"icosa/local_download_path"   : "res://icosa_downloads",
-	"icosa/runtime_download_path" : "user://icosa_downloads"
+	"icosa/downloads/local_download_path"           : "res://icosa_downloads",
+	"icosa/downloads/runtime_download_path"         : "user://icosa_downloads",
+	"icosa/environment/import_world_environment"      : false,
+	"icosa/environment/import_tilt_brush_environment" : false,
+	"icosa/debug/debug_print_requests"          : false,
 }
 
 class ProjectSetting:
@@ -65,25 +67,6 @@ func _enter_tree():
 	upload_asset_button.pressed.connect(_on_upload_asset)
 	add_control_to_container(CONTAINER_SPATIAL_EDITOR_MENU, upload_asset_button)
 	add_tool_menu_item("Icosa/Upload Scene to Gallery", Callable(self, "_on_upload_asset"))
-
-	# Initialize upload studio wrapped in a Window
-	upload_studio_window = Window.new()
-	upload_studio_window.title = "Upload to Icosa Gallery"
-	upload_studio_window.size = Vector2i(1200, 800)
-	upload_studio_window.unresizable = false
-	upload_studio_window.close_requested.connect(_on_upload_studio_close)
-
-	upload_studio_instance = UploadStudio.instantiate() as IcosaUploadStudio
-	upload_studio_instance.set_anchors_preset(Control.PRESET_FULL_RECT)
-	upload_studio_window.add_child(upload_studio_instance)
-
-	# Add window as child but keep it hidden
-	add_child(upload_studio_window)
-	upload_studio_window.hide()
-
-	# Set the browser reference after the node is in the scene tree
-	var browser_node = main_panel_instance.get_node("Browser/IcosaBrowser")
-	upload_studio_instance.set("browser", browser_node)
 
 	build_project_settings()
 
@@ -127,27 +110,38 @@ func _on_fix_origin():
 	if fix_origin_tool:
 		fix_origin_tool.run_for_selection(get_editor_interface())
 
+func _ensure_upload_studio():
+	if upload_studio_window:
+		return
+	upload_studio_window = Window.new()
+	upload_studio_window.title = "Upload to Icosa Gallery"
+	upload_studio_window.size = Vector2i(1200, 800)
+	upload_studio_window.unresizable = false
+	upload_studio_window.close_requested.connect(_on_upload_studio_close)
+
+	upload_studio_instance = UploadStudio.instantiate() as IcosaUploadStudio
+	upload_studio_instance.set_anchors_preset(Control.PRESET_FULL_RECT)
+	upload_studio_window.add_child(upload_studio_instance)
+	add_child(upload_studio_window)
+	upload_studio_window.hide()
+
+	var browser_node = main_panel_instance.get_node("Browser/IcosaBrowser")
+	upload_studio_instance.set("browser", browser_node)
+
 func _on_upload_asset():
-	print("[Plugin] Upload asset button clicked")
-	if upload_studio_window and main_panel_instance:
-		# Get the currently edited scene
-		var edited_scene_root = get_editor_interface().get_edited_scene_root()
-		if edited_scene_root:
-			var scene_path = edited_scene_root.scene_file_path
-			print("[Plugin] Current edited scene: ", scene_path)
-
-			# Show the upload studio window centered
-			upload_studio_window.popup_centered()
-
-			# Auto-load the current scene into the studio
-			if upload_studio_instance and scene_path:
-				upload_studio_instance.load_current_scene(edited_scene_root, scene_path)
-		else:
-			printerr("[Plugin] No scene is currently being edited!")
-			# Still show the window so they can manually load a scene
-			upload_studio_window.popup_centered()
+	if not main_panel_instance:
+		printerr("[Plugin] Panel instance is null!")
+		return
+	_ensure_upload_studio()
+	var edited_scene_root = get_editor_interface().get_edited_scene_root()
+	if edited_scene_root:
+		var scene_path = edited_scene_root.scene_file_path
+		upload_studio_window.popup_centered()
+		if scene_path:
+			upload_studio_instance.load_current_scene(edited_scene_root, scene_path)
 	else:
-		printerr("[Plugin] Window or panel instance is null!")
+		printerr("[Plugin] No scene is currently being edited!")
+		upload_studio_window.popup_centered()
 
 func _on_upload_studio_close():
 	if upload_studio_window:
@@ -180,6 +174,10 @@ func _make_visible(visible):
 		hide_bottom_panel()
 		if _scene_tabs:
 			_scene_tabs.visible = false
+		# Trigger first-time requests now that the panel is actually shown
+		var browser_node = main_panel_instance.get_node_or_null("Browser/IcosaBrowser")
+		if browser_node and browser_node.has_method("first_activate"):
+			browser_node.first_activate()
 	else:
 		EditorInterface.distraction_free_mode = _prev_distraction_free
 		if _scene_tabs:

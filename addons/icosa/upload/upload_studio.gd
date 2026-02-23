@@ -8,71 +8,28 @@ var loaded_scene_path: String = ""  # Path to the loaded .tscn file
 var editor_scene_root: Node  # Reference to the actual editor scene (for export)
 
 func _init():
-	print("!!! [UploadStudio] _init called !!!")
+	#print("!!! [UploadStudio] _init called !!!")
+	pass
 
 func _ready():
-	print("========================================")
-	print("[UploadStudio] READY CALLED - UploadStudio initializing")
-	print("[UploadStudio] Node name: ", name)
-	print("[UploadStudio] Is inside tree: ", is_inside_tree())
-	print("========================================")
-
-	# Manually reconnect all signals to ensure they work
-	_reconnect_signals()
+	if Engine.is_editor_hint():
+		return
 
 	# Set up file dialog filters
 	if has_node("%SceneFileDialog"):
 		%SceneFileDialog.filters = PackedStringArray(["*.tscn ; Godot Scene Files"])
-		print("[UploadStudio] File dialog configured")
 
 	# Set up SubViewportContainer to forward input to SubViewport for orbit controls
 	var subviewport_container = %SubViewportContainer
 	if subviewport_container:
 		subviewport_container.set_process_input(true)
 		subviewport_container.mouse_filter = Control.MOUSE_FILTER_PASS
-		print("[UploadStudio] SubViewportContainer configured for input")
-
-func _reconnect_signals():
-	print("[UploadStudio] Reconnecting signals...")
-
-	# Find and connect LoadScene button
-	var load_scene_btn = get_node_or_null("HSplitContainer/Menu/Elements/LoadScene")
-	if load_scene_btn:
-		if not load_scene_btn.pressed.is_connected(_on_load_scene_pressed):
-			load_scene_btn.pressed.connect(_on_load_scene_pressed)
-			print("[UploadStudio] Connected LoadScene button")
-		else:
-			print("[UploadStudio] LoadScene already connected")
-	else:
-		printerr("[UploadStudio] LoadScene button not found!")
-
-	# Find and connect SnapThumbnail button
-	var snap_btn = get_node_or_null("HSplitContainer/Menu/Elements/SnapThumbnail")
-	if snap_btn:
-		if not snap_btn.pressed.is_connected(_on_snap_thumbnail_pressed):
-			snap_btn.pressed.connect(_on_snap_thumbnail_pressed)
-			print("[UploadStudio] Connected SnapThumbnail button")
-		else:
-			print("[UploadStudio] SnapThumbnail already connected")
-	else:
-		printerr("[UploadStudio] SnapThumbnail button not found!")
-
-	# Find and connect Upload button
-	var upload_btn = get_node_or_null("HSplitContainer/Menu/Elements/Upload")
-	if upload_btn:
-		if not upload_btn.pressed.is_connected(_on_upload_pressed):
-			upload_btn.pressed.connect(_on_upload_pressed)
-			print("[UploadStudio] Connected Upload button")
-		else:
-			print("[UploadStudio] Upload already connected")
-	else:
-		printerr("[UploadStudio] Upload button not found!")
 
 func _on_background_color_color_changed(color):
 	%WorldEnvironment.environment.background_color = color
 
 func _on_snap_thumbnail_pressed():
-	print("[UploadStudio] Snap thumbnail button pressed!")
+	#print("[UploadStudio] Snap thumbnail button pressed!")
 	var subviewport: SubViewport = %SubViewport
 	var display: TextureRect = %ThumbnailDisplay
 	subviewport.render_target_update_mode = SubViewport.UPDATE_ONCE
@@ -86,7 +43,7 @@ func _on_snap_thumbnail_pressed():
 	subviewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	%SubViewportContainer.stretch = true
 
-	print("[UploadStudio] Thumbnail captured!")
+	#print("[UploadStudio] Thumbnail captured!")
 
 	# Update file list to show thumbnail
 	_update_file_list()
@@ -111,7 +68,7 @@ func _on_delete_thumbnail_pressed():
 
 func load_current_scene(scene_root: Node, scene_path: String):
 	"""Load the currently edited scene from the editor"""
-	print("[UploadStudio] Loading current scene: ", scene_path)
+	#print("[UploadStudio] Loading current scene: ", scene_path)
 
 	# Store reference to the actual editor scene (for export with materials)
 	editor_scene_root = scene_root
@@ -136,11 +93,11 @@ func load_current_scene(scene_root: Node, scene_path: String):
 	_update_file_list()
 	_update_status("Scene loaded: " + scene_path.get_file())
 
-	print("[UploadStudio] Scene loaded successfully")
-	print("[UploadStudio] Editor scene has %d children" % scene_root.get_child_count())
+	#print("[UploadStudio] Scene loaded successfully")
+	#print("[UploadStudio] Editor scene has %d children" % scene_root.get_child_count())
 
 func _on_load_scene_pressed():
-	print("[UploadStudio] Load scene button pressed - opening file dialog")
+	#print("[UploadStudio] Load scene button pressed - opening file dialog")
 	if has_node("%SceneFileDialog"):
 		%SceneFileDialog.popup_centered_ratio(0.7)
 	else:
@@ -151,7 +108,7 @@ func _on_scene_file_selected(path: String):
 
 func _load_scene_from_file(path: String):
 	"""Load a scene from a file path (manual selection)"""
-	print("[UploadStudio] Loading scene from file: ", path)
+	#print("[UploadStudio] Loading scene from file: ", path)
 
 	# Clear existing scene
 	if loaded_scene:
@@ -180,7 +137,7 @@ func _load_scene_from_file(path: String):
 	_update_file_list()
 	_update_status("Scene loaded: " + path.get_file())
 
-	print("Loaded scene: ", path)
+	#print("Loaded scene: ", path)
 
 func _update_file_list():
 	if not has_node("%FileList"):
@@ -229,7 +186,7 @@ func _update_status(message: String):
 		%StatusLabel.text = message
 
 func _export_and_upload():
-	print("Starting export and upload process...")
+	#print("Starting export and upload process...")
 	_update_status("Starting export...")
 
 	# Create temporary directory for export
@@ -249,7 +206,7 @@ func _export_and_upload():
 		return
 
 	# Debug: List all files created by the export
-	print("[DEBUG] Files in temp directory after GLTF export:")
+	#print("[DEBUG] Files in temp directory after GLTF export:")
 	_list_directory_recursive(temp_dir, "")
 
 	# Save thumbnail
@@ -269,11 +226,11 @@ func _export_and_upload():
 		return
 
 	# Verify the zip file was created and contains files
-	print("[VERIFY] Checking zip file before upload...")
+	#print("[VERIFY] Checking zip file before upload...")
 	_verify_zip_contents(zip_path)
 
 	# DEBUG: Copy zip to res:// for inspection
-	print("[DEBUG] Copying zip to res://debug_upload.zip for inspection...")
+	#print("[DEBUG] Copying zip to res://debug_upload.zip for inspection...")
 	var source_file = FileAccess.open(zip_path, FileAccess.READ)
 	if source_file:
 		var zip_data = source_file.get_buffer(source_file.get_length())
@@ -283,7 +240,7 @@ func _export_and_upload():
 		if debug_file:
 			debug_file.store_buffer(zip_data)
 			debug_file.close()
-			print("[DEBUG] Saved copy to res://debug_upload.zip")
+			#print("[DEBUG] Saved copy to res://debug_upload.zip")
 
 	# Upload the zip
 	_update_status("Uploading to Icosa Gallery...")
@@ -297,121 +254,54 @@ func _export_scene_to_gltf(output_path: String) -> bool:
 		printerr("No scene path available to export")
 		return false
 
-	# CRITICAL FIX: Load the scene fresh from file for export
-	# Using the editor scene root doesn't properly resolve external material resources
-	print("  Loading scene fresh from file: ", loaded_scene_path)
 	var packed_scene = load(loaded_scene_path) as PackedScene
 	if not packed_scene:
-		printerr("  Failed to load scene from: ", loaded_scene_path)
+		printerr("Failed to load scene from: ", loaded_scene_path)
 		return false
 
 	var scene_to_export = packed_scene.instantiate() as Node3D
 	if not scene_to_export:
-		printerr("  Failed to instantiate scene")
+		printerr("Failed to instantiate scene")
 		return false
 
-	print("  Scene instantiated successfully")
-
-	# Debug: Count materials in the scene before export
-	var material_count = _count_materials_recursive(scene_to_export, 0)
-	print("  Materials found in scene tree: ", material_count)
-
-	# CRITICAL FIX: Bake override materials into the mesh before export
-	# The GLTF exporter only sees materials on the Mesh resource, not override materials
-	print("  Baking override materials into meshes...")
 	_bake_override_materials(scene_to_export)
 
-	# CRITICAL FIX: Pre-save textures with unique filenames before export
-	# Without this, textures with no resource_path all get exported as ".png" and overwrite each other
-	print("  Pre-saving textures with unique names...")
 	var temp_textures_dir = output_path.get_base_dir() + "/temp_textures"
 	var dir = DirAccess.open(output_path.get_base_dir())
-	if dir:
-		if not dir.dir_exists("temp_textures"):
-			dir.make_dir("temp_textures")
+	if dir and not dir.dir_exists("temp_textures"):
+		dir.make_dir("temp_textures")
+
 	_presave_textures_with_unique_names(scene_to_export, temp_textures_dir)
 
 	var gltf_document = GLTFDocument.new()
 	var gltf_state = GLTFState.new()
 
-	# Configure GLTF export settings
 	gltf_document.image_format = "PNG"
 	gltf_document.lossy_quality = 0.75
 
-	# CRITICAL: Set the base path for the GLTF state so texture paths resolve correctly
-	var output_dir = output_path.get_base_dir()
-	gltf_state.set_base_path(output_dir)
-	print("  Set GLTF base path to: ", output_dir)
+	gltf_state.set_base_path(output_path.get_base_dir())
 
-	# Debug: Print export settings
-	print("  GLTF export settings:")
-	print("    image_format: ", gltf_document.image_format)
-	print("    lossy_quality: ", gltf_document.lossy_quality)
-
-	# Export the scene to GLTF
-	print("  Calling append_from_scene...")
 	var error = gltf_document.append_from_scene(scene_to_export, gltf_state)
-	print("  append_from_scene returned: ", error)
 	if error != OK:
 		printerr("Failed to convert scene to GLTF state: ", error)
 		scene_to_export.queue_free()
 		return false
 
-	print("  Materials in GLTF state: ", gltf_state.get_materials().size())
-	print("  Meshes in GLTF state: ", gltf_state.get_meshes().size())
-	print("  Textures in GLTF state: ", gltf_state.get_textures().size())
-	print("  Images in GLTF state: ", gltf_state.get_images().size())
-
-	# Write to file
 	error = gltf_document.write_to_filesystem(gltf_state, output_path)
 	if error != OK:
 		printerr("Failed to write GLTF to file: ", error)
 		scene_to_export.queue_free()
 		return false
 
-	print("Exported GLTF to: ", output_path)
-
-	# CRITICAL FIX: The GLTF exporter URL-encodes the URIs (textures%2Ffile.png instead of textures/file.png)
-	# This breaks Icosa Gallery's texture loading. We need to fix the URIs in the JSON
 	_fix_gltf_uri_encoding(output_path)
 
-	# Debug: Read and print the GLTF JSON to see what was actually exported
-	var gltf_file = FileAccess.open(output_path, FileAccess.READ)
-	if gltf_file:
-		var gltf_json_text = gltf_file.get_as_text()
-		gltf_file.close()
-
-		# Parse JSON to check for materials
-		var json = JSON.new()
-		var parse_result = json.parse(gltf_json_text)
-		if parse_result == OK:
-			var gltf_data = json.data
-			if gltf_data is Dictionary:
-				print("  GLTF JSON structure:")
-				print("    Has materials: ", gltf_data.has("materials"))
-				if gltf_data.has("materials"):
-					print("    Materials count in JSON: ", gltf_data["materials"].size())
-					for i in range(gltf_data["materials"].size()):
-						print("      Material ", i, ": ", gltf_data["materials"][i])
-				print("    Has textures: ", gltf_data.has("textures"))
-				if gltf_data.has("textures"):
-					print("    Textures count in JSON: ", gltf_data["textures"].size())
-					for i in range(gltf_data["textures"].size()):
-						print("      Texture ", i, ": ", gltf_data["textures"][i])
-				print("    Has images: ", gltf_data.has("images"))
-				if gltf_data.has("images"):
-					print("    Images count in JSON: ", gltf_data["images"].size())
-					for i in range(min(gltf_data["images"].size(), 3)):
-						print("      Image ", i, ": ", gltf_data["images"][i])
-
-	# Clean up the temporary instance
 	scene_to_export.queue_free()
 
-	# Clean up temp textures directory
 	if DirAccess.dir_exists_absolute(temp_textures_dir):
 		_remove_dir_recursive(temp_textures_dir)
 
 	return true
+
 
 func _count_materials_recursive(node: Node, count: int) -> int:
 	if node is MeshInstance3D:
@@ -448,14 +338,14 @@ func _count_materials_recursive(node: Node, count: int) -> int:
 							has_textures = true
 							texture_info += (", " if not texture_info.is_empty() else "") + "roughness"
 
-					print("    Found material on %s surface %d: %s (type: %s, is StandardMaterial3D: %s, is override: %s, textures: %s)" % [
-						node.name, i,
-						mat.resource_name if mat.resource_name else "unnamed",
-						mat_type,
-						is_standard,
-						is_override,
-						texture_info if has_textures else "none"
-					])
+					#print("    Found material on %s surface %d: %s (type: %s, is StandardMaterial3D: %s, is override: %s, textures: %s)" % [
+						#node.name, i,
+						#mat.resource_name if mat.resource_name else "unnamed",
+						#mat_type,
+						#is_standard,
+						#is_override,
+						#texture_info if has_textures else "none"
+					#])
 
 	for child in node.get_children():
 		count = _count_materials_recursive(child, count)
@@ -466,7 +356,7 @@ func _presave_textures_with_unique_names(node: Node, temp_dir: String):
 	"""Pre-save all textures to temp directory with unique names, then reload them"""
 	var texture_map = {}  # Original texture -> new texture path
 	_collect_and_save_textures(node, temp_dir, texture_map)
-	print("    Pre-saved ", texture_map.size(), " unique textures")
+	#print("    Pre-saved ", texture_map.size(), " unique textures")
 
 	# Now replace the textures in materials with reloaded versions
 	_replace_textures_with_presaved(node, texture_map)
@@ -519,7 +409,7 @@ func _save_texture_to_temp(texture: Texture2D, temp_dir: String, texture_map: Di
 		var err = image.save_png(save_path)
 		if err == OK:
 			texture_map[texture] = save_path
-			print("      Saved texture: ", texture_name, ".png")
+			#print("      Saved texture: ", texture_name, ".png")
 		else:
 			printerr("      Failed to save texture: ", err)
 
@@ -566,7 +456,7 @@ func _replace_material_texture(mat: StandardMaterial3D, texture_property: String
 				# CRITICAL: Set resource_path so GLTF exporter knows the filename
 				new_texture.resource_path = new_path
 				mat.set(texture_property, new_texture)
-				print("      Replaced ", texture_property, " with ", new_path.get_file())
+				#print("      Replaced ", texture_property, " with ", new_path.get_file())
 
 func _bake_override_materials(node: Node):
 	"""Bake surface override materials into the mesh resource so GLTF exporter can see them"""
@@ -590,10 +480,10 @@ func _bake_override_materials(node: Node):
 					var override_mat = mesh_instance.get_surface_override_material(i)
 					if override_mat:
 						new_mesh.surface_set_material(i, override_mat)
-						print("    Baked override material on %s surface %d: %s" % [
-							node.name, i,
-							override_mat.resource_name if override_mat.resource_name else "unnamed"
-						])
+						#print("    Baked override material on %s surface %d: %s" % [
+							#node.name, i,
+							#override_mat.resource_name if override_mat.resource_name else "unnamed"
+						#])
 
 				# Replace the mesh on the instance
 				mesh_instance.mesh = new_mesh
@@ -616,7 +506,7 @@ func _save_thumbnail(output_path: String) -> bool:
 		printerr("Failed to save thumbnail: ", error)
 		return false
 
-	print("Saved thumbnail to: ", output_path)
+	#print("Saved thumbnail to: ", output_path)
 	return true
 
 func _create_zip(source_dir: String, zip_path: String) -> bool:
@@ -631,7 +521,7 @@ func _create_zip(source_dir: String, zip_path: String) -> bool:
 
 	packer.close()
 
-	print("Created zip file with %d files: %s" % [files_added, zip_path])
+	#print("Created zip file with %d files: %s" % [files_added, zip_path])
 	return files_added > 0
 
 func _add_directory_to_zip(packer: ZIPPacker, dir_path: String, zip_prefix: String, skip_file: String) -> int:
@@ -654,7 +544,7 @@ func _add_directory_to_zip(packer: ZIPPacker, dir_path: String, zip_prefix: Stri
 				# Add directory entry to zip (required for proper structure)
 				packer.start_file(zip_path + "/")
 				packer.close_file()
-				print("  Added directory to zip: ", zip_path + "/")
+				#print("  Added directory to zip: ", zip_path + "/")
 
 				# Recursively add subdirectory contents
 				files_added += _add_directory_to_zip(packer, full_path, zip_path, skip_file)
@@ -667,7 +557,7 @@ func _add_directory_to_zip(packer: ZIPPacker, dir_path: String, zip_prefix: Stri
 					packer.close_file()
 					file.close()
 					files_added += 1
-					print("  Added to zip: ", zip_path)
+					#print("  Added to zip: ", zip_path)
 				else:
 					printerr("  Failed to read file: ", full_path)
 
@@ -685,10 +575,10 @@ func _verify_zip_contents(zip_path: String):
 		return
 
 	var files = reader.get_files()
-	print("[VERIFY] Zip contains ", files.size(), " entries:")
+	#print("[VERIFY] Zip contains ", files.size(), " entries:")
 	for file in files:
 		var file_data = reader.read_file(file)
-		print("[VERIFY]   ", file, " (", file_data.size(), " bytes)")
+		#print("[VERIFY]   ", file, " (", file_data.size(), " bytes)")
 
 	reader.close()
 
@@ -734,7 +624,7 @@ func _upload_zip(zip_path: String):
 		upload_http.queue_free()
 		return
 
-	print("Uploading asset...")
+	#print("Uploading asset...")
 
 	# Wait for response
 	var reply = await upload_http.request_completed
@@ -746,17 +636,17 @@ func _upload_zip(zip_path: String):
 	upload_http.queue_free()
 
 	if response_code == 200 or response_code == 201:
-		print("Successfully uploaded asset!")
-		print("Response: ", response_body.get_string_from_utf8())
+		#print("Successfully uploaded asset!")
+		#print("Response: ", response_body.get_string_from_utf8())
 		_update_status("Success! Asset uploaded to Icosa Gallery")
 	else:
 		printerr("Upload error: ", response_code, " ", result)
-		print("Response body: ", response_body.get_string_from_utf8())
+		#print("Response body: ", response_body.get_string_from_utf8())
 		_update_status("Error: Upload failed (code %d)" % response_code)
 
 func _fix_gltf_uri_encoding(gltf_path: String):
 	"""Fix URL-encoded URIs in GLTF JSON (textures%2Ffile.png -> textures/file.png)"""
-	print("  Fixing URI encoding in GLTF...")
+	#print("  Fixing URI encoding in GLTF...")
 
 	var gltf_file = FileAccess.open(gltf_path, FileAccess.READ)
 	if not gltf_file:
@@ -785,7 +675,7 @@ func _fix_gltf_uri_encoding(gltf_path: String):
 			if old_uri != new_uri:
 				image["uri"] = new_uri
 				fixed_count += 1
-				print("    Fixed URI: ", old_uri, " -> ", new_uri)
+				#print("    Fixed URI: ", old_uri, " -> ", new_uri)
 
 	if fixed_count > 0:
 		# Write the updated JSON back
@@ -794,23 +684,23 @@ func _fix_gltf_uri_encoding(gltf_path: String):
 		if gltf_file:
 			gltf_file.store_string(updated_json)
 			gltf_file.close()
-			print("    Fixed ", fixed_count, " URIs in GLTF")
+			#print("    Fixed ", fixed_count, " URIs in GLTF")
 		else:
 			printerr("    Failed to write updated GLTF")
 
 func _fix_texture_filenames_post_export(scene_root: Node, gltf_path: String):
 	"""Post-process exported GLTF to fix texture filenames"""
-	print("  Post-processing texture filenames...")
+	#print("  Post-processing texture filenames...")
 
 	# Collect all unique textures from materials
 	var texture_list = []
 	_collect_textures_from_scene_ordered(scene_root, texture_list)
 
 	if texture_list.size() == 0:
-		print("    No textures to fix")
+		#print("    No textures to fix")
 		return
 
-	print("    Found ", texture_list.size(), " textures in scene")
+	#print("    Found ", texture_list.size(), " textures in scene")
 
 	# Read the GLTF JSON
 	var gltf_file = FileAccess.open(gltf_path, FileAccess.READ)
@@ -828,7 +718,7 @@ func _fix_texture_filenames_post_export(scene_root: Node, gltf_path: String):
 
 	var gltf_data = json.data
 	if not gltf_data is Dictionary or not gltf_data.has("images"):
-		print("    No images in GLTF to fix")
+		#print("    No images in GLTF to fix")
 		return
 
 	var images = gltf_data["images"]
@@ -857,7 +747,7 @@ func _fix_texture_filenames_post_export(scene_root: Node, gltf_path: String):
 		var new_file_path = base_dir + "/textures/" + new_filename
 		var new_uri = "textures/" + new_filename
 
-		print("    Renaming: ", old_file_path, " -> ", new_file_path)
+		#print("    Renaming: ", old_file_path, " -> ", new_file_path)
 
 		# Rename the file on disk
 		var dir = DirAccess.open(base_dir)
@@ -866,7 +756,7 @@ func _fix_texture_filenames_post_export(scene_root: Node, gltf_path: String):
 			if err == OK:
 				# Update the JSON
 				image["uri"] = new_uri
-				print("      Success!")
+				#print("      Success!")
 			else:
 				printerr("      Failed to rename file: ", err)
 		else:
@@ -878,7 +768,7 @@ func _fix_texture_filenames_post_export(scene_root: Node, gltf_path: String):
 	if gltf_file:
 		gltf_file.store_string(updated_json)
 		gltf_file.close()
-		print("    Updated GLTF JSON with new texture paths")
+		#print("    Updated GLTF JSON with new texture paths")
 	else:
 		printerr("    Failed to write updated GLTF")
 
@@ -937,7 +827,7 @@ func _list_directory_recursive(path: String, indent: String):
 	while file_name != "":
 		if file_name != "." and file_name != "..":
 			if dir.current_is_dir():
-				print(indent + "[DIR] " + file_name)
+				#print(indent + "[DIR] " + file_name)
 				_list_directory_recursive(path + "/" + file_name, indent + "  ")
 			else:
 				var file_path = path + "/" + file_name
@@ -946,7 +836,7 @@ func _list_directory_recursive(path: String, indent: String):
 				if file:
 					size = file.get_length()
 					file.close()
-				print(indent + "[FILE] " + file_name + " (" + str(size) + " bytes)")
+				#print(indent + "[FILE] " + file_name + " (" + str(size) + " bytes)")
 		file_name = dir.get_next()
 	dir.list_dir_end()
 

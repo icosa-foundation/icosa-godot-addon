@@ -130,8 +130,6 @@ func _reset_login_ui() -> void:
 func _login_success() -> void:
 	%LoginDetails.hide()
 	%UserDetails.show()
-	#print("token is: ", token)
-	_user_request(token)
 	_user_assets_request(token)
 	_user_liked_assets_request(token)
 

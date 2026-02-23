@@ -191,9 +191,13 @@ func _ready():
 	# Hide author page elements initially
 	%AuthorPage.hide()
 
-	# Skip initial search if this is an author profile tab (will be set up later)
-	if !skip_initial_search:
-		_on_keywords_text_submitted("")
+var _initial_search_done := false
+
+func _first_activate():
+	if skip_initial_search or _initial_search_done:
+		return
+	_initial_search_done = true
+	_on_keywords_text_submitted("")
 
 func execute_search():
 	%NoAssetsFound.hide()

@@ -81,6 +81,7 @@ text = "Cancel"
 
 [node name="UserDetails" type="PanelContainer" parent="." unique_id=1428422549]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_fb6c0")
 
@@ -125,10 +126,9 @@ text = " Logout "
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-current_tab = 1
+current_tab = 0
 
 [node name="Assets" type="VBoxContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs" unique_id=631680289]
-visible = false
 layout_mode = 2
 size_flags_vertical = 3
 metadata/_tab_index = 0
@@ -162,6 +162,7 @@ size_flags_vertical = 3
 alignment = 1
 
 [node name="Favorites" type="VBoxContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs" unique_id=1539835194]
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 metadata/_tab_index = 1
@@ -228,7 +229,7 @@ alignment = 1
 [node name="CreateCollection" type="Button" parent="UserDetails/Assets/DisplayAssets/UserTabs/Collections" unique_id=1039581069]
 layout_mode = 2
 size_flags_horizontal = 4
-size_flags_vertical = 6
+size_flags_vertical = 4
 text = "Create new collection"
 icon = ExtResource("3_5bjak")
 icon_alignment = 1
