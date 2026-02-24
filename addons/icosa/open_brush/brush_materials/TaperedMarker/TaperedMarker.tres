@@ -1,4 +1,4 @@
-[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://vkdvl556ky23"]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://vkdvl556ky23"]
 
 [ext_resource type="Texture2D" uid="uid://b45e1hsesu1te" path="res://addons/icosa/open_brush/brush_materials/TaperedMarker/TaperedMarker-d90c6ad8-af0f-4b54-b422-e0f92abe1b3c-v10.0-MainTex.png" id="1"]
 
@@ -7,6 +7,7 @@ resource_name = "TaperedMarker"
 transparency = 2
 alpha_scissor_threshold = 0.067
 alpha_antialiasing_mode = 0
+cull_mode = 2
 shading_mode = 0
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true

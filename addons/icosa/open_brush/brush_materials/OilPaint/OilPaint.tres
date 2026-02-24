@@ -1,7 +1,7 @@
-[gd_resource type="StandardMaterial3D" load_steps=3 format=3 uid="uid://beufijphvssfg"]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://beufijphvssfg"]
 
 [ext_resource type="Texture2D" uid="uid://dfenepg7pjvdx" path="res://addons/icosa/open_brush/brush_materials/OilPaint/OilPaint-c515dad7-4393-4681-81ad-162ef052241b-v10.0-MainTex.png" id="1"]
-[ext_resource type="Texture2D" uid="uid://dntwd7nnhhonc" path="res://addons/icosa/open_brush/brush_materials/OilPaint/OilPaint-c515dad7-4393-4681-81ad-162ef052241b-v10.0-BumpMap.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://di15nq5af53f1" path="res://addons/icosa/open_brush/brush_materials/OilPaint/OilPaint-c515dad7-4393-4681-81ad-162ef052241b-v10.0-BumpMap.png" id="2"]
 
 [resource]
 resource_name = "OilPaintSingleSided"

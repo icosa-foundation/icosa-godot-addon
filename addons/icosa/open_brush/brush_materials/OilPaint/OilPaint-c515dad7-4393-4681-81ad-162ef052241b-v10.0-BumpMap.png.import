@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dntwd7nnhhonc"
+uid="uid://di15nq5af53f1"
 path.s3tc="res://.godot/imported/OilPaint-c515dad7-4393-4681-81ad-162ef052241b-v10.0-BumpMap.png-fe5a716e5cc487d680f7590573ebf733.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
@@ -27,7 +27,7 @@ compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=1
-roughness/src_normal="res://addons/icosa/brush_materials/OilPaint/OilPaint-c515dad7-4393-4681-81ad-162ef052241b-v10.0-BumpMap.png"
+roughness/src_normal="res://addons/icosa/open_brush/brush_materials/OilPaint/OilPaint-f72ec0e7-a844-4e38-82e3-140c44772699-v10.0-BumpMap.png"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

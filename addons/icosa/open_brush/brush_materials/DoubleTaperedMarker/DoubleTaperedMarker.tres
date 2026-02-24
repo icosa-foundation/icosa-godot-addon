@@ -1,4 +1,4 @@
-[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://b1xlcxcjen6ey"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://b1xlcxcjen6ey"]
 
 [ext_resource type="Shader" uid="uid://cst7wiwwyx1fj" path="res://addons/icosa/open_brush/brush_materials/DoubleTaperedMarker/DoubleTaperedMarker.gdshader" id="1"]
 

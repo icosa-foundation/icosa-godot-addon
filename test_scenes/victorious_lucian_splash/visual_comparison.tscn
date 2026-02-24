@@ -1,34 +1,30 @@
 [gd_scene format=3 uid="uid://bd4r7gwb72wxi"]
 
-[ext_resource type="PackedScene" uid="uid://bncvx1kw5or07" path="res://test_scenes/victorious_lucian_splash/sketch.gltf" id="1_2n4on"]
+[ext_resource type="PackedScene" uid="uid://ckft8neuknrwk" path="res://test_scenes/victorious_lucian_splash/default_scene.tscn" id="1_jk7we"]
 [ext_resource type="Texture2D" uid="uid://bbiiq6hyvyind" path="res://test_scenes/victorious_lucian_splash/screenshot_OpenBrush_victorious_lucial_splash.webp" id="2_jk7we"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_2n4on"]
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jk7we"]
 sky_top_color = Color(0.49803922, 0.49803922, 0.59607846, 1)
 sky_horizon_color = Color(0.38039216, 0.35686275, 0.45882353, 1)
 ground_bottom_color = Color(0.07058824, 0.05490196, 0.05490196, 1)
 ground_horizon_color = Color(0.45490196, 0.3764706, 0.5372549, 1)
 sun_angle_max = 0.0
 use_debanding = false
+energy_multiplier = 0.55
 
-[sub_resource type="Sky" id="Sky_g0iyq"]
-sky_material = SubResource("ProceduralSkyMaterial_2n4on")
+[sub_resource type="Sky" id="Sky_6mtyo"]
+sky_material = SubResource("ProceduralSkyMaterial_jk7we")
 
-[sub_resource type="Environment" id="Environment_2n4on"]
+[sub_resource type="Environment" id="Environment_uday3"]
 background_mode = 2
 background_color = Color(0.16923234, 0.0564678, 0.26337764, 1)
-sky = SubResource("Sky_g0iyq")
+sky = SubResource("Sky_6mtyo")
 ambient_light_source = 3
-ambient_light_energy = 7.83
 reflected_light_source = 2
-tonemap_mode = 2
-tonemap_exposure = 1.75
+tonemap_exposure = 2.0
 adjustment_enabled = true
 adjustment_contrast = 1.2
 adjustment_saturation = 1.5
-
-[sub_resource type="World3D" id="World3D_g0iyq"]
-environment = SubResource("Environment_2n4on")
 
 [node name="VisualComparison" type="Node3D" unique_id=1155957687]
 
@@ -51,7 +47,6 @@ size_flags_stretch_ratio = 0.5
 stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="HSplitContainer/SubViewportContainer" unique_id=314659319]
-world_3d = SubResource("World3D_g0iyq")
 handle_input_locally = false
 msaa_3d = 2
 screen_space_aa = 2
@@ -59,15 +54,24 @@ mesh_lod_threshold = 0.0
 size = Vector2i(576, 648)
 render_target_update_mode = 4
 
-[node name="defaultScene" parent="HSplitContainer/SubViewportContainer/SubViewport" unique_id=828711800 instance=ExtResource("1_2n4on")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="defaultScene" parent="HSplitContainer/SubViewportContainer/SubViewport" unique_id=1347612653 instance=ExtResource("1_jk7we")]
 
-[node name="SpotLight3D" type="SpotLight3D" parent="HSplitContainer/SubViewportContainer/SubViewport" unique_id=640312480]
-transform = Transform3D(-0.30803815, -0.801066, 0.51323074, 0.77452713, 0.10211092, 0.62424445, -0.5524675, 0.5898022, 0.58899325, 0.8680439, 3.8447485, 1.8749316)
-light_color = Color(0.9684753, 0.8118291, 0.62693506, 1)
-light_energy = 4.0
-light_size = 0.01
-shadow_enabled = true
+[node name="WorldEnvironment" parent="HSplitContainer/SubViewportContainer/SubViewport/defaultScene" index="0" unique_id=1101120030]
+environment = SubResource("Environment_uday3")
+
+[node name="Sun" parent="HSplitContainer/SubViewportContainer/SubViewport/defaultScene" index="1" unique_id=1393562335]
+transform = Transform3D(-0.7640486, -0.23060413, 0.60253763, 0.60484827, 0.06891377, 0.7933533, -0.22447367, 0.9706045, 0.08682702, 3.531, 3.19, 0.56)
+light_color = Color(0.97, 0.86136, 0.7372, 1)
+directional_shadow_split_1 = 0.05
+directional_shadow_split_2 = 0.075
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 30.0
+sky_mode = 1
+
+[node name="Camera" parent="HSplitContainer/SubViewportContainer/SubViewport/defaultScene" index="3" unique_id=1074576640]
+transform = Transform3D(0.4322665, 0.1992729, -0.87945193, 0.008502874, 0.97433287, 0.22495103, 0.9017056, -0.10471668, 0.4194771, -1.376, 1.081, 0.403)
+fov = 60.0
+far = 1000.0
 
 [node name="TextureRect" type="TextureRect" parent="HSplitContainer" unique_id=1235481503]
 layout_mode = 2
@@ -76,3 +80,5 @@ size_flags_stretch_ratio = 0.5
 texture = ExtResource("2_jk7we")
 expand_mode = 5
 stretch_mode = 6
+
+[editable path="HSplitContainer/SubViewportContainer/SubViewport/defaultScene"]
