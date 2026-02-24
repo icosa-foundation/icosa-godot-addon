@@ -102,8 +102,10 @@ func _import_post(gltf_state: GLTFState, root: Node) -> Error:
 	_apply_lights(root, gltf_json)
 	_apply_brush_materials_to_meshes(gltf_state)
 	_rename_nodes(root)
-	if ProjectSettings.get_setting("icosa/import_tilt_brush_environment", false):
+	if ProjectSettings.get_setting("icosa/environment/import_tilt_brush_environment", false):
 		_apply_environment(root, gltf_json)
+	if ProjectSettings.get_setting("icosa/environment/import_world_environment", false):
+		_apply_world_environment(root, gltf_json)
 	_gltf_json_cache = {}
 	return OK
 
@@ -116,52 +118,104 @@ func _apply_environment(root: Node, gltf_json: Dictionary) -> void:
 	var extras: Dictionary = scenes[0].get("extras", {})
 	var env_guid: String = extras.get("TB_EnvironmentGuid", "")
 
-	var env_def: Dictionary = {}
-	if not env_guid.is_empty() and environment_data.has(env_guid):
-		env_def = environment_data[env_guid]
-	else:
-		# Fall back to matching by name from TB_Environment field.
+	# Fall back to name-based lookup if GUID not present or not found.
+	if env_guid.is_empty() or not environment_data.has(env_guid):
 		var env_name: String = extras.get("TB_Environment", "")
-		for guid in environment_data:
-			if environment_data[guid].get("name", "") == env_name:
-				env_def = environment_data[guid]
-				break
+		if not env_name.is_empty():
+			for guid in environment_data:
+				if environment_data[guid].get("name", "") == env_name:
+					env_guid = guid
+					break
 
-	if env_def.is_empty():
+	if env_guid.is_empty():
 		return
 
-	var c := func(arr: Array) -> Color:
-		return Color(arr[0], arr[1], arr[2]) if arr.size() >= 3 else Color.BLACK
+	# Find the GLB inside the GUID-named folder.
+	var env_dir := "res://addons/icosa/open_brush/environments/%s/" % env_guid
+	var dir := DirAccess.open(env_dir)
+	if dir == null:
+		push_warning("IcosaTiltGLTF: environment folder not found: %s" % env_dir)
+		return
 
-	# Build sky using gradient between sky_color_a (horizon) and sky_color_b (zenith).
+	var glb_path := ""
+	dir.list_dir_begin()
+	var fname := dir.get_next()
+	while fname != "":
+		if not dir.current_is_dir() and fname.get_extension().to_lower() == "glb":
+			glb_path = env_dir + fname
+			break
+		fname = dir.get_next()
+	dir.list_dir_end()
+
+	if glb_path.is_empty():
+		push_warning("IcosaTiltGLTF: no GLB found in environment folder: %s" % env_dir)
+		return
+
+	var env_scene: PackedScene = load(glb_path)
+	if env_scene == null:
+		push_warning("IcosaTiltGLTF: failed to load environment GLB: %s" % glb_path)
+		return
+
+	var env_node := env_scene.instantiate() as Node3D
+	env_node.name = "TiltBrushEnvironment"
+	env_node.scale = Vector3(0.1, 0.1, 0.1)
+	env_node.rotation_degrees = Vector3(0.0, 180.0, 0.0)
+	root.add_child(env_node)
+	env_node.owner = root
+
+
+func _apply_world_environment(root: Node, gltf_json: Dictionary) -> void:
+	# Resolve the environment GUID (same lookup as _apply_environment).
+	var scenes: Array = gltf_json.get("scenes", [])
+	if scenes.is_empty():
+		return
+	var extras: Dictionary = scenes[0].get("extras", {})
+	var env_guid: String = extras.get("TB_EnvironmentGuid", "")
+
+	if env_guid.is_empty() or not environment_data.has(env_guid):
+		var env_name: String = extras.get("TB_Environment", "")
+		if not env_name.is_empty():
+			for guid in environment_data:
+				if environment_data[guid].get("name", "") == env_name:
+					env_guid = guid
+					break
+
+	if env_guid.is_empty() or not environment_data.has(env_guid):
+		return
+
+	var env_def: Dictionary = environment_data[env_guid]
+
+	# Helper: convert {r,g,b,a} dict to Color.
+	var c := func(d: Dictionary, fallback := Color.BLACK) -> Color:
+		if d.is_empty():
+			return fallback
+		return Color(d.get("r", 0.0), d.get("g", 0.0), d.get("b", 0.0))
+
+	var rs: Dictionary = env_def.get("renderSettings", {})
+	var sky_a: Dictionary = env_def.get("skyboxColorA", {})
+	var sky_b: Dictionary = env_def.get("skyboxColorB", {})
+	var clear: Dictionary = rs.get("clearColor", {})
+
 	var sky_mat := ProceduralSkyMaterial.new()
-	sky_mat.sky_horizon_color = c.call(env_def.get("sky_color_a", [0.0, 0.0, 0.0]))
-	sky_mat.sky_top_color = c.call(env_def.get("sky_color_b", [0.0, 0.0, 0.0]))
-	sky_mat.ground_horizon_color = c.call(env_def.get("sky_color_a", [0.0, 0.0, 0.0]))
-	sky_mat.ground_bottom_color = c.call(env_def.get("clear_color", [0.0, 0.0, 0.0]))
-	sky_mat.sky_energy_multiplier = 0.0 # this hides the sun in the sky
+	sky_mat.sky_horizon_color = c.call(sky_a)
+	sky_mat.sky_top_color = c.call(sky_b)
+	sky_mat.ground_horizon_color = c.call(sky_a)
+	sky_mat.ground_bottom_color = c.call(clear)
+	sky_mat.sky_energy_multiplier = 0.0
 
 	var sky := Sky.new()
 	sky.sky_material = sky_mat
-
 
 	var env := Environment.new()
 	env.sky = sky
 	env.background_mode = Environment.BG_SKY
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = c.call(env_def.get("ambient_color", [0.4, 0.4, 0.4]))
+	env.ambient_light_color = c.call(rs.get("ambientColor", {}), Color(0.4, 0.4, 0.4))
 	env.ambient_light_energy = 1.0
-
-	# Fog.
-	if env_def.get("fog_enabled", false) and env_def.get("fog_density", 0.0) > 0.0:
-		env.fog_enabled = true
-		env.fog_light_color = c.call(env_def.get("fog_color", [0.0, 0.0, 0.0]))
-		env.fog_density = env_def.get("fog_density", 0.0)
-	else:
-		env.fog_enabled = false
+	env.fog_enabled = false
 
 	var world_env := WorldEnvironment.new()
-	world_env.name = "WorldEnvironment"
+	world_env.name = "IcosaWorldEnvironment"
 	world_env.environment = env
 	root.add_child(world_env)
 	world_env.owner = root
@@ -243,7 +297,7 @@ func _ensure_loaded() -> void:
 			if parsed is Dictionary:
 				name_mapping = parsed
 	if environment_data.is_empty():
-		var file := FileAccess.open("res://addons/icosa/open_brush/environments.json", FileAccess.READ)
+		var file := FileAccess.open("res://addons/icosa/open_brush/environments/environments.json", FileAccess.READ)
 		if file != null:
 			var parsed := JSON.parse_string(file.get_as_text())
 			file.close()
