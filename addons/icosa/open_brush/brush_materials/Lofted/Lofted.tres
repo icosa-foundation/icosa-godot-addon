@@ -4,6 +4,6 @@
 resource_name = "Lofted"
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
-roughness = 0.6
+metallic_specular = 0.0
 emission_enabled = true
 emission_energy_multiplier = 0.5

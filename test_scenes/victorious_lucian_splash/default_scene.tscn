@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://ckft8neuknrwk"]
+
+[ext_resource type="PackedScene" uid="uid://bncvx1kw5or07" path="res://test_scenes/victorious_lucian_splash/sketch.gltf" id="1_iaf6v"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_2n4on"]
+sky_top_color = Color(0.49803922, 0.49803922, 0.59607846, 1)
+sky_horizon_color = Color(0.38039216, 0.35686275, 0.45882353, 1)
+ground_bottom_color = Color(0.07058824, 0.05490196, 0.05490196, 1)
+ground_horizon_color = Color(0.45490196, 0.3764706, 0.5372549, 1)
+sun_angle_max = 0.0
+use_debanding = false
+
+[sub_resource type="Sky" id="Sky_g0iyq"]
+sky_material = SubResource("ProceduralSkyMaterial_2n4on")
+
+[sub_resource type="Environment" id="Environment_iaf6v"]
+background_mode = 2
+background_color = Color(0.16923234, 0.0564678, 0.26337764, 1)
+sky = SubResource("Sky_g0iyq")
+ambient_light_source = 3
+ambient_light_sky_contribution = 0.31
+ambient_light_energy = 7.83
+reflected_light_source = 2
+tonemap_mode = 2
+tonemap_exposure = 1.75
+adjustment_enabled = true
+adjustment_contrast = 1.2
+adjustment_saturation = 1.5
+
+[node name="defaultScene" unique_id=1347612653 instance=ExtResource("1_iaf6v")]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." index="0" unique_id=1101120030]
+environment = SubResource("Environment_iaf6v")
+
+[node name="Sun" type="DirectionalLight3D" parent="." index="1" unique_id=1393562335]
+transform = Transform3D(-0.47840708, 0.35484144, 0.8032523, 0.8736674, 0.100146815, 0.47610494, 0.08849861, 0.9295474, -0.3579244, 3.531418, 3.8447485, -1.825481)
+light_color = Color(0.9684753, 0.8118291, 0.62693506, 1)
+light_energy = 4.0
+light_angular_distance = 0.1
+shadow_enabled = true
+
+[node name="Camera" parent="." index="3" unique_id=1074576640]
+transform = Transform3D(0.40749007, 0.09854367, -0.9078771, 0.008146358, 0.9937289, 0.111518666, 0.9131732, -0.052838646, 0.40413192, -1.6648853, 1.011374, 0.3523099)
+fov = 54.3

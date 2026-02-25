@@ -1,0 +1,84 @@
+[gd_scene format=3 uid="uid://bd4r7gwb72wxi"]
+
+[ext_resource type="PackedScene" uid="uid://ckft8neuknrwk" path="res://test_scenes/victorious_lucian_splash/default_scene.tscn" id="1_jk7we"]
+[ext_resource type="Texture2D" uid="uid://bbiiq6hyvyind" path="res://test_scenes/victorious_lucian_splash/screenshot_OpenBrush_victorious_lucial_splash.webp" id="2_jk7we"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jk7we"]
+sky_top_color = Color(0.49803922, 0.49803922, 0.59607846, 1)
+sky_horizon_color = Color(0.38039216, 0.35686275, 0.45882353, 1)
+ground_bottom_color = Color(0.07058824, 0.05490196, 0.05490196, 1)
+ground_horizon_color = Color(0.45490196, 0.3764706, 0.5372549, 1)
+sun_angle_max = 0.0
+use_debanding = false
+energy_multiplier = 0.55
+
+[sub_resource type="Sky" id="Sky_6mtyo"]
+sky_material = SubResource("ProceduralSkyMaterial_jk7we")
+
+[sub_resource type="Environment" id="Environment_uday3"]
+background_mode = 2
+background_color = Color(0.16923234, 0.0564678, 0.26337764, 1)
+sky = SubResource("Sky_6mtyo")
+ambient_light_source = 3
+reflected_light_source = 2
+tonemap_exposure = 2.0
+adjustment_enabled = true
+adjustment_contrast = 1.2
+adjustment_saturation = 1.5
+
+[node name="VisualComparison" type="Node3D" unique_id=1155957687]
+
+[node name="HSplitContainer" type="HSplitContainer" parent="." unique_id=1181613159]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offsets = PackedInt32Array(200)
+collapsed = true
+dragging_enabled = false
+dragger_visibility = 2
+split_offset = 200
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="HSplitContainer" unique_id=1933957529]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="HSplitContainer/SubViewportContainer" unique_id=314659319]
+handle_input_locally = false
+msaa_3d = 2
+screen_space_aa = 2
+mesh_lod_threshold = 0.0
+size = Vector2i(576, 648)
+render_target_update_mode = 4
+
+[node name="defaultScene" parent="HSplitContainer/SubViewportContainer/SubViewport" unique_id=1347612653 instance=ExtResource("1_jk7we")]
+
+[node name="WorldEnvironment" parent="HSplitContainer/SubViewportContainer/SubViewport/defaultScene" index="0" unique_id=1101120030]
+environment = SubResource("Environment_uday3")
+
+[node name="Sun" parent="HSplitContainer/SubViewportContainer/SubViewport/defaultScene" index="1" unique_id=1393562335]
+transform = Transform3D(-0.7640486, -0.23060413, 0.60253763, 0.60484827, 0.06891377, 0.7933533, -0.22447367, 0.9706045, 0.08682702, 3.531, 3.19, 0.56)
+light_color = Color(0.97, 0.86136, 0.7372, 1)
+directional_shadow_split_1 = 0.05
+directional_shadow_split_2 = 0.075
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 30.0
+sky_mode = 1
+
+[node name="Camera" parent="HSplitContainer/SubViewportContainer/SubViewport/defaultScene" index="3" unique_id=1074576640]
+transform = Transform3D(0.4322665, 0.1992729, -0.87945193, 0.008502874, 0.97433287, 0.22495103, 0.9017056, -0.10471668, 0.4194771, -1.376, 1.081, 0.403)
+fov = 60.0
+far = 1000.0
+
+[node name="TextureRect" type="TextureRect" parent="HSplitContainer" unique_id=1235481503]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+texture = ExtResource("2_jk7we")
+expand_mode = 5
+stretch_mode = 6
+
+[editable path="HSplitContainer/SubViewportContainer/SubViewport/defaultScene"]
