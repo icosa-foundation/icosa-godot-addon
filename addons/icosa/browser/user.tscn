@@ -81,6 +81,7 @@ text = "Cancel"
 
 [node name="UserDetails" type="PanelContainer" parent="." unique_id=1428422549]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_fb6c0")
 
@@ -110,8 +111,6 @@ text = "Upload Asset.."
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-text = "You are logged in as %s.
-"
 fit_content = true
 autowrap_mode = 0
 horizontal_alignment = 1
@@ -127,24 +126,23 @@ text = " Logout "
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-current_tab = 2
+current_tab = 0
 
-[node name="My Assets" type="VBoxContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs" unique_id=631680289]
-visible = false
+[node name="Assets" type="VBoxContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs" unique_id=631680289]
 layout_mode = 2
 size_flags_vertical = 3
 metadata/_tab_index = 0
 
-[node name="Title" type="Label" parent="UserDetails/Assets/DisplayAssets/UserTabs/My Assets" unique_id=1875840234]
+[node name="Title" type="Label" parent="UserDetails/Assets/DisplayAssets/UserTabs/Assets" unique_id=1875840234]
 layout_mode = 2
 text = "My Assets"
 horizontal_alignment = 1
 
-[node name="PanelContainer" type="PanelContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/My Assets" unique_id=1439996301]
+[node name="PanelContainer" type="PanelContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/Assets" unique_id=1439996301]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="NoUserAssets" type="Label" parent="UserDetails/Assets/DisplayAssets/UserTabs/My Assets/PanelContainer" unique_id=1371571723]
+[node name="NoUserAssets" type="Label" parent="UserDetails/Assets/DisplayAssets/UserTabs/Assets/PanelContainer" unique_id=1371571723]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 6
@@ -152,41 +150,43 @@ text = "you have not uploaded any assets!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/My Assets/PanelContainer" unique_id=1071273529]
+[node name="ScrollContainer" type="ScrollContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/Assets/PanelContainer" unique_id=1071273529]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UserAssets" type="FlowContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/My Assets/PanelContainer/ScrollContainer" unique_id=1074685249]
+[node name="UserAssets" type="FlowContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/Assets/PanelContainer/ScrollContainer" unique_id=1074685249]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 1
 
-[node name="Liked Assets" type="VBoxContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs" unique_id=1539835194]
+[node name="Favorites" type="VBoxContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs" unique_id=1539835194]
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
 metadata/_tab_index = 1
 
-[node name="Title" type="Label" parent="UserDetails/Assets/DisplayAssets/UserTabs/Liked Assets" unique_id=667117225]
+[node name="Title" type="Label" parent="UserDetails/Assets/DisplayAssets/UserTabs/Favorites" unique_id=667117225]
 layout_mode = 2
-text = "Liked Assets"
+text = "My Favorites"
 horizontal_alignment = 1
 
-[node name="Note" type="RichTextLabel" parent="UserDetails/Assets/DisplayAssets/UserTabs/Liked Assets" unique_id=2066211539]
+[node name="Note" type="RichTextLabel" parent="UserDetails/Assets/DisplayAssets/UserTabs/Favorites" unique_id=2066211539]
 layout_mode = 2
+size_flags_horizontal = 4
 theme_override_font_sizes/normal_font_size = 13
 bbcode_enabled = true
-text = "⚠To add more assets here, go to the icosa.gallery website and click the heart to like assets."
+text = "⚠ You can only add favorites on the web"
 fit_content = true
+autowrap_mode = 0
 horizontal_alignment = 1
 
-[node name="PanelContainer" type="PanelContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/Liked Assets" unique_id=442293651]
+[node name="PanelContainer" type="PanelContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/Favorites" unique_id=442293651]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="NoLikedAssets" type="Label" parent="UserDetails/Assets/DisplayAssets/UserTabs/Liked Assets/PanelContainer" unique_id=1088738537]
+[node name="NoLikedAssets" type="Label" parent="UserDetails/Assets/DisplayAssets/UserTabs/Favorites/PanelContainer" unique_id=1088738537]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -194,11 +194,11 @@ text = "you have not liked any assets!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/Liked Assets/PanelContainer" unique_id=1240730462]
+[node name="ScrollContainer" type="ScrollContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/Favorites/PanelContainer" unique_id=1240730462]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UserLikedAssets" type="FlowContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/Liked Assets/PanelContainer/ScrollContainer" unique_id=263376440]
+[node name="UserLikedAssets" type="FlowContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs/Favorites/PanelContainer/ScrollContainer" unique_id=263376440]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -206,6 +206,7 @@ size_flags_vertical = 3
 alignment = 1
 
 [node name="Collections" type="VBoxContainer" parent="UserDetails/Assets/DisplayAssets/UserTabs" unique_id=2051155826]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
@@ -228,7 +229,7 @@ alignment = 1
 [node name="CreateCollection" type="Button" parent="UserDetails/Assets/DisplayAssets/UserTabs/Collections" unique_id=1039581069]
 layout_mode = 2
 size_flags_horizontal = 4
-size_flags_vertical = 6
+size_flags_vertical = 4
 text = "Create new collection"
 icon = ExtResource("3_5bjak")
 icon_alignment = 1

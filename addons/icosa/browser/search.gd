@@ -191,15 +191,21 @@ func _ready():
 	# Hide author page elements initially
 	%AuthorPage.hide()
 
-	# Skip initial search if this is an author profile tab (will be set up later)
-	if !skip_initial_search:
-		_on_keywords_text_submitted("")
+var _initial_search_done := false
+
+func _first_activate():
+	if skip_initial_search or _initial_search_done:
+		return
+	_initial_search_done = true
+	_on_keywords_text_submitted("")
 
 func execute_search():
 	%NoAssetsFound.hide()
 	"""Execute a search using the current_search object"""
 	var query = current_search.build_query()
 	var full_url = search_endpoint + query
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaSearch] GET ", full_url)
 	http.request(full_url, [HEADER_AGENT, HEADER_APP], HTTPClient.METHOD_GET)
 
 func build_query(keywords):

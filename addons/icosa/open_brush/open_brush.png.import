@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dy6sw4lbxduej"
-path="res://.godot/imported/thumbnail.png-e1bea387e68564f1cad18afe633285a3.ctex"
+uid="uid://dtxpg6ewg0fln"
+path="res://.godot/imported/open_brush.png-c6f73cff887c82f8e455411db967b72d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://debug_upload/thumbnail.png"
-dest_files=["res://.godot/imported/thumbnail.png-e1bea387e68564f1cad18afe633285a3.ctex"]
+source_file="res://addons/icosa/open_brush/open_brush.png"
+dest_files=["res://.godot/imported/open_brush.png-c6f73cff887c82f8e455411db967b72d.ctex"]
 
 [params]
 

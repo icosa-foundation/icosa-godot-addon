@@ -8,6 +8,7 @@ extends GLTFDocumentExtension
 var material_cache: Dictionary = {}
 var brush_materials: Dictionary = {}
 var name_mapping: Dictionary = {}
+var environment_data: Dictionary = {}
 var _gltf_json_cache: Dictionary = {}
 
 # Default Tilt Brush light rig used when the file doesn't specify lights.
@@ -16,6 +17,26 @@ const DEFAULT_LIGHT_0_COLOR := Color(1.0, 0.99, 0.95, 1.0)
 const DEFAULT_LIGHT_1_DIRECTION := Vector3(0.0, 0.5, -0.866)
 const DEFAULT_LIGHT_1_COLOR := Color(0.35, 0.4, 0.55, 1.0)
 const DEFAULT_AMBIENT_COLOR := Color(0.2, 0.2, 0.2, 1.0)
+
+
+func _is_tilt_brush(gltf_state: GLTFState) -> bool:
+	var json = gltf_state.json
+	if not json is Dictionary:
+		return false
+	var asset = json.get("asset")
+	if not asset is Dictionary:
+		return false
+	var generator: String = asset.get("generator", "")
+	return generator.begins_with("Tilt Brush") or generator.begins_with("Open Brush")
+
+
+func _get_gltf_json(gltf_state: GLTFState) -> Dictionary:
+	if not _gltf_json_cache.is_empty():
+		return _gltf_json_cache
+	var json = gltf_state.json
+	if json is Dictionary:
+		return json
+	return {}
 
 
 func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> Error:
@@ -58,24 +79,211 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 
 	_map_custom_attributes_to_standard_slots(gltf_json)
 
+	# gltf_state.json returns a copy — write the modified dict back so Godot sees our changes.
+	gltf_state.json = gltf_json
+
 	return OK
 
 
 func _import_post_parse(gltf_state: GLTFState) -> Error:
-	if _gltf_json_cache.is_empty():
+	if not _is_tilt_brush(gltf_state):
 		return OK
-	_add_custom_data_to_brushes(gltf_state, _gltf_json_cache)
-	_replace_materials_with_brush_materials(gltf_state)
+	_ensure_loaded()
+	var gltf_json := _get_gltf_json(gltf_state)
+	_add_custom_data_to_brushes(gltf_state, gltf_json)
 	return OK
 
 
 func _import_post(gltf_state: GLTFState, root: Node) -> Error:
-	if _gltf_json_cache.is_empty():
+	if not _is_tilt_brush(gltf_state):
 		return OK
-	_apply_lights(root, _gltf_json_cache)
-	_apply_materials_to_importer_scene(root, gltf_state)
+	_ensure_loaded()
+	var gltf_json := _get_gltf_json(gltf_state)
+	_apply_lights(root, gltf_json)
+	_apply_brush_materials_to_meshes(gltf_state)
+	_rename_nodes(root)
+	if ProjectSettings.get_setting("icosa/environment/import_tilt_brush_environment", false):
+		_apply_environment(root, gltf_json)
+	if ProjectSettings.get_setting("icosa/environment/import_world_environment", false):
+		_apply_world_environment(root, gltf_json)
 	_gltf_json_cache = {}
 	return OK
+
+
+func _apply_environment(root: Node, gltf_json: Dictionary) -> void:
+	# Read environment GUID from scene extras.
+	var scenes: Array = gltf_json.get("scenes", [])
+	if scenes.is_empty():
+		return
+	var extras: Dictionary = scenes[0].get("extras", {})
+	var env_guid: String = extras.get("TB_EnvironmentGuid", "")
+
+	# Fall back to name-based lookup if GUID not present or not found.
+	if env_guid.is_empty() or not environment_data.has(env_guid):
+		var env_name: String = extras.get("TB_Environment", "")
+		if not env_name.is_empty():
+			for guid in environment_data:
+				if environment_data[guid].get("name", "") == env_name:
+					env_guid = guid
+					break
+
+	if env_guid.is_empty():
+		return
+
+	# Find the GLB inside the GUID-named folder.
+	var env_dir := "res://addons/icosa/open_brush/environments/%s/" % env_guid
+	var dir := DirAccess.open(env_dir)
+	if dir == null:
+		push_warning("IcosaTiltGLTF: environment folder not found: %s" % env_dir)
+		return
+
+	var glb_path := ""
+	dir.list_dir_begin()
+	var fname := dir.get_next()
+	while fname != "":
+		if not dir.current_is_dir() and fname.get_extension().to_lower() == "glb":
+			glb_path = env_dir + fname
+			break
+		fname = dir.get_next()
+	dir.list_dir_end()
+
+	if glb_path.is_empty():
+		push_warning("IcosaTiltGLTF: no GLB found in environment folder: %s" % env_dir)
+		return
+
+	var env_scene: PackedScene = load(glb_path)
+	if env_scene == null:
+		push_warning("IcosaTiltGLTF: failed to load environment GLB: %s" % glb_path)
+		return
+
+	var env_node := env_scene.instantiate() as Node3D
+	env_node.name = "TiltBrushEnvironment"
+	env_node.scale = Vector3(0.1, 0.1, 0.1)
+	env_node.rotation_degrees = Vector3(0.0, 180.0, 0.0)
+	root.add_child(env_node)
+	env_node.owner = root
+
+
+func _apply_world_environment(root: Node, gltf_json: Dictionary) -> void:
+	# Resolve the environment GUID (same lookup as _apply_environment).
+	var scenes: Array = gltf_json.get("scenes", [])
+	if scenes.is_empty():
+		return
+	var extras: Dictionary = scenes[0].get("extras", {})
+	var env_guid: String = extras.get("TB_EnvironmentGuid", "")
+
+	if env_guid.is_empty() or not environment_data.has(env_guid):
+		var env_name: String = extras.get("TB_Environment", "")
+		if not env_name.is_empty():
+			for guid in environment_data:
+				if environment_data[guid].get("name", "") == env_name:
+					env_guid = guid
+					break
+
+	if env_guid.is_empty() or not environment_data.has(env_guid):
+		return
+
+	var env_def: Dictionary = environment_data[env_guid]
+
+	# Helper: convert {r,g,b,a} dict to Color.
+	var c := func(d: Dictionary, fallback := Color.BLACK) -> Color:
+		if d.is_empty():
+			return fallback
+		return Color(d.get("r", 0.0), d.get("g", 0.0), d.get("b", 0.0))
+
+	var rs: Dictionary = env_def.get("renderSettings", {})
+	var sky_a: Dictionary = env_def.get("skyboxColorA", {})
+	var sky_b: Dictionary = env_def.get("skyboxColorB", {})
+	var clear: Dictionary = rs.get("clearColor", {})
+
+	var sky_mat := ProceduralSkyMaterial.new()
+	sky_mat.sky_horizon_color = c.call(sky_a)
+	sky_mat.sky_top_color = c.call(sky_b)
+	sky_mat.ground_horizon_color = c.call(sky_a)
+	sky_mat.ground_bottom_color = c.call(clear)
+	sky_mat.sky_energy_multiplier = 0.0
+
+	var sky := Sky.new()
+	sky.sky_material = sky_mat
+
+	var env := Environment.new()
+	env.sky = sky
+	env.background_mode = Environment.BG_SKY
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = c.call(rs.get("ambientColor", {}), Color(0.4, 0.4, 0.4))
+	env.ambient_light_energy = 1.0
+	env.fog_enabled = false
+
+	var world_env := WorldEnvironment.new()
+	world_env.name = "IcosaWorldEnvironment"
+	world_env.environment = env
+	root.add_child(world_env)
+	world_env.owner = root
+
+
+func _rename_nodes(root: Node) -> void:
+	# Rename root node to OpenBrushScene.
+	root.name = "OpenBrushScene"
+
+	# GUID regex: 8-4-4-4-12 hex chars separated by hyphens.
+	var guid_regex := RegEx.new()
+	guid_regex.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
+
+	# Collect only the Node3D wrapper containers (not ImporterMeshInstance3D nodes).
+	# These are the outer node_* nodes whose children are the actual mesh nodes.
+	var containers := []
+	for node in root.find_children("*", "", true, false):
+		if (node.name as String).begins_with("node_") and node.get_class() == "Node3D":
+			containers.append(node)
+
+	for container in containers:
+		if not is_instance_valid(container):
+			continue
+		var node_name := container.name as String
+
+		# Determine the brush name from the GUID in the node name.
+		var brush_name := "Mesh"
+		var m := guid_regex.search(node_name)
+		if m != null:
+			var mapped: String = name_mapping.get(m.get_string(), "")
+			if not mapped.is_empty():
+				brush_name = mapped
+
+		var parent: Node = container.get_parent()
+		if parent == null:
+			continue
+
+		# Hoist all children up to the container's parent, then remove the container.
+		# Bake the container's transform into each child so nothing moves.
+		for child in container.get_children():
+			var child_node := child as Node3D
+			if child_node != null:
+				child_node.transform = container.transform * child_node.transform
+			container.remove_child(child)
+			parent.add_child(child)
+			child.owner = root
+			child.name = brush_name
+
+		parent.remove_child(container)
+		container.queue_free()
+
+
+func _apply_brush_materials_to_meshes(gltf_state: GLTFState) -> void:
+	# At _import_post time the scene still has ImporterMeshInstance3D nodes.
+	# The ImporterMesh objects in GLTFState are the authoritative source —
+	# set brush materials on them directly so they bake into the final ArrayMesh.
+	var gltf_meshes := gltf_state.get_meshes()
+	for gltf_mesh in gltf_meshes:
+		var importer_mesh: ImporterMesh = gltf_mesh.mesh
+		if importer_mesh == null:
+			continue
+		for i in range(importer_mesh.get_surface_count()):
+			var mat: Material = importer_mesh.get_surface_material(i)
+			if mat == null or mat.resource_name.is_empty():
+				continue
+			var brush_mat: Material = _find_matching_brush_material(mat.resource_name)
+			if brush_mat != null:
+				importer_mesh.set_surface_material(i, brush_mat)
 
 
 func _ensure_loaded() -> void:
@@ -88,6 +296,13 @@ func _ensure_loaded() -> void:
 			file.close()
 			if parsed is Dictionary:
 				name_mapping = parsed
+	if environment_data.is_empty():
+		var file := FileAccess.open("res://addons/icosa/open_brush/environments/environments.json", FileAccess.READ)
+		if file != null:
+			var parsed := JSON.parse_string(file.get_as_text())
+			file.close()
+			if parsed is Dictionary:
+				environment_data = parsed
 
 
 func _scan_directory_for_materials(dir_path: String) -> void:
@@ -106,17 +321,6 @@ func _scan_directory_for_materials(dir_path: String) -> void:
 			found_material_in_dir = true
 		file_name = dir.get_next()
 
-
-func _replace_materials_with_brush_materials(gltf_state: GLTFState) -> void:
-	var materials := gltf_state.get_materials()
-	for i in range(materials.size()):
-		var mat := materials[i]
-		if mat == null or mat.resource_name.is_empty():
-			continue
-		var brush_mat := _find_matching_brush_material(mat.resource_name)
-		if brush_mat != null:
-			materials[i] = brush_mat
-	gltf_state.set_materials(materials)
 
 
 func _add_custom_data_to_brushes(gltf_state: GLTFState, gltf_json: Dictionary) -> void:
@@ -463,7 +667,43 @@ func _apply_lights(root: Node, gltf_json: Dictionary) -> void:
 		light_1_dir = parsed_lights[1]["direction"]
 		light_1_col = parsed_lights[1]["color"]
 
+	_replace_scene_light_nodes(root, light_0_col, light_1_col)
 	_apply_light_uniforms_to_node(root, light_0_dir, light_0_col, light_1_dir, light_1_col, ambient_col)
+
+
+func _replace_scene_light_nodes(root: Node,
+		light_0_col: Color, light_1_col: Color) -> void:
+	# Remove legacy light nodes that some file versions include.
+	for node_name in ["keyLightNode", "headLightNode"]:
+		for node in root.find_children(node_name, "", true, false):
+			node.get_parent().remove_child(node)
+			node.queue_free()
+
+	# Replace node_SceneLight_* Node3D placeholders with DirectionalLight3D.
+	var replacements := [
+		["node_SceneLight_0", "u_SceneLight_0", light_0_col],
+		["node_SceneLight_1", "u_SceneLight_1", light_1_col],
+	]
+	for entry in replacements:
+		var prefix: String = entry[0]
+		var new_name: String = entry[1]
+		var col: Color = entry[2]
+		for node in root.find_children("*", "", true, false):
+			if not (node.name as String).begins_with(prefix):
+				continue
+			var light := DirectionalLight3D.new()
+			light.name = new_name
+			light.light_color = col
+			light.transform = node.transform
+			var parent := node.get_parent()
+			parent.add_child(light)
+			light.owner = root
+			parent.remove_child(node)
+			node.queue_free()
+
+	# Rename Camera to ThumbnailCamera.
+	for cam in root.find_children("Camera", "Camera3D", true, false):
+		cam.name = "ThumbnailCamera"
 
 
 func _parse_khr_lights(gltf_json: Dictionary) -> Array:

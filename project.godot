@@ -26,14 +26,7 @@ project/assembly_name="icosa-gallery"
 
 enabled=PackedStringArray("res://addons/icosa/plugin.cfg")
 
-[rendering]
+[icosa]
 
-lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3
-lights_and_shadows/positional_shadow/soft_shadow_filter_quality=3
-
-[shader_globals]
-
-u_ambient_light_color={
-"type": "color",
-"value": Color(0.41832882, 0.4183289, 0.41832885, 1)
-}
+environment/import_world_environment=true
+environment/import_tilt_brush_environment=true

@@ -37,6 +37,8 @@ func get_public_collections(page_token: String = "", page_size: int = 50):
 	if not params.is_empty():
 		url += "?" + "&".join(params)
 
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaCollections] GET ", url)
 	http_request.request_completed.connect(_on_collections_loaded)
 	var err = http_request.request(url, [HEADER_AGENT, HEADER_APP], HTTPClient.METHOD_GET)
 
@@ -59,6 +61,8 @@ func get_my_collections(page_token: String = "", page_size: int = 50):
 	if not params.is_empty():
 		url += "?" + "&".join(params)
 
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaCollections] GET ", url)
 	http_request.request_completed.connect(_on_collections_loaded)
 	var err = http_request.request(
 		url,
@@ -86,6 +90,8 @@ func create_collection(name: String, description: String = "", visibility: Strin
 
 	var json_body = JSON.stringify(body)
 
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaCollections] POST ", USER_COLLECTIONS_ENDPOINT)
 	http_request.request_completed.connect(_on_collection_created)
 	var err = http_request.request(
 		USER_COLLECTIONS_ENDPOINT,
@@ -121,6 +127,8 @@ func get_collection(collection_id: String):
 		_populate_collection_from_data(collection, json.data)
 		collection_fetched.emit(collection)
 	)
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaCollections] GET ", url)
 	http.request(url, [HEADER_AGENT, HEADER_APP, HEADER_AUTH % access_token], HTTPClient.METHOD_GET)
 
 ## Update an existing collection
@@ -140,6 +148,8 @@ func update_collection(collection_url: String, name: String = "", description: S
 	var json_body = JSON.stringify(body)
 	var url = USER_COLLECTIONS_ENDPOINT + "/" + collection_url
 
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaCollections] PATCH ", url)
 	http_request.request_completed.connect(_on_collection_updated)
 	var err = http_request.request(
 		url,
@@ -159,6 +169,8 @@ func delete_collection(collection_url: String):
 
 	var url = USER_COLLECTIONS_ENDPOINT + "/" + collection_url
 
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaCollections] DELETE ", url)
 	http_request.request_completed.connect(_on_collection_deleted.bind(collection_url))
 	var err = http_request.request(
 		url,
@@ -182,6 +194,8 @@ func set_collection_assets(collection_url: String, asset_urls: Array):
 	var json_body = JSON.stringify(body)
 	var url = USER_COLLECTIONS_ENDPOINT + "/" + collection_url + "/set_assets"
 
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaCollections] PUT ", url)
 	http_request.request_completed.connect(_on_collection_updated)
 	var err = http_request.request(
 		url,
@@ -218,6 +232,8 @@ func set_collection_thumbnail(collection_url: String, image_path: String):
 
 	var url = USER_COLLECTIONS_ENDPOINT + "/" + collection_url + "/set_thumbnail"
 
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaCollections] POST ", url)
 	http_request.request_completed.connect(_on_thumbnail_uploaded)
 	var err = http_request.request_raw(
 		url,
@@ -228,7 +244,7 @@ func set_collection_thumbnail(collection_url: String, image_path: String):
 
 	if err != OK:
 		error_occurred.emit("Failed to send request: " + str(err))
-
+	
 # Response handlers
 
 func _on_collections_loaded(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray):

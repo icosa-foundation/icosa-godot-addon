@@ -3,7 +3,8 @@
 class_name DownloadQueue
 extends Node
 
-@export var debug_print: bool = false  # Enable debug printing
+var debug_print: bool:
+	get: return ProjectSettings.get_setting("icosa/debug_print_requests", false)
 
 var queue: Array = []
 var current_download: IcosaDownload = null

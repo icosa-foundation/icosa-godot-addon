@@ -21,6 +21,7 @@ var is_downloaded = false
 var preview_scene_path = ""
 var no_thumbnail_image = false
 var on_author_profile = false
+var in_collection = false
 
 func init(chosen_asset : IcosaAsset):
 	asset = chosen_asset
@@ -42,8 +43,11 @@ func _ready():
 
 	# Connect the AddToCollection menu button
 	if has_node("%AddToCollection"):
-		var menu_button = %AddToCollection as MenuButton
-		menu_button.about_to_popup.connect(_on_add_to_collection_about_to_popup)
+		if in_collection:
+			%AddToCollection.hide()
+		else:
+			var menu_button = %AddToCollection as MenuButton
+			menu_button.about_to_popup.connect(_on_add_to_collection_about_to_popup)
 	
 	if is_preview:
 		disabled = true
@@ -185,8 +189,44 @@ func _on_file_downloaded(asset_name: String, path : String):
 		return
 	if path.ends_with(".gltf"):
 		preview_scene_path = path
+		_fix_texture_paths(path)
 	current_download_url += 1
 	update_progress()
+
+func _fix_texture_paths(gltf_path: String):
+	# Read the GLTF and move any flat-downloaded textures into the subdirectory
+	# the GLTF expects (e.g. move "Foo.png" -> "textures/Foo.png").
+	var file = FileAccess.open(gltf_path, FileAccess.READ)
+	if not file:
+		return
+	var json = JSON.new()
+	if json.parse(file.get_as_text()) != OK:
+		file.close()
+		return
+	file.close()
+	var gltf_data = json.data
+	if not gltf_data is Dictionary or not gltf_data.has("images"):
+		return
+	var base_dir := gltf_path.get_base_dir()
+	for img in gltf_data["images"]:
+		if not (img is Dictionary) or not img.has("uri"):
+			continue
+		var uri: String = img["uri"]
+		if not "/" in uri:
+			continue
+		var target_path := base_dir.path_join(uri)
+		if FileAccess.file_exists(target_path):
+			continue
+		# File not at expected path — check if it's sitting flat next to the GLTF
+		var flat_path := base_dir.path_join(uri.get_file())
+		if not FileAccess.file_exists(flat_path):
+			continue
+		# Ensure the subdirectory exists
+		var subdir := target_path.get_base_dir()
+		if not DirAccess.dir_exists_absolute(subdir):
+			DirAccess.make_dir_recursive_absolute(subdir)
+		# Move the file into place
+		DirAccess.rename_absolute(flat_path, target_path)
 
 func load_license_sticker():
 	var sticker_table = {

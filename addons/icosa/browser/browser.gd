@@ -154,13 +154,14 @@ func _ready():
 		select_button.pressed.connect(_on_select_downloads_path_pressed)
 	%DownloadsPath.text_changed.connect(_on_downloads_path_text_changed)
 
-	if access_token == null:
+var _first_activate_done := false
+
+func first_activate():
+	if _first_activate_done:
 		return
-	if !access_token.is_empty():
-		user_tab.recieved_user_data.connect(on_logged_in)
-		user_tab.user_token_too_old.connect(token_too_old)
-		user_tab._user_request(access_token)
-		user_tab.token = access_token
+	_first_activate_done = true
+	# Activate whichever tab is currently selected
+	_activate_tab(current_tab)
 
 func on_logged_in(user_data):
 	for tab in get_children():
@@ -262,7 +263,29 @@ func on_tab_selected(tab: int):
 		on_add_tab_pressed()
 		return
 
-	# User tab and content tabs can be selected normally - no special handling needed
+	# Activate the tab (fires requests the first time each tab is shown)
+	if _first_activate_done:
+		_activate_tab(tab)
+
+func _activate_tab(tab: int):
+	if is_user_tab(tab):
+		_activate_user_tab()
+	else:
+		var tab_node = get_tab_control(tab)
+		if tab_node is IcosaSearchTab:
+			tab_node._first_activate()
+
+func _activate_user_tab():
+	if access_token == null or access_token.is_empty():
+		return
+	if user_tab.is_logged_in:
+		return
+	if not user_tab.recieved_user_data.is_connected(on_logged_in):
+		user_tab.recieved_user_data.connect(on_logged_in)
+	if not user_tab.user_token_too_old.is_connected(token_too_old):
+		user_tab.user_token_too_old.connect(token_too_old)
+	user_tab.token = access_token
+	user_tab._user_request(access_token)
 
 ## Called when the "+" button is pressed to add a new search tab
 func on_add_tab_pressed():
@@ -277,6 +300,7 @@ func on_add_tab_pressed():
 	_suppress_tab_selection = true
 	current_tab = tab_index
 	_suppress_tab_selection = false
+	search._first_activate()
 
 func update_search_tab_title(index, new_title):
 	await get_tree().process_frame
@@ -323,16 +347,17 @@ func _on_queue_progress_updated(completed_files: int, total_files: int, complete
 	if not progress_container:
 		return
 
-	print("[IcosaBrowser] Progress update: assets=%d/%d files=%d/%d" % [completed_assets, total_assets, completed_files, total_files])
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaBrowser] Progress update: assets=%d/%d files=%d/%d" % [completed_assets, total_assets, completed_files, total_files])
 
 	# Show progress container if there are downloads
 	if total_assets > 0:
-		print("[IcosaBrowser] Showing progress container (total_assets=%d)" % total_assets)
+		if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+			print("[IcosaBrowser] Showing progress container (total_assets=%d)" % total_assets)
 		progress_container.show()
-		if not progress_container.visible:
-			push_error("[IcosaBrowser] Failed to show progress container! visible=%s" % progress_container.visible)
 	else:
-		print("[IcosaBrowser] Hiding progress container (total_assets=%d)" % total_assets)
+		if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+			print("[IcosaBrowser] Hiding progress container (total_assets=%d)" % total_assets)
 		progress_container.hide()
 		return
 
@@ -369,8 +394,8 @@ func _on_download_progress(current_bytes: int, total_bytes: int, asset_name: Str
 	var label = %CurrentlDownloadLabel
 	var progress_container = %DownloadProgressBars
 
-	print("[IcosaBrowser] Download progress: %s > %s: %d/%d bytes" % [asset_name, filename, current_bytes, total_bytes])
-	print("[IcosaBrowser] Progress bar visible: %s, Container visible: %s" % [progress_bar.visible, progress_container.visible])
+	if ProjectSettings.get_setting("icosa/debug_print_requests", false):
+		print("[IcosaBrowser] Download progress: %s > %s: %d/%d bytes" % [asset_name, filename, current_bytes, total_bytes])
 
 	var current_mb = current_bytes / (1024.0 * 1024.0)
 
