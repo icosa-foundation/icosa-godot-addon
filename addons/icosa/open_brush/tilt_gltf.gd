@@ -54,6 +54,7 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 
 	_ensure_loaded()
 	_gltf_json_cache = gltf_json
+	_patch_import_file(gltf_state)
 
 	# Clear embedded image URIs — brush ShaderMaterials supply their own textures.
 	# The URIs point to https:/www.tiltbrush.com/... which can't be loaded locally.
@@ -191,17 +192,52 @@ func _apply_world_environment(root: Node, gltf_json: Dictionary) -> void:
 			return fallback
 		return Color(d.get("r", 0.0), d.get("g", 0.0), d.get("b", 0.0))
 
+	# Helper: parse "r, g, b" string from GLTF extras into Color.
+	var cs := func(s: String, fallback := Color.BLACK) -> Color:
+		var parts := s.split(",")
+		if parts.size() >= 3:
+			return Color(parts[0].strip_edges().to_float(), parts[1].strip_edges().to_float(), parts[2].strip_edges().to_float())
+		return fallback
+
 	var rs: Dictionary = env_def.get("renderSettings", {})
-	var sky_a: Dictionary = env_def.get("skyboxColorA", {})
-	var sky_b: Dictionary = env_def.get("skyboxColorB", {})
 	var clear: Dictionary = rs.get("clearColor", {})
 
+	# GLTF extras carry per-sketch sky color overrides — prefer these over environments.json defaults.
+	var sky_a: Color
+	var sky_b: Color
+	if extras.has("TB_SkyColorA"):
+		sky_a = cs.call(extras["TB_SkyColorA"])
+	else:
+		sky_a = c.call(env_def.get("skyboxColorA", {}))
+	if extras.has("TB_SkyColorB"):
+		sky_b = cs.call(extras["TB_SkyColorB"])
+	else:
+		sky_b = c.call(env_def.get("skyboxColorB", {}))
+
+	# TB_SkyGradientDirection is a world-space vector pointing toward sky_b.
+	# Godot's ProceduralSkyMaterial only supports a vertical gradient.
+	# If the gradient direction is close to straight up, map sky_a->horizon, sky_b->zenith.
+	# Otherwise the gradient is off-axis and won't map well — use sky_b as a flat color.
+	var use_gradient := false
+	if extras.has("TB_SkyGradientDirection"):
+		var parts := (extras["TB_SkyGradientDirection"] as String).split(",")
+		if parts.size() >= 3:
+			var dir := Vector3(parts[0].strip_edges().to_float(), parts[1].strip_edges().to_float(), parts[2].strip_edges().to_float()).normalized()
+			use_gradient = dir.dot(Vector3.UP) > 0.7
+
 	var sky_mat := ProceduralSkyMaterial.new()
-	sky_mat.sky_horizon_color = c.call(sky_a)
-	sky_mat.sky_top_color = c.call(sky_b)
-	sky_mat.ground_horizon_color = c.call(sky_a)
-	sky_mat.ground_bottom_color = c.call(clear)
-	sky_mat.sky_energy_multiplier = 0.0
+	if use_gradient:
+		sky_mat.sky_top_color = sky_b
+		sky_mat.sky_horizon_color = sky_a
+		sky_mat.ground_horizon_color = sky_a
+		sky_mat.ground_bottom_color = sky_a
+	else:
+		sky_mat.sky_top_color = sky_b
+		sky_mat.sky_horizon_color = sky_b
+		sky_mat.ground_horizon_color = sky_b
+		sky_mat.ground_bottom_color = sky_b
+	sky_mat.sun_angle_max = 0.0
+	sky_mat.sky_energy_multiplier = 1.0
 
 	var sky := Sky.new()
 	sky.sky_material = sky_mat
@@ -230,18 +266,19 @@ func _rename_nodes(root: Node) -> void:
 	guid_regex.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
 
 	# Collect only the Node3D wrapper containers (not ImporterMeshInstance3D nodes).
-	# These are the outer node_* nodes whose children are the actual mesh nodes.
 	var containers := []
 	for node in root.find_children("*", "", true, false):
 		if (node.name as String).begins_with("node_") and node.get_class() == "Node3D":
 			containers.append(node)
 
+	# First pass: collect brush name per container and its mesh children.
+	# brush_groups maps brush_name -> Array of {node, transform} to merge.
+	var brush_groups: Dictionary = {}
 	for container in containers:
 		if not is_instance_valid(container):
 			continue
 		var node_name := container.name as String
 
-		# Determine the brush name from the GUID in the node name.
 		var brush_name := "Mesh"
 		var m := guid_regex.search(node_name)
 		if m != null:
@@ -253,19 +290,80 @@ func _rename_nodes(root: Node) -> void:
 		if parent == null:
 			continue
 
-		# Hoist all children up to the container's parent, then remove the container.
-		# Bake the container's transform into each child so nothing moves.
 		for child in container.get_children():
+			var child_xform := Transform3D.IDENTITY
 			var child_node := child as Node3D
 			if child_node != null:
-				child_node.transform = container.transform * child_node.transform
+				child_xform = container.transform * child_node.transform
+			child.owner = null
 			container.remove_child(child)
-			parent.add_child(child)
-			child.owner = root
-			child.name = brush_name
+			if not brush_groups.has(brush_name):
+				brush_groups[brush_name] = []
+			brush_groups[brush_name].append({"node": child, "xform": child_xform})
 
 		parent.remove_child(container)
-		container.queue_free()
+		container.free()
+
+	# Second pass: for each brush type, merge all ImporterMesh data into the first node
+	# then discard the rest, or just place the single node directly.
+	for brush_name in brush_groups:
+		var entries: Array = brush_groups[brush_name]
+
+		# Pull the primary node — use its ImporterMesh as the merge target.
+		var primary_entry: Dictionary = entries[0]
+		var primary_node: Node = primary_entry["node"]
+		var primary_xform: Transform3D = primary_entry["xform"]
+		var primary_mesh: ImporterMesh = primary_node.get("mesh") as ImporterMesh
+
+		if primary_mesh == null:
+			# Fallback: just hoist as-is.
+			var pn3 := primary_node as Node3D
+			if pn3:
+				pn3.transform = primary_xform
+			primary_node.owner = null
+			root.add_child(primary_node)
+			primary_node.owner = root
+			primary_node.name = brush_name
+			continue
+
+		# Merge all subsequent meshes' surfaces into the primary ImporterMesh.
+		var rel_to_primary := primary_xform.inverse()
+		for i in range(1, entries.size()):
+			var entry: Dictionary = entries[i]
+			var other_node: Node = entry["node"]
+			var other_xform: Transform3D = entry["xform"]
+			var other_mesh: ImporterMesh = other_node.get("mesh") as ImporterMesh
+			if other_mesh != null:
+				var rel_xform := rel_to_primary * other_xform
+				for s in range(other_mesh.get_surface_count()):
+					var arrays := other_mesh.get_surface_arrays(s)
+					# Transform vertex positions and normals into primary's local space.
+					var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+					for v in range(verts.size()):
+						verts[v] = rel_xform * verts[v]
+					arrays[Mesh.ARRAY_VERTEX] = verts
+					if arrays[Mesh.ARRAY_NORMAL] is PackedVector3Array:
+						var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
+						var basis := rel_xform.basis.inverse().transposed()
+						for v in range(normals.size()):
+							normals[v] = (basis * normals[v]).normalized()
+						arrays[Mesh.ARRAY_NORMAL] = normals
+					primary_mesh.add_surface(
+						other_mesh.get_surface_primitive_type(s),
+						arrays, [], {},
+						other_mesh.get_surface_material(s),
+						other_mesh.get_surface_name(s)
+					)
+			other_node.free()
+
+		# Place the merged primary node at the primary transform under root.
+		var pn3 := primary_node as Node3D
+		if pn3:
+			pn3.transform = primary_xform
+		primary_node.owner = null
+		root.add_child(primary_node)
+		primary_node.owner = root
+		primary_node.name = brush_name
 
 
 func _apply_brush_materials_to_meshes(gltf_state: GLTFState) -> void:
@@ -284,6 +382,34 @@ func _apply_brush_materials_to_meshes(gltf_state: GLTFState) -> void:
 			var brush_mat: Material = _find_matching_brush_material(mat.resource_name)
 			if brush_mat != null:
 				importer_mesh.set_surface_material(i, brush_mat)
+
+
+func _patch_import_file(gltf_state: GLTFState) -> void:
+	# Disable LOD generation in the .import file so Godot never builds LODs for Tilt Brush meshes.
+	# If the file already has the correct value this is a no-op.
+	var source := gltf_state.get_base_path().path_join(gltf_state.filename)
+	var import_path := source + ".import"
+	if not FileAccess.file_exists(import_path):
+		return
+	var file := FileAccess.open(import_path, FileAccess.READ)
+	if file == null:
+		return
+	var content := file.get_as_text()
+	file.close()
+	if "meshes/generate_lods=false" in content:
+		return  # already patched
+	var patched := content.replace("meshes/generate_lods=true", "meshes/generate_lods=false")
+	if patched == content:
+		# Key not present at all — insert it after [params]
+		patched = patched.replace("[params]\n", "[params]\nmeshes/generate_lods=false\n")
+	var out := FileAccess.open(import_path, FileAccess.WRITE)
+	if out == null:
+		return
+	out.store_string(patched)
+	out.close()
+	# Queue a reimport so the patched settings take effect on the next editor refresh.
+	if Engine.is_editor_hint():
+		EditorInterface.get_resource_filesystem().reimport_files([source])
 
 
 func _ensure_loaded() -> void:
