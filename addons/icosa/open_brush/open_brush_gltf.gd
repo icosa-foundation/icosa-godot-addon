@@ -1,8 +1,8 @@
 @tool
-class_name IcosaTiltGLTF
+class_name IcosaOpenBrushGLTF
 extends GLTFDocumentExtension
 
-## GLTFDocumentExtension for Tilt Brush / Open Brush assets.
+## GLTFDocumentExtension for Open Brush / Tilt Brush assets.
 ## Registered separately in plugin.gd alongside IcosaGLTF.
 
 var material_cache: Dictionary = {}
@@ -11,7 +11,7 @@ var name_mapping: Dictionary = {}
 var environment_data: Dictionary = {}
 var _gltf_json_cache: Dictionary = {}
 
-# Default Tilt Brush light rig used when the file doesn't specify lights.
+# Default Open Brush light rig used when the file doesn't specify lights.
 const DEFAULT_LIGHT_0_DIRECTION := Vector3(0.0, -0.707, 0.707)
 const DEFAULT_LIGHT_0_COLOR := Color(1.0, 0.99, 0.95, 1.0)
 const DEFAULT_LIGHT_1_DIRECTION := Vector3(0.0, 0.5, -0.866)
@@ -19,7 +19,7 @@ const DEFAULT_LIGHT_1_COLOR := Color(0.35, 0.4, 0.55, 1.0)
 const DEFAULT_AMBIENT_COLOR := Color(0.2, 0.2, 0.2, 1.0)
 
 
-func _is_tilt_brush(gltf_state: GLTFState) -> bool:
+func _is_open_brush(gltf_state: GLTFState) -> bool:
 	var json = gltf_state.json
 	if not json is Dictionary:
 		return false
@@ -87,7 +87,7 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 
 
 func _import_post_parse(gltf_state: GLTFState) -> Error:
-	if not _is_tilt_brush(gltf_state):
+	if not _is_open_brush(gltf_state):
 		return OK
 	_ensure_loaded()
 	var gltf_json := _get_gltf_json(gltf_state)
@@ -96,7 +96,7 @@ func _import_post_parse(gltf_state: GLTFState) -> Error:
 
 
 func _import_post(gltf_state: GLTFState, root: Node) -> Error:
-	if not _is_tilt_brush(gltf_state):
+	if not _is_open_brush(gltf_state):
 		return OK
 	_ensure_loaded()
 	var gltf_json := _get_gltf_json(gltf_state)
@@ -135,7 +135,7 @@ func _apply_environment(root: Node, gltf_json: Dictionary) -> void:
 	var env_dir := "res://addons/icosa/open_brush/environments/%s/" % env_guid
 	var dir := DirAccess.open(env_dir)
 	if dir == null:
-		push_warning("IcosaTiltGLTF: environment folder not found: %s" % env_dir)
+		push_warning("IcosaOpenBrushGLTF: environment folder not found: %s" % env_dir)
 		return
 
 	var glb_path := ""
@@ -149,16 +149,16 @@ func _apply_environment(root: Node, gltf_json: Dictionary) -> void:
 	dir.list_dir_end()
 
 	if glb_path.is_empty():
-		push_warning("IcosaTiltGLTF: no GLB found in environment folder: %s" % env_dir)
+		push_warning("IcosaOpenBrushGLTF: no GLB found in environment folder: %s" % env_dir)
 		return
 
 	var env_scene: PackedScene = load(glb_path)
 	if env_scene == null:
-		push_warning("IcosaTiltGLTF: failed to load environment GLB: %s" % glb_path)
+		push_warning("IcosaOpenBrushGLTF: failed to load environment GLB: %s" % glb_path)
 		return
 
 	var env_node := env_scene.instantiate() as Node3D
-	env_node.name = "TiltBrushEnvironment"
+	env_node.name = "OpenBrushEnvironment"
 	env_node.scale = Vector3(0.1, 0.1, 0.1)
 	env_node.rotation_degrees = Vector3(0.0, 180.0, 0.0)
 	root.add_child(env_node)
@@ -214,30 +214,20 @@ func _apply_world_environment(root: Node, gltf_json: Dictionary) -> void:
 	else:
 		sky_b = c.call(env_def.get("skyboxColorB", {}))
 
-	# TB_SkyGradientDirection is a world-space vector pointing toward sky_b.
-	# Godot's ProceduralSkyMaterial only supports a vertical gradient.
-	# If the gradient direction is close to straight up, map sky_a->horizon, sky_b->zenith.
-	# Otherwise the gradient is off-axis and won't map well — use sky_b as a flat color.
-	var use_gradient := false
+	# TB_SkyGradientDirection is a world-space unit vector pointing toward sky_b.
+	var gradient_dir := Vector3.UP
 	if extras.has("TB_SkyGradientDirection"):
 		var parts := (extras["TB_SkyGradientDirection"] as String).split(",")
 		if parts.size() >= 3:
-			var dir := Vector3(parts[0].strip_edges().to_float(), parts[1].strip_edges().to_float(), parts[2].strip_edges().to_float()).normalized()
-			use_gradient = dir.dot(Vector3.UP) > 0.7
+			var u := Vector3(parts[0].strip_edges().to_float(), parts[1].strip_edges().to_float(), parts[2].strip_edges().to_float())
+			gradient_dir = Vector3(u.x, u.y, 0.0).normalized()
 
-	var sky_mat := ProceduralSkyMaterial.new()
-	if use_gradient:
-		sky_mat.sky_top_color = sky_b
-		sky_mat.sky_horizon_color = sky_a
-		sky_mat.ground_horizon_color = sky_a
-		sky_mat.ground_bottom_color = sky_a
-	else:
-		sky_mat.sky_top_color = sky_b
-		sky_mat.sky_horizon_color = sky_b
-		sky_mat.ground_horizon_color = sky_b
-		sky_mat.ground_bottom_color = sky_b
-	sky_mat.sun_angle_max = 0.0
-	sky_mat.sky_energy_multiplier = 1.0
+	var sky_shader := load("res://addons/icosa/open_brush/tilt_brush_sky.gdshader") as Shader
+	var sky_mat := ShaderMaterial.new()
+	sky_mat.shader = sky_shader
+	sky_mat.set_shader_parameter("sky_color_a", sky_a)
+	sky_mat.set_shader_parameter("sky_color_b", sky_b)
+	sky_mat.set_shader_parameter("gradient_direction", gradient_dir)
 
 	var sky := Sky.new()
 	sky.sky_material = sky_mat
@@ -385,7 +375,7 @@ func _apply_brush_materials_to_meshes(gltf_state: GLTFState) -> void:
 
 
 func _patch_import_file(gltf_state: GLTFState) -> void:
-	# Disable LOD generation in the .import file so Godot never builds LODs for Tilt Brush meshes.
+	# Disable LOD generation in the .import file so Godot never builds LODs for Open Brush meshes.
 	# If the file already has the correct value this is a no-op.
 	var source := gltf_state.get_base_path().path_join(gltf_state.filename)
 	var import_path := source + ".import"
@@ -694,7 +684,7 @@ func _find_matching_brush_material(material_name: String) -> Material:
 				material_cache[original_name] = loaded
 				return loaded
 
-	push_warning("IcosaTiltGLTF: no brush material for '%s' (mapped: '%s')" % [original_name, material_name])
+	push_warning("IcosaOpenBrushGLTF: no brush material for '%s' (mapped: '%s')" % [original_name, material_name])
 	material_cache[original_name] = null
 	return null
 
