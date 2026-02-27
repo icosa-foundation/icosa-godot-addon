@@ -2,83 +2,210 @@
 
 [ext_resource type="PackedScene" uid="uid://ckft8neuknrwk" path="res://test_scenes/victorious_lucian_splash/default_scene.tscn" id="1_jk7we"]
 [ext_resource type="Texture2D" uid="uid://bbiiq6hyvyind" path="res://test_scenes/victorious_lucian_splash/screenshot_OpenBrush_victorious_lucial_splash.webp" id="2_jk7we"]
+[ext_resource type="Script" uid="uid://dpew2o2faip6k" path="res://test_scenes/victorious_lucian_splash/visual_comparison.gd" id="3_6mtyo"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jk7we"]
-sky_top_color = Color(0.49803922, 0.49803922, 0.59607846, 1)
-sky_horizon_color = Color(0.38039216, 0.35686275, 0.45882353, 1)
-ground_bottom_color = Color(0.07058824, 0.05490196, 0.05490196, 1)
-ground_horizon_color = Color(0.45490196, 0.3764706, 0.5372549, 1)
-sun_angle_max = 0.0
-use_debanding = false
-energy_multiplier = 0.55
-
-[sub_resource type="Sky" id="Sky_6mtyo"]
-sky_material = SubResource("ProceduralSkyMaterial_jk7we")
-
-[sub_resource type="Environment" id="Environment_uday3"]
-background_mode = 2
-background_color = Color(0.16923234, 0.0564678, 0.26337764, 1)
-sky = SubResource("Sky_6mtyo")
-ambient_light_source = 3
-reflected_light_source = 2
-tonemap_exposure = 2.0
-adjustment_enabled = true
-adjustment_contrast = 1.2
-adjustment_saturation = 1.5
+[sub_resource type="SystemFont" id="SystemFont_6mtyo"]
+font_names = PackedStringArray("Monospace")
 
 [node name="VisualComparison" type="Node3D" unique_id=1155957687]
 
-[node name="HSplitContainer" type="HSplitContainer" parent="." unique_id=1181613159]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=1143641616]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-split_offsets = PackedInt32Array(200)
-collapsed = true
-dragging_enabled = false
-dragger_visibility = 2
-split_offset = 200
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="HSplitContainer" unique_id=1933957529]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 0.5
-stretch = true
-
-[node name="SubViewport" type="SubViewport" parent="HSplitContainer/SubViewportContainer" unique_id=314659319]
+[node name="Viewport" type="SubViewport" parent="SubViewportContainer" unique_id=1043398115]
+unique_name_in_owner = true
 handle_input_locally = false
-msaa_3d = 2
-screen_space_aa = 2
-mesh_lod_threshold = 0.0
-size = Vector2i(576, 648)
+size = Vector2i(1152, 648)
 render_target_update_mode = 4
 
-[node name="defaultScene" parent="HSplitContainer/SubViewportContainer/SubViewport" unique_id=1347612653 instance=ExtResource("1_jk7we")]
-
-[node name="WorldEnvironment" parent="HSplitContainer/SubViewportContainer/SubViewport/defaultScene" index="0" unique_id=1101120030]
-environment = SubResource("Environment_uday3")
-
-[node name="Sun" parent="HSplitContainer/SubViewportContainer/SubViewport/defaultScene" index="1" unique_id=1393562335]
-transform = Transform3D(-0.7640486, -0.23060413, 0.60253763, 0.60484827, 0.06891377, 0.7933533, -0.22447367, 0.9706045, 0.08682702, 3.531, 3.19, 0.56)
-light_color = Color(0.97, 0.86136, 0.7372, 1)
-directional_shadow_split_1 = 0.05
-directional_shadow_split_2 = 0.075
-directional_shadow_blend_splits = true
-directional_shadow_max_distance = 30.0
-sky_mode = 1
-
-[node name="Camera" parent="HSplitContainer/SubViewportContainer/SubViewport/defaultScene" index="3" unique_id=1074576640]
-transform = Transform3D(0.4322665, 0.1992729, -0.87945193, 0.008502874, 0.97433287, 0.22495103, 0.9017056, -0.10471668, 0.4194771, -1.376, 1.081, 0.403)
-fov = 60.0
-far = 1000.0
-
-[node name="TextureRect" type="TextureRect" parent="HSplitContainer" unique_id=1235481503]
-layout_mode = 2
+[node name="Reference" type="TextureRect" parent="SubViewportContainer/Viewport" unique_id=1235481503]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -0.25335693
+offset_bottom = 0.25323486
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.5
 texture = ExtResource("2_jk7we")
 expand_mode = 5
 stretch_mode = 6
+metadata/_edit_lock_ = true
 
-[editable path="HSplitContainer/SubViewportContainer/SubViewport/defaultScene"]
+[node name="Render" type="SubViewportContainer" parent="SubViewportContainer/Viewport" unique_id=1933957529]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+stretch = true
+metadata/_edit_lock_ = true
+metadata/_edit_group_ = true
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer/Viewport/Render" unique_id=314659319]
+handle_input_locally = false
+msaa_3d = 2
+screen_space_aa = 2
+mesh_lod_threshold = 0.0
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="defaultScene" parent="SubViewportContainer/Viewport/Render/SubViewport" unique_id=1347612653 instance=ExtResource("1_jk7we")]
+metadata/_edit_lock_ = true
+
+[node name="PreviewPanel" type="Panel" parent="." unique_id=86704273]
+unique_name_in_owner = true
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -129.0
+offset_top = -2.0
+offset_right = -129.0
+offset_bottom = -2.0
+grow_horizontal = 0
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PreviewPanel" unique_id=1008253329]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Img1" type="TextureRect" parent="PreviewPanel/VBoxContainer" unique_id=570300969]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 10
+stretch_mode = 2
+
+[node name="Img2" type="TextureRect" parent="PreviewPanel/VBoxContainer" unique_id=1745190160]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 2
+stretch_mode = 2
+
+[node name="CheckButton" type="CheckButton" parent="." unique_id=1683309164]
+unique_name_in_owner = true
+anchors_preset = -1
+anchor_right = 0.28500003
+anchor_bottom = 0.32900003
+offset_left = 12.0
+offset_top = 9.0
+offset_right = -257.32004
+offset_bottom = -173.19202
+tooltip_text = "toggle to switch between individual images"
+action_mode = 0
+button_mask = 7
+keep_pressed_outside = true
+text = "A"
+
+[node name="ControlPanel" type="Panel" parent="." unique_id=2096250504 node_paths=PackedStringArray("viewport", "reference", "render", "label", "resolution_spin_box", "blur_spin_box")]
+offset_left = -2.0
+offset_top = 440.0
+offset_right = 579.0
+offset_bottom = 650.0
+script = ExtResource("3_6mtyo")
+viewport = NodePath("../SubViewportContainer/Viewport")
+reference = NodePath("../SubViewportContainer/Viewport/Reference")
+render = NodePath("../SubViewportContainer/Viewport/Render")
+label = NodePath("Label")
+resolution_spin_box = NodePath("ResolutionSpinBox")
+blur_spin_box = NodePath("BlurSpinBox")
+
+[node name="Label" type="RichTextLabel" parent="ControlPanel" unique_id=328337251]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 72.0
+offset_right = 573.0
+offset_bottom = 202.0
+theme_override_constants/line_separation = 0
+theme_override_constants/table_h_separation = 26
+theme_override_constants/table_v_separation = 2
+theme_override_fonts/mono_font = SubResource("SystemFont_6mtyo")
+fit_content = true
+autowrap_mode = 0
+autowrap_trim_flags = 0
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="ControlPanel" unique_id=2101849920]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 16.0
+offset_right = 128.0
+offset_bottom = 66.0
+text = "Compare
+"
+
+[node name="Timer" type="Timer" parent="ControlPanel" unique_id=1435681955]
+unique_name_in_owner = true
+
+[node name="AutoCheckBox" type="CheckBox" parent="ControlPanel" unique_id=1411619452]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 136.0
+offset_top = 26.0
+offset_right = 200.0
+offset_bottom = 57.0
+text = "auto"
+
+[node name="ResolutionSpinBox" type="SpinBox" parent="ControlPanel" unique_id=329204591]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 308.0
+offset_top = 18.0
+offset_right = 394.5
+offset_bottom = 63.0
+min_value = 8.0
+max_value = 1024.0
+value = 256.0
+allow_greater = true
+
+[node name="Label2" type="Label" parent="ControlPanel/ResolutionSpinBox" unique_id=843131856]
+layout_mode = 0
+offset_left = -96.0
+offset_top = 11.0
+offset_right = -16.0
+offset_bottom = 34.0
+text = "resolution"
+
+[node name="BlurSpinBox" type="SpinBox" parent="ControlPanel" unique_id=1299078760]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 327.0
+offset_top = 91.0
+offset_right = 464.0
+offset_bottom = 136.0
+max_value = 1024.0
+step = 0.125
+value = 8.0
+allow_greater = true
+
+[node name="Label2" type="Label" parent="ControlPanel/BlurSpinBox" unique_id=1295996979]
+layout_mode = 0
+offset_left = -96.0
+offset_top = 11.0
+offset_right = -16.0
+offset_bottom = 34.0
+text = "blur"
+
+[connection signal="mouse_exited" from="CheckButton" to="ControlPanel" method="_on_check_button_mouse_exited"]
+[connection signal="toggled" from="CheckButton" to="ControlPanel" method="_on_check_button_toggled"]
+[connection signal="pressed" from="ControlPanel/Button" to="ControlPanel" method="_on_button_pressed"]
+[connection signal="timeout" from="ControlPanel/Timer" to="ControlPanel" method="_on_timer_timeout"]
+[connection signal="toggled" from="ControlPanel/AutoCheckBox" to="ControlPanel" method="_on_check_box_toggled"]
