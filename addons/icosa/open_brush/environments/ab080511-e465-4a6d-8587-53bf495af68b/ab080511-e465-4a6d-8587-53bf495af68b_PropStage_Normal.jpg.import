@@ -1,0 +1,44 @@
+[remap]
+
+importer="texture"
+type="CompressedTexture2D"
+uid="uid://bj0c3tch6c2xf"
+path.s3tc="res://.godot/imported/ab080511-e465-4a6d-8587-53bf495af68b_PropStage_Normal.jpg-955afc56df70d7b9f87a01e5e260eb1f.s3tc.ctex"
+metadata={
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
+}
+generator_parameters={
+"md5": "717cfc54720e1dcc591c0cf2c383640c"
+}
+
+[deps]
+
+source_file="res://addons/icosa/open_brush/environments/ab080511-e465-4a6d-8587-53bf495af68b/ab080511-e465-4a6d-8587-53bf495af68b_PropStage_Normal.jpg"
+dest_files=["res://.godot/imported/ab080511-e465-4a6d-8587-53bf495af68b_PropStage_Normal.jpg-955afc56df70d7b9f87a01e5e260eb1f.s3tc.ctex"]
+
+[params]
+
+compress/mode=2
+compress/high_quality=false
+compress/lossy_quality=0.7
+compress/uastc_level=0
+compress/rdo_quality_loss=0.0
+compress/hdr_compression=1
+compress/normal_map=1
+compress/channel_pack=0
+mipmaps/generate=true
+mipmaps/limit=-1
+roughness/mode=1
+roughness/src_normal="res://addons/icosa/open_brush/environments/ab080511-e465-4a6d-8587-53bf495af68b/ab080511-e465-4a6d-8587-53bf495af68b_PropStage_Normal.jpg"
+process/channel_remap/red=0
+process/channel_remap/green=1
+process/channel_remap/blue=2
+process/channel_remap/alpha=3
+process/fix_alpha_border=true
+process/premult_alpha=false
+process/normal_map_invert_y=false
+process/hdr_as_srgb=false
+process/hdr_clamp_exposure=false
+process/size_limit=0
+detect_3d/compress_to=0

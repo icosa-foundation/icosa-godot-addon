@@ -775,6 +775,15 @@ func _apply_lights(root: Node, gltf_json: Dictionary) -> void:
 	var light_1_col := DEFAULT_LIGHT_1_COLOR
 	var ambient_col := DEFAULT_AMBIENT_COLOR
 
+	# Try to read ambient and lights from environments.json using the scene's env GUID.
+	var env_guid := _resolve_env_guid(gltf_json)
+	if not env_guid.is_empty() and environment_data.has(env_guid):
+		var env_def: Dictionary = environment_data[env_guid]
+		var rs: Dictionary = env_def.get("renderSettings", {})
+		var ac: Dictionary = rs.get("ambientColor", {})
+		if not ac.is_empty():
+			ambient_col = Color(ac.get("r", 1.0), ac.get("g", 1.0), ac.get("b", 1.0))
+
 	var parsed_lights := _parse_khr_lights(gltf_json)
 	if parsed_lights.size() >= 1:
 		light_0_dir = parsed_lights[0]["direction"]
@@ -785,6 +794,22 @@ func _apply_lights(root: Node, gltf_json: Dictionary) -> void:
 
 	_replace_scene_light_nodes(root, light_0_col, light_1_col)
 	_apply_light_uniforms_to_node(root, light_0_dir, light_0_col, light_1_dir, light_1_col, ambient_col)
+
+
+func _resolve_env_guid(gltf_json: Dictionary) -> String:
+	var scenes: Array = gltf_json.get("scenes", [])
+	if scenes.is_empty():
+		return ""
+	var extras: Dictionary = scenes[0].get("extras", {})
+	var env_guid: String = extras.get("TB_EnvironmentGuid", "")
+	if not env_guid.is_empty() and environment_data.has(env_guid):
+		return env_guid
+	var env_name: String = extras.get("TB_Environment", "")
+	if not env_name.is_empty():
+		for guid in environment_data:
+			if environment_data[guid].get("name", "") == env_name:
+				return guid
+	return ""
 
 
 func _replace_scene_light_nodes(root: Node,

@@ -7,10 +7,14 @@
 resource_name = "OilPaintSingleSided"
 transparency = 2
 alpha_scissor_threshold = 0.5
-alpha_antialiasing_mode = 0
+alpha_antialiasing_mode = 1
+alpha_antialiasing_edge = 0.19
+cull_mode = 2
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
 albedo_texture = ExtResource("1")
-roughness = 0.5
+metallic_specular = 0.0
 normal_enabled = true
+normal_scale = 0.01
 normal_texture = ExtResource("2")
+uv1_world_triplanar = true

@@ -1,0 +1,44 @@
+[remap]
+
+importer="texture"
+type="CompressedTexture2D"
+uid="uid://bywj5w2vmg7ss"
+path.s3tc="res://.godot/imported/dressform_PropStage_Normal.jpg-54eb5dc3e9ad8f1491c1c4e3a923a958.s3tc.ctex"
+metadata={
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
+}
+generator_parameters={
+"md5": "717cfc54720e1dcc591c0cf2c383640c"
+}
+
+[deps]
+
+source_file="res://addons/icosa/open_brush/environments/e2e72b76-d443-4721-97e6-f3d49fe98dda/dressform_PropStage_Normal.jpg"
+dest_files=["res://.godot/imported/dressform_PropStage_Normal.jpg-54eb5dc3e9ad8f1491c1c4e3a923a958.s3tc.ctex"]
+
+[params]
+
+compress/mode=2
+compress/high_quality=false
+compress/lossy_quality=0.7
+compress/uastc_level=0
+compress/rdo_quality_loss=0.0
+compress/hdr_compression=1
+compress/normal_map=1
+compress/channel_pack=0
+mipmaps/generate=true
+mipmaps/limit=-1
+roughness/mode=1
+roughness/src_normal="res://addons/icosa/open_brush/environments/e2e72b76-d443-4721-97e6-f3d49fe98dda/dressform_PropStage_Normal.jpg"
+process/channel_remap/red=0
+process/channel_remap/green=1
+process/channel_remap/blue=2
+process/channel_remap/alpha=3
+process/fix_alpha_border=true
+process/premult_alpha=false
+process/normal_map_invert_y=false
+process/hdr_as_srgb=false
+process/hdr_clamp_exposure=false
+process/size_limit=0
+detect_3d/compress_to=0

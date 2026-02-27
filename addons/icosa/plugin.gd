@@ -11,6 +11,7 @@ var main_panel_instance
 
 var gltf : IcosaGLTF
 var open_brush_gltf : IcosaOpenBrushGLTF
+var open_brush_scene : IcosaOpenBrushScene
 var fix_origin_tool : IcosaFixOriginTool
 var fix_origin_button : Button
 
@@ -46,6 +47,8 @@ func _enter_tree():
 	GLTFDocument.register_gltf_document_extension(gltf)
 	open_brush_gltf = IcosaOpenBrushGLTF.new()
 	GLTFDocument.register_gltf_document_extension(open_brush_gltf)
+	open_brush_scene = IcosaOpenBrushScene.new()
+	add_scene_format_importer_plugin(open_brush_scene)
 	main_panel_instance.visible = false
 
 	fix_origin_tool = FixOriginTool.new()
@@ -76,6 +79,7 @@ func _exit_tree():
 		main_panel_instance.queue_free()
 	GLTFDocument.unregister_gltf_document_extension(gltf)
 	GLTFDocument.unregister_gltf_document_extension(open_brush_gltf)
+	remove_scene_format_importer_plugin(open_brush_scene)
 
 	remove_tool_menu_item("Icosa/Fix Selected Mesh Origin")
 	remove_tool_menu_item("Icosa/Upload Scene to Gallery")
