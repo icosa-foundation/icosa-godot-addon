@@ -28,5 +28,6 @@ enabled=PackedStringArray("res://addons/icosa/plugin.cfg")
 
 [icosa]
 
-environment/import_world_environment=true
-environment/import_tilt_brush_environment=true
+debug/print_import_time=true
+import/import_world_environment=true
+import/import_tilt_brush_environment=true

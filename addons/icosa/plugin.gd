@@ -25,9 +25,11 @@ var _scene_tabs: Control = null
 var settings = {
 	"icosa/downloads/local_download_path"           : "res://icosa_downloads",
 	"icosa/downloads/runtime_download_path"         : "user://icosa_downloads",
-	"icosa/environment/import_world_environment"      : false,
-	"icosa/environment/import_tilt_brush_environment" : false,
+	"icosa/import/merge_meshes"                       : true,
+	"icosa/import/import_world_environment"           : false,
+	"icosa/import/import_tilt_brush_environment"      : false,
 	"icosa/debug/debug_print_requests"          : false,
+	"icosa/debug/print_import_time"             : false,
 }
 
 class ProjectSetting:

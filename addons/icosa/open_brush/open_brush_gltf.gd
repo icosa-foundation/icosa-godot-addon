@@ -10,6 +10,7 @@ var brush_materials: Dictionary = {}
 var name_mapping: Dictionary = {}
 var environment_data: Dictionary = {}
 var _gltf_json_cache: Dictionary = {}
+var _import_start_ms: int = 0
 
 # Default Open Brush light rig used when the file doesn't specify lights.
 const DEFAULT_LIGHT_0_DIRECTION := Vector3(0.0, -0.707, 0.707)
@@ -54,6 +55,7 @@ func _import_preflight(gltf_state: GLTFState, extensions: PackedStringArray) -> 
 
 	_ensure_loaded()
 	_gltf_json_cache = gltf_json
+	_import_start_ms = Time.get_ticks_msec()
 	_patch_import_file(gltf_state)
 
 	# Clear embedded image URIs — brush ShaderMaterials supply their own textures.
@@ -91,7 +93,13 @@ func _import_post_parse(gltf_state: GLTFState) -> Error:
 		return OK
 	_ensure_loaded()
 	var gltf_json := _get_gltf_json(gltf_state)
+	var print_time := ProjectSettings.get_setting("icosa/debug/print_import_time", false) as bool
+	if print_time:
+		print("[IcosaOpenBrushGLTF] preflight→post_parse: %.2f s" % ((Time.get_ticks_msec() - _import_start_ms) / 1000.0))
+	var t := Time.get_ticks_msec()
 	_add_custom_data_to_brushes(gltf_state, gltf_json)
+	if print_time:
+		print("[IcosaOpenBrushGLTF] _add_custom_data_to_brushes: %.2f s" % ((Time.get_ticks_msec() - t) / 1000.0))
 	return OK
 
 
@@ -100,14 +108,30 @@ func _import_post(gltf_state: GLTFState, root: Node) -> Error:
 		return OK
 	_ensure_loaded()
 	var gltf_json := _get_gltf_json(gltf_state)
+	var print_time := ProjectSettings.get_setting("icosa/debug/print_import_time", false) as bool
+	if print_time:
+		print("[IcosaOpenBrushGLTF] post_parse→post: %.2f s" % ((Time.get_ticks_msec() - _import_start_ms) / 1000.0))
+	var t := Time.get_ticks_msec()
 	_apply_lights(root, gltf_json)
+	if print_time:
+		print("[IcosaOpenBrushGLTF] _apply_lights: %.2f s" % ((Time.get_ticks_msec() - t) / 1000.0))
+	t = Time.get_ticks_msec()
 	_apply_brush_materials_to_meshes(gltf_state)
-	_rename_nodes(root)
-	if ProjectSettings.get_setting("icosa/environment/import_tilt_brush_environment", false):
+	if print_time:
+		print("[IcosaOpenBrushGLTF] _apply_brush_materials_to_meshes: %.2f s" % ((Time.get_ticks_msec() - t) / 1000.0))
+	t = Time.get_ticks_msec()
+	var merge_meshes := ProjectSettings.get_setting("icosa/import/merge_meshes", true) as bool
+	_rename_nodes(root, merge_meshes)
+	if print_time:
+		print("[IcosaOpenBrushGLTF] _rename_nodes: %.2f s" % ((Time.get_ticks_msec() - t) / 1000.0))
+	if ProjectSettings.get_setting("icosa/import/import_tilt_brush_environment", false):
 		_apply_environment(root, gltf_json)
-	if ProjectSettings.get_setting("icosa/environment/import_world_environment", false):
+	if ProjectSettings.get_setting("icosa/import/import_world_environment", false):
 		_apply_world_environment(root, gltf_json)
 	_gltf_json_cache = {}
+	if print_time:
+		var elapsed := (Time.get_ticks_msec() - _import_start_ms) / 1000.0
+		print("[IcosaOpenBrushGLTF] Total: %.2f s" % elapsed)
 	return OK
 
 
@@ -247,7 +271,7 @@ func _apply_world_environment(root: Node, gltf_json: Dictionary) -> void:
 	world_env.owner = root
 
 
-func _rename_nodes(root: Node) -> void:
+func _rename_nodes(root: Node, merge_meshes: bool = true) -> void:
 	# Rename root node to OpenBrushScene.
 	root.name = "OpenBrushScene"
 
@@ -294,10 +318,25 @@ func _rename_nodes(root: Node) -> void:
 		parent.remove_child(container)
 		container.free()
 
-	# Second pass: for each brush type, merge all ImporterMesh data into the first node
-	# then discard the rest, or just place the single node directly.
+	# Second pass: for each brush type, either merge all meshes into one node or
+	# hoist each mesh individually depending on the merge_meshes setting.
 	for brush_name in brush_groups:
 		var entries: Array = brush_groups[brush_name]
+
+		if not merge_meshes:
+			# No merge — hoist each node individually, suffixed with index.
+			for i in range(entries.size()):
+				var entry: Dictionary = entries[i]
+				var node: Node = entry["node"]
+				var xform: Transform3D = entry["xform"]
+				var n3 := node as Node3D
+				if n3:
+					n3.transform = xform
+				node.owner = null
+				root.add_child(node)
+				node.owner = root
+				node.name = brush_name if entries.size() == 1 else "%s_%d" % [brush_name, i]
+			continue
 
 		# Pull the primary node — use its ImporterMesh as the merge target.
 		var primary_entry: Dictionary = entries[0]
@@ -386,12 +425,13 @@ func _patch_import_file(gltf_state: GLTFState) -> void:
 		return
 	var content := file.get_as_text()
 	file.close()
-	if "meshes/generate_lods=false" in content:
+	if "meshes/generate_lods=false" in content and "meshes/create_shadow_meshes=false" in content:
 		return  # already patched
-	var patched := content.replace("meshes/generate_lods=true", "meshes/generate_lods=false")
-	if patched == content:
-		# Key not present at all — insert it after [params]
-		patched = patched.replace("[params]\n", "[params]\nmeshes/generate_lods=false\n")
+	var patched := content
+	patched = patched.replace("meshes/generate_lods=true", "meshes/generate_lods=false")
+	patched = patched.replace("meshes/create_shadow_meshes=true", "meshes/create_shadow_meshes=false")
+	if "meshes/generate_lods" not in patched:
+		patched = patched.replace("[params]\n", "[params]\nmeshes/generate_lods=false\nmeshes/create_shadow_meshes=false\n")
 	var out := FileAccess.open(import_path, FileAccess.WRITE)
 	if out == null:
 		return
@@ -842,9 +882,12 @@ func _replace_scene_light_nodes(root: Node,
 			parent.remove_child(node)
 			node.queue_free()
 
-	# Rename Camera to ThumbnailCamera.
+	# Rename Camera to ThumbnailCamera and clamp FOV to valid Godot range.
 	for cam in root.find_children("Camera", "Camera3D", true, false):
 		cam.name = "ThumbnailCamera"
+		var cam3d := cam as Camera3D
+		if cam3d != null:
+			cam3d.fov = clampf(cam3d.fov, 1.0, 179.0)
 
 
 func _parse_khr_lights(gltf_json: Dictionary) -> Array:

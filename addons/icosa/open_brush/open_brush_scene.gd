@@ -25,16 +25,45 @@ func _get_extensions() -> PackedStringArray:
 	return ["tilt"]
 
 
+func _patch_tilt_import_file(path: String) -> void:
+	var import_path := path + ".import"
+	if not FileAccess.file_exists(import_path):
+		return
+	var file := FileAccess.open(import_path, FileAccess.READ)
+	if file == null:
+		return
+	var content := file.get_as_text()
+	file.close()
+	if "meshes/generate_lods=false" in content and "meshes/create_shadow_meshes=false" in content:
+		return  # already patched
+	var patched := content
+	patched = patched.replace("meshes/generate_lods=true", "meshes/generate_lods=false")
+	patched = patched.replace("meshes/create_shadow_meshes=true", "meshes/create_shadow_meshes=false")
+	var out := FileAccess.open(import_path, FileAccess.WRITE)
+	if out == null:
+		return
+	out.store_string(patched)
+	out.close()
+	if Engine.is_editor_hint():
+		EditorInterface.get_resource_filesystem().reimport_files([path])
+
+
 func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
+	_patch_tilt_import_file(path)
 	var open_brush := _get_open_brush()
 	open_brush.ensure_loaded()
 
+	var start_ms := Time.get_ticks_msec()
 	var reader := _TiltReader.new()
 	var result: Dictionary = reader.load_tilt(path)
 	if not result["error"].is_empty():
 		push_error("IcosaOpenBrushScene: %s" % result["error"])
 		return null
-	return _build_scene(result)
+	var scene := _build_scene(result)
+	if ProjectSettings.get_setting("icosa/debug/print_import_time", false):
+		var elapsed := (Time.get_ticks_msec() - start_ms) / 1000.0
+		print("[IcosaOpenBrushScene] Import took %.2f s — %s" % [elapsed, path.get_file()])
+	return scene
 
 
 # ---------------------------------------------------------------------------
@@ -86,10 +115,10 @@ func _build_scene(tilt_data: Dictionary) -> Node3D:
 		light_params["light_1_dir"], light_params["light_1_col"],
 		light_params["ambient_col"])
 
-	if ProjectSettings.get_setting("icosa/environment/import_tilt_brush_environment", false):
+	if ProjectSettings.get_setting("icosa/import/import_tilt_brush_environment", false):
 		ob.apply_environment(root, resolved_env_guid)
 
-	if ProjectSettings.get_setting("icosa/environment/import_world_environment", false):
+	if ProjectSettings.get_setting("icosa/import/import_world_environment", false):
 		ob.apply_world_environment(root, resolved_env_guid,
 			Color(0, 0, 0, 0), Color(0, 0, 0, 0), Vector3.ZERO)
 
@@ -283,7 +312,7 @@ func _tessellate_strokes(strokes: Array, scene_scale: float = 1.0, brush_name: S
 		var v1 := float(i_atlas + 1) / float(atlas_v)
 
 		# Subdivide segments longer than spawn_interval to fill coverage gaps.
-		control_points = _subdivide_control_points(control_points, brush_size)
+		#control_points = _subdivide_control_points(control_points, brush_size)
 
 		var lengths := _compute_arc_lengths(control_points, scene_scale)
 		var total_len: float = lengths[-1] if lengths.size() > 0 else 1.0
