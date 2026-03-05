@@ -2,7 +2,11 @@
 
 [ext_resource type="PackedScene" uid="uid://ckft8neuknrwk" path="res://test_scenes/victorious_lucian_splash/default_scene.tscn" id="1_jk7we"]
 [ext_resource type="Texture2D" uid="uid://bbiiq6hyvyind" path="res://test_scenes/victorious_lucian_splash/screenshot_OpenBrush_victorious_lucial_splash.webp" id="2_jk7we"]
+[ext_resource type="Shader" uid="uid://civ3wbq3e037y" path="res://test_scenes/victorious_lucian_splash/visual_comparison.gdshader" id="2_uday3"]
 [ext_resource type="Script" uid="uid://dpew2o2faip6k" path="res://test_scenes/victorious_lucian_splash/visual_comparison.gd" id="3_6mtyo"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2cpu2"]
+shader = ExtResource("2_uday3")
 
 [sub_resource type="SystemFont" id="SystemFont_6mtyo"]
 font_names = PackedStringArray("Monospace")
@@ -38,6 +42,8 @@ stretch_mode = 6
 metadata/_edit_lock_ = true
 
 [node name="Render" type="SubViewportContainer" parent="SubViewportContainer/Viewport" unique_id=1933957529]
+material = SubResource("ShaderMaterial_2cpu2")
+instance_shader_parameters/display_mode = 0
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -51,8 +57,6 @@ metadata/_edit_group_ = true
 
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer/Viewport/Render" unique_id=314659319]
 handle_input_locally = false
-msaa_3d = 2
-screen_space_aa = 2
 mesh_lod_threshold = 0.0
 size = Vector2i(1152, 648)
 render_target_update_mode = 4
@@ -98,7 +102,7 @@ size_flags_horizontal = 4
 size_flags_vertical = 2
 stretch_mode = 2
 
-[node name="CheckButton" type="CheckButton" parent="." unique_id=1683309164]
+[node name="ModeSelector" type="OptionButton" parent="." unique_id=1288065097]
 unique_name_in_owner = true
 anchors_preset = -1
 anchor_right = 0.28500003
@@ -108,10 +112,18 @@ offset_top = 9.0
 offset_right = -257.32004
 offset_bottom = -173.19202
 tooltip_text = "toggle to switch between individual images"
-action_mode = 0
 button_mask = 7
 keep_pressed_outside = true
-text = "A"
+selected = 3
+item_count = 4
+popup/item_0/text = "Reference"
+popup/item_0/id = 0
+popup/item_1/text = "Result"
+popup/item_1/id = 1
+popup/item_2/text = "Average"
+popup/item_2/id = 3
+popup/item_3/text = "Difference"
+popup/item_3/id = 2
 
 [node name="ControlPanel" type="Panel" parent="." unique_id=2096250504 node_paths=PackedStringArray("viewport", "reference", "render", "label", "resolution_spin_box", "blur_spin_box")]
 offset_left = -2.0
@@ -204,8 +216,8 @@ offset_right = -16.0
 offset_bottom = 34.0
 text = "blur"
 
-[connection signal="mouse_exited" from="CheckButton" to="ControlPanel" method="_on_check_button_mouse_exited"]
-[connection signal="toggled" from="CheckButton" to="ControlPanel" method="_on_check_button_toggled"]
+[connection signal="item_selected" from="ModeSelector" to="ControlPanel" method="_on_mode_selector_item_selected"]
+[connection signal="mouse_exited" from="ModeSelector" to="ControlPanel" method="_on_mode_selector_mouse_exited"]
 [connection signal="pressed" from="ControlPanel/Button" to="ControlPanel" method="_on_button_pressed"]
 [connection signal="timeout" from="ControlPanel/Timer" to="ControlPanel" method="_on_timer_timeout"]
 [connection signal="toggled" from="ControlPanel/AutoCheckBox" to="ControlPanel" method="_on_check_box_toggled"]
