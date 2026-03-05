@@ -16,6 +16,7 @@ var metrics_previous : Dictionary
 	#set_process($CheckBox.button_pressed)
 	#
 func _ready() -> void:
+	render.set_instance_shader_parameter(&"display_mode", %ModeSelector.selected) # initialize
 	compare(resolution_spin_box.value, blur_spin_box.value)
 	%PreviewPanel.hide()
 	if %AutoCheckBox.button_pressed:
@@ -37,17 +38,22 @@ func push_neutral():
 
 
 func compare(resolution: int, blur: float):
-	reference.show()
-	render.hide()
-	render.modulate = Color(1, 1, 1, 1)
+	#reference.show()
+	#render.hide()
+	var previous_display_mode = render.get_instance_shader_parameter(&"display_mode")
+	render.set_instance_shader_parameter(&"display_mode", 0) # show reference
+	#render.modulate = Color(1, 1, 1, 1)
 	#self.hide()
 	await get_tree().process_frame
 	await get_tree().process_frame
-	var img1 = viewport.get_texture().get_image()
-	render.show()
-	reference.hide()
+	var img1 = viewport.get_texture().get_image() # capture reference
+	render.set_instance_shader_parameter(&"display_mode", 1) # show render
+	#render.show()
+	#reference.hide()
 	await get_tree().process_frame
-	var img2 = viewport.get_texture().get_image()
+	await get_tree().process_frame
+	var img2 = viewport.get_texture().get_image() # capture render
+	render.set_instance_shader_parameter(&"display_mode", previous_display_mode) # restore user set value
 	# in theory trilinear resize should generate missing mipmaps anyway, but the results from this are smoother
 	img1.generate_mipmaps()
 	img2.generate_mipmaps()
@@ -120,9 +126,9 @@ func compare(resolution: int, blur: float):
 		label.pop()
 	label.pop() # table
 	
-	reference.show()
-	render.show()
-	render.modulate = Color(1, 1, 1, 0.5)
+	#reference.show()
+	#render.show()
+	#render.modulate = Color(1, 1, 1, 0.5)
 	
 	metrics_previous = metrics
 
@@ -146,21 +152,9 @@ func _on_check_box_toggled(toggled_on: bool) -> void:
 func _on_timer_timeout() -> void:
 	compare(resolution_spin_box.value, blur_spin_box.value)
 
-
-func _on_check_button_toggled(toggled_on: bool) -> void:
-	if toggled_on:
-		reference.show()
-		render.hide()
-		%CheckButton.text = "B"
-	else:
-		%CheckButton.text = "A"
-		render.show()
-		reference.hide()
-		render.modulate = Color(1,1,1,1)
-
-	%PreviewPanel.hide()
-	hide()
-
-
-func _on_check_button_mouse_exited() -> void:
+func _on_mode_selector_mouse_exited() -> void:
 	show()
+
+
+func _on_mode_selector_item_selected(index: int) -> void:
+	render.set_instance_shader_parameter(&"display_mode", index)
