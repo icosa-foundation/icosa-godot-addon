@@ -1,15 +1,17 @@
 extends Control
 
 @export var viewport: SubViewport
-@export var reference : Control
-@export var render : Control
+@export var reference: Control
+@export var render: Control
 
-@export var label : RichTextLabel
+@export var label: RichTextLabel
 
 @export var resolution_spin_box: SpinBox
 @export var blur_spin_box: SpinBox
 
-var metrics_previous : Dictionary
+var metrics_previous: Dictionary
+
+var img2_previous: Image
 
 #
 #func _ready() -> void:
@@ -20,7 +22,7 @@ func _ready() -> void:
 	compare(resolution_spin_box.value, blur_spin_box.value)
 	%PreviewPanel.hide()
 	if %AutoCheckBox.button_pressed:
-		%Timer.start()
+		%Timer.start(1.0 / %AutoFreq.value)
 
 
 func push_good():
@@ -38,27 +40,44 @@ func push_neutral():
 
 
 func compare(resolution: int, blur: float):
-	#reference.show()
-	#render.hide()
+	var antiflicker_img = viewport.get_texture().get_image() # capture current render
+	%AntiFlicker.texture = ImageTexture.create_from_image(antiflicker_img)
+	%AntiFlicker.show()
+	# store for later
 	var previous_display_mode = render.get_instance_shader_parameter(&"display_mode")
-	render.set_instance_shader_parameter(&"display_mode", 0) # show reference
-	#render.modulate = Color(1, 1, 1, 1)
-	#self.hide()
-	await get_tree().process_frame
-	await get_tree().process_frame
-	var img1 = viewport.get_texture().get_image() # capture reference
+	
+	# grab render image
 	render.set_instance_shader_parameter(&"display_mode", 1) # show render
-	#render.show()
-	#reference.hide()
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var img2 = viewport.get_texture().get_image() # capture render
+	img2.generate_mipmaps()
+	img2.resize(resolution, resolution, Image.INTERPOLATE_TRILINEAR)
+	
+	# compare to previous render to see if there's a point to doing more work
+	var metrics_to_prev = img2.compute_image_metrics(img2_previous, false)
+	
+	#print()
+	if metrics_to_prev["mean_squared"] < 0.05:
+		# the render has not changed since last frame,
+		# there's no point in updating the comparison data, we'll only loose sight of trends (improvements, declines)
+		render.set_instance_shader_parameter(&"display_mode", previous_display_mode)
+		#print("No change")
+		return
+	
+	# save for later so we can compare next time
+	img2_previous = img2
+	
+	# grab reference image
+	render.set_instance_shader_parameter(&"display_mode", 0) # show reference
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var img1 = viewport.get_texture().get_image() # capture reference
+	
 	render.set_instance_shader_parameter(&"display_mode", previous_display_mode) # restore user set value
 	# in theory trilinear resize should generate missing mipmaps anyway, but the results from this are smoother
 	img1.generate_mipmaps()
-	img2.generate_mipmaps()
 	img1.resize(resolution, resolution, Image.INTERPOLATE_TRILINEAR)
-	img2.resize(resolution, resolution, Image.INTERPOLATE_TRILINEAR)
 	
 	%Img1.texture = ImageTexture.create_from_image(img1)
 	%Img2.texture = ImageTexture.create_from_image(img2)
@@ -90,7 +109,7 @@ func compare(resolution: int, blur: float):
 			label.append_text("%2.1f" % metrics_previous[i])
 			label.pop()
 			label.pop()
-			label.push_cell()
+			#label.push_cell()
 			label.append_text("   ")
 			label.push_bold()
 			label.push_mono()
@@ -131,6 +150,7 @@ func compare(resolution: int, blur: float):
 	#render.modulate = Color(1, 1, 1, 0.5)
 	
 	metrics_previous = metrics
+	%AntiFlicker.hide()
 
 
 
@@ -144,7 +164,7 @@ func _on_button_pressed() -> void:
 
 func _on_check_box_toggled(toggled_on: bool) -> void:
 	if toggled_on:
-		%Timer.start()
+		%Timer.start(1.0 / %AutoFreq.value)
 	else:
 		%Timer.stop()
 
@@ -158,3 +178,17 @@ func _on_mode_selector_mouse_exited() -> void:
 
 func _on_mode_selector_item_selected(index: int) -> void:
 	render.set_instance_shader_parameter(&"display_mode", index)
+	%AntiFlicker.hide()
+	%PreviewPanel.hide()
+	show()
+
+
+func _on_auto_freq_value_changed(value: float) -> void:
+	%Timer.wait_time = 1.0 / value
+
+
+func _on_mode_selector_item_focused(index: int) -> void:
+	render.set_instance_shader_parameter(&"display_mode", index)
+	%AntiFlicker.hide()
+	hide()
+	%PreviewPanel.hide()

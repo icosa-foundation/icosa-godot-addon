@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://c3fde64myx0rq"]
+
+[ext_resource type="PackedScene" uid="uid://bd4r7gwb72wxi" path="res://test_scenes/victorious_lucian_splash/visual_comparison.tscn" id="1_ktp83"]
+
+[sub_resource type="Gradient" id="Gradient_ktp83"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_xdqq5"]
+gradient = SubResource("Gradient_ktp83")
+width = 512
+height = 512
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_be5m5"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_b3ep6"]
+gradient = SubResource("Gradient_be5m5")
+width = 512
+height = 512
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+
+[node name="VisualComparison" unique_id=1155957687 instance=ExtResource("1_ktp83")]
+
+[node name="Reference" parent="SubViewportContainer/Viewport" parent_id_path=PackedInt32Array(1043398115) index="0" unique_id=1235481503]
+offset_top = 0.0
+offset_bottom = 0.0
+texture = SubResource("GradientTexture2D_xdqq5")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="defaultScene" parent="SubViewportContainer/Viewport/Render/SubViewport" parent_id_path=PackedInt32Array(314659319) index="0" unique_id=1347612653]
+visible = false
+
+[node name="TextureRect" type="TextureRect" parent="SubViewportContainer/Viewport/Render/SubViewport" parent_id_path=PackedInt32Array(314659319) index="1" unique_id=836102863]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_b3ep6")
+expand_mode = 1
+flip_h = true

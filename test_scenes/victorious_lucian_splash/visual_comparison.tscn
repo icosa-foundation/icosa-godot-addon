@@ -64,6 +64,16 @@ render_target_update_mode = 4
 [node name="defaultScene" parent="SubViewportContainer/Viewport/Render/SubViewport" unique_id=1347612653 instance=ExtResource("1_jk7we")]
 metadata/_edit_lock_ = true
 
+[node name="AntiFlicker" type="TextureRect" parent="." unique_id=2084285890]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 5
+stretch_mode = 6
+
 [node name="PreviewPanel" type="Panel" parent="." unique_id=86704273]
 unique_name_in_owner = true
 anchors_preset = 6
@@ -173,15 +183,31 @@ offset_left = 136.0
 offset_top = 26.0
 offset_right = 200.0
 offset_bottom = 57.0
+button_pressed = true
 text = "auto"
+
+[node name="AutoFreq" type="HSlider" parent="ControlPanel/AutoCheckBox" unique_id=1156324131]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 80.0
+offset_top = -5.0
+offset_right = 228.0
+offset_bottom = 32.0
+tooltip_text = "auto update frequency"
+min_value = 1.0
+max_value = 20.0
+value = 2.0
+exp_edit = true
+tick_count = 20
+ticks_on_borders = true
 
 [node name="ResolutionSpinBox" type="SpinBox" parent="ControlPanel" unique_id=329204591]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 308.0
-offset_top = 18.0
-offset_right = 394.5
-offset_bottom = 63.0
+offset_left = 476.0
+offset_top = 15.0
+offset_right = 562.5
+offset_bottom = 60.0
 min_value = 8.0
 max_value = 1024.0
 value = 256.0
@@ -216,8 +242,10 @@ offset_right = -16.0
 offset_bottom = 34.0
 text = "blur"
 
+[connection signal="item_focused" from="ModeSelector" to="ControlPanel" method="_on_mode_selector_item_focused"]
 [connection signal="item_selected" from="ModeSelector" to="ControlPanel" method="_on_mode_selector_item_selected"]
 [connection signal="mouse_exited" from="ModeSelector" to="ControlPanel" method="_on_mode_selector_mouse_exited"]
 [connection signal="pressed" from="ControlPanel/Button" to="ControlPanel" method="_on_button_pressed"]
 [connection signal="timeout" from="ControlPanel/Timer" to="ControlPanel" method="_on_timer_timeout"]
 [connection signal="toggled" from="ControlPanel/AutoCheckBox" to="ControlPanel" method="_on_check_box_toggled"]
+[connection signal="value_changed" from="ControlPanel/AutoCheckBox/AutoFreq" to="ControlPanel" method="_on_auto_freq_value_changed"]
