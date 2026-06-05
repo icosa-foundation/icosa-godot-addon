@@ -3,6 +3,7 @@ extends Control
 @export var viewport: SubViewport
 @export var reference: Control
 @export var render: Control
+@export var anti_flicker: TextureRect
 
 @export var label: RichTextLabel
 
@@ -19,6 +20,8 @@ var img2_previous: Image
 	#
 func _ready() -> void:
 	render.set_instance_shader_parameter(&"display_mode", %ModeSelector.selected) # initialize
+	anti_flicker.set_instance_shader_parameter(&"display_mode", %ModeSelector.selected) # initialize
+	%HeatMapFilter.visible = %ModeSelector.selected == 4;
 	compare(resolution_spin_box.value, blur_spin_box.value)
 	%PreviewPanel.hide()
 	if %AutoCheckBox.button_pressed:
@@ -41,13 +44,17 @@ func push_neutral():
 
 func compare(resolution: int, blur: float):
 	var antiflicker_img = viewport.get_texture().get_image() # capture current render
+	#antiflicker_img.generate_mipmaps()
 	%AntiFlicker.texture = ImageTexture.create_from_image(antiflicker_img)
 	%AntiFlicker.show()
+	await get_tree().process_frame
 	# store for later
 	var previous_display_mode = render.get_instance_shader_parameter(&"display_mode")
 	
 	# grab render image
 	render.set_instance_shader_parameter(&"display_mode", 1) # show render
+	#anti_flicker.set_instance_shader_parameter(&"display_mode", 1) # show render
+	#viewport_container.set_instance_shader_parameter(&"display_mode", 1) # show render
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var img2 = viewport.get_texture().get_image() # capture render
@@ -62,6 +69,7 @@ func compare(resolution: int, blur: float):
 		# the render has not changed since last frame,
 		# there's no point in updating the comparison data, we'll only loose sight of trends (improvements, declines)
 		render.set_instance_shader_parameter(&"display_mode", previous_display_mode)
+		#anti_flicker.set_instance_shader_parameter(&"display_mode", previous_display_mode)
 		#print("No change")
 		return
 	
@@ -70,11 +78,13 @@ func compare(resolution: int, blur: float):
 	
 	# grab reference image
 	render.set_instance_shader_parameter(&"display_mode", 0) # show reference
+	#anti_flicker.set_instance_shader_parameter(&"display_mode", 0) # show reference
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var img1 = viewport.get_texture().get_image() # capture reference
 	
 	render.set_instance_shader_parameter(&"display_mode", previous_display_mode) # restore user set value
+	#anti_flicker.set_instance_shader_parameter(&"display_mode", previous_display_mode) # restore user set value
 	# in theory trilinear resize should generate missing mipmaps anyway, but the results from this are smoother
 	img1.generate_mipmaps()
 	img1.resize(resolution, resolution, Image.INTERPOLATE_TRILINEAR)
@@ -178,6 +188,9 @@ func _on_mode_selector_mouse_exited() -> void:
 
 func _on_mode_selector_item_selected(index: int) -> void:
 	render.set_instance_shader_parameter(&"display_mode", index)
+	#anti_flicker.set_instance_shader_parameter(&"display_mode", index)
+	%HeatMapFilter.visible = index == 4;
+	
 	%AntiFlicker.hide()
 	%PreviewPanel.hide()
 	show()
@@ -189,6 +202,8 @@ func _on_auto_freq_value_changed(value: float) -> void:
 
 func _on_mode_selector_item_focused(index: int) -> void:
 	render.set_instance_shader_parameter(&"display_mode", index)
-	%AntiFlicker.hide()
-	hide()
-	%PreviewPanel.hide()
+	#anti_flicker.set_instance_shader_parameter(&"display_mode", index)
+	%HeatMapFilter.visible = index == 4;
+	#%AntiFlicker.hide()
+	#hide()
+	#%PreviewPanel.hide()

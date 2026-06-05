@@ -12,6 +12,7 @@ fill = 2
 fill_from = Vector2(0.5, 0.5)
 
 [sub_resource type="Gradient" id="Gradient_be5m5"]
+colors = PackedColorArray(0, 0, 0, 1, 0.98265713, 0.98400563, 0.98265713, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_b3ep6"]
 gradient = SubResource("Gradient_be5m5")
@@ -19,6 +20,9 @@ width = 512
 height = 512
 fill = 2
 fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_ktp83"]
+viewport_path = NodePath("SubViewportContainer/Viewport")
 
 [node name="VisualComparison" unique_id=1155957687 instance=ExtResource("1_ktp83")]
 
@@ -41,3 +45,6 @@ grow_vertical = 2
 texture = SubResource("GradientTexture2D_b3ep6")
 expand_mode = 1
 flip_h = true
+
+[node name="HeatMapFilter" parent="." index="2" unique_id=1092785372]
+texture = SubResource("ViewportTexture_ktp83")

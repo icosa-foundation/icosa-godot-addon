@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://bd4r7gwb72wxi"]
 
+[ext_resource type="Shader" uid="uid://qoi4t1khaehx" path="res://test_scenes/victorious_lucian_splash/visual_comparison_heatmap.gdshader" id="1_2cpu2"]
 [ext_resource type="PackedScene" uid="uid://ckft8neuknrwk" path="res://test_scenes/victorious_lucian_splash/default_scene.tscn" id="1_jk7we"]
 [ext_resource type="Texture2D" uid="uid://bbiiq6hyvyind" path="res://test_scenes/victorious_lucian_splash/screenshot_OpenBrush_victorious_lucial_splash.webp" id="2_jk7we"]
 [ext_resource type="Shader" uid="uid://civ3wbq3e037y" path="res://test_scenes/victorious_lucian_splash/visual_comparison.gdshader" id="2_uday3"]
@@ -8,12 +9,31 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_2cpu2"]
 shader = ExtResource("2_uday3")
 
+[sub_resource type="Gradient" id="Gradient_2cpu2"]
+interpolation_color_space = 2
+offsets = PackedFloat32Array(0, 0.20169851, 0.38641188, 0.6220807, 0.81104034, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0, 0, 1, 1, 0.4333334, 1, 0, 1, 0.9607843, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_a5dvo"]
+gradient = SubResource("Gradient_2cpu2")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a5dvo"]
+shader = ExtResource("1_2cpu2")
+shader_parameter/gradient = SubResource("GradientTexture1D_a5dvo")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_2cpu2"]
+viewport_path = NodePath("SubViewportContainer/Viewport")
+
 [sub_resource type="SystemFont" id="SystemFont_6mtyo"]
 font_names = PackedStringArray("Monospace")
+subpixel_positioning = 0
 
 [node name="VisualComparison" type="Node3D" unique_id=1155957687]
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=1143641616]
+unique_name_in_owner = true
+texture_filter = 4
+texture_repeat = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -23,6 +43,8 @@ grow_vertical = 2
 [node name="Viewport" type="SubViewport" parent="SubViewportContainer" unique_id=1043398115]
 unique_name_in_owner = true
 handle_input_locally = false
+msaa_2d = 2
+canvas_item_default_texture_filter = 2
 size = Vector2i(1152, 648)
 render_target_update_mode = 4
 
@@ -66,13 +88,30 @@ metadata/_edit_lock_ = true
 
 [node name="AntiFlicker" type="TextureRect" parent="." unique_id=2084285890]
 unique_name_in_owner = true
+visible = false
+texture_filter = 4
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -0.25335693
+offset_bottom = 0.2532959
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 5
+stretch_mode = 6
+
+[node name="HeatMapFilter" type="TextureRect" parent="." unique_id=1092785372]
+unique_name_in_owner = true
+visible = false
+texture_filter = 4
+material = SubResource("ShaderMaterial_a5dvo")
+instance_shader_parameters/display_mode = 4
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-expand_mode = 5
-stretch_mode = 6
+texture = SubResource("ViewportTexture_2cpu2")
 
 [node name="PreviewPanel" type="Panel" parent="." unique_id=86704273]
 unique_name_in_owner = true
@@ -124,8 +163,8 @@ offset_bottom = -173.19202
 tooltip_text = "toggle to switch between individual images"
 button_mask = 7
 keep_pressed_outside = true
-selected = 3
-item_count = 4
+selected = 4
+item_count = 5
 popup/item_0/text = "Reference"
 popup/item_0/id = 0
 popup/item_1/text = "Result"
@@ -134,8 +173,10 @@ popup/item_2/text = "Average"
 popup/item_2/id = 3
 popup/item_3/text = "Difference"
 popup/item_3/id = 2
+popup/item_4/text = "Difference Heatmap"
+popup/item_4/id = 4
 
-[node name="ControlPanel" type="Panel" parent="." unique_id=2096250504 node_paths=PackedStringArray("viewport", "reference", "render", "label", "resolution_spin_box", "blur_spin_box")]
+[node name="ControlPanel" type="Panel" parent="." unique_id=2096250504 node_paths=PackedStringArray("viewport", "reference", "render", "anti_flicker", "label", "resolution_spin_box", "blur_spin_box")]
 offset_left = -2.0
 offset_top = 440.0
 offset_right = 579.0
@@ -144,6 +185,7 @@ script = ExtResource("3_6mtyo")
 viewport = NodePath("../SubViewportContainer/Viewport")
 reference = NodePath("../SubViewportContainer/Viewport/Reference")
 render = NodePath("../SubViewportContainer/Viewport/Render")
+anti_flicker = NodePath("../AntiFlicker")
 label = NodePath("Label")
 resolution_spin_box = NodePath("ResolutionSpinBox")
 blur_spin_box = NodePath("BlurSpinBox")
