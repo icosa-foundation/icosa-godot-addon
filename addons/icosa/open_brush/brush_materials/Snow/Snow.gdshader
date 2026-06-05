@@ -71,6 +71,7 @@ void vertex() {
 
   VERTEX = (inv_modelview_mat * vec4(vertex_view, 1.0)).xyz;
   v_fog_coord = vertex_view.z;
+  
 }
 
 void fragment() {
@@ -84,6 +85,10 @@ void fragment() {
   vec3 final_color = tex_color.rgb * COLOR.rgb;
   final_color = apply_fog(final_color, v_fog_coord);
 
+  // Calculate scroll animation params
+  float scrollAmount = TIME;
+  float t = mod(scrollAmount * 0.3 + COLOR.a, 1.0);
+
   ALBEDO = final_color;
-  ALPHA = 1.0;
+  ALPHA *= sin(t * PI);
 }
