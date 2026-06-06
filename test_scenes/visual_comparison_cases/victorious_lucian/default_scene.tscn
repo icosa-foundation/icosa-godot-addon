@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ckft8neuknrwk"]
 
-[ext_resource type="PackedScene" uid="uid://bncvx1kw5or07" path="res://test_scenes/victorious_lucian_splash/sketch.gltf" id="1_iaf6v"]
-[ext_resource type="Script" uid="uid://cx7ekq328fxx4" path="res://test_scenes/victorious_lucian_splash/camera.gd" id="2_k8c47"]
+[ext_resource type="PackedScene" uid="uid://bncvx1kw5or07" path="res://test_scenes/visual_comparison_cases/victorious_lucian/sketch.gltf" id="1_iaf6v"]
+[ext_resource type="Script" uid="uid://cx7ekq328fxx4" path="res://test_scenes/visual_comparison_tool/camera.gd" id="2_k8c47"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_2n4on"]
 sky_top_color = Color(0.49803922, 0.49803922, 0.59607846, 1)

@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://bhvvubsdkhkx7"]
+
+[ext_resource type="PackedScene" uid="uid://bd4r7gwb72wxi" path="res://test_scenes/visual_comparison_tool/visual_comparison.tscn" id="1_qj2p4"]
+[ext_resource type="Texture2D" uid="uid://bbiiq6hyvyind" path="res://test_scenes/visual_comparison_cases/victorious_lucian/screenshot_OpenBrush_victorious_lucial_splash.webp" id="2_ieev6"]
+[ext_resource type="PackedScene" uid="uid://ckft8neuknrwk" path="res://test_scenes/visual_comparison_cases/victorious_lucian/default_scene.tscn" id="2_r3ond"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_xtmnl"]
+viewport_path = NodePath("SubViewportContainer/Viewport")
+
+[node name="VisualComparison" unique_id=1155957687 instance=ExtResource("1_qj2p4")]
+
+[node name="Reference" parent="SubViewportContainer/Viewport" parent_id_path=PackedInt32Array(1043398115) index="0" unique_id=1235481503]
+texture = ExtResource("2_ieev6")
+
+[node name="defaultScene" parent="SubViewportContainer/Viewport/Render/SubViewport" parent_id_path=PackedInt32Array(314659319) index="0" unique_id=1347612653 instance=ExtResource("2_r3ond")]
+
+[node name="HeatMapFilter" parent="." index="2" unique_id=1092785372]
+texture = SubResource("ViewportTexture_xtmnl")

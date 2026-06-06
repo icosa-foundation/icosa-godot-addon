@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://d4ii5mnjc00wb"]
+
+[ext_resource type="PackedScene" uid="uid://ikrhb0hlb3cc" path="res://icosa_downloads/the_upside_down_ervEzbIlddY/tmp1352bc07.gltf" id="1_4agc0"]
+[ext_resource type="Script" uid="uid://cx7ekq328fxx4" path="res://test_scenes/visual_comparison_tool/camera.gd" id="2_r2u65"]
+[ext_resource type="Material" uid="uid://bv5mdy30vysy4" path="res://addons/icosa/open_brush/brush_materials/Splatter/SplatterDoubleSided.tres" id="3_dex6x"]
+
+[node name="OpenBrushScene" unique_id=44072563 instance=ExtResource("1_4agc0")]
+
+[node name="ThumbnailCamera" parent="." index="0" unique_id=269067962 node_paths=PackedStringArray("look_target")]
+transform = Transform3D(0.99836004, 0.008703531, 0.056582168, 0, 0.9883754, -0.15203299, -0.057247646, 0.15178366, 0.98675454, 0.18364355, 0.5427382, 4.3391714)
+fov = 60.0
+script = ExtResource("2_r2u65")
+look_target = NodePath("../CameraLookTarget")
+
+[node name="CameraLookTarget" type="Marker3D" parent="." index="1" unique_id=1863240482]
+transform = Transform3D(0.9943428, -0.016241873, -0.10496941, 0, 0.98824036, -0.15290996, 0.10621851, 0.15204495, 0.9826497, -0.5341425, 2.4713871, -8.17853)
+
+[node name="Splatter" parent="." index="8" unique_id=929876050]
+material_override = ExtResource("3_dex6x")

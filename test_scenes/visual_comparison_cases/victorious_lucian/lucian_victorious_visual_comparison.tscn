@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://curyxppf1pbj4"]
+
+[ext_resource type="PackedScene" uid="uid://bd4r7gwb72wxi" path="res://test_scenes/visual_comparison_tool/visual_comparison.tscn" id="1_wu5ex"]
+[ext_resource type="PackedScene" uid="uid://ckft8neuknrwk" path="res://test_scenes/visual_comparison_cases/victorious_lucian/default_scene.tscn" id="2_nb32e"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jk7we"]
+sky_top_color = Color(0.49803922, 0.49803922, 0.59607846, 1)
+sky_horizon_color = Color(0.38039216, 0.35686275, 0.45882353, 1)
+ground_bottom_color = Color(0.07058824, 0.05490196, 0.05490196, 1)
+ground_horizon_color = Color(0.45490196, 0.3764706, 0.5372549, 1)
+sun_angle_max = 0.0
+use_debanding = false
+energy_multiplier = 0.55
+
+[sub_resource type="Sky" id="Sky_6mtyo"]
+sky_material = SubResource("ProceduralSkyMaterial_jk7we")
+
+[sub_resource type="Environment" id="Environment_uday3"]
+background_mode = 2
+background_color = Color(0.16923234, 0.0564678, 0.26337764, 1)
+sky = SubResource("Sky_6mtyo")
+ambient_light_source = 3
+reflected_light_source = 2
+tonemap_exposure = 2.0
+adjustment_enabled = true
+adjustment_contrast = 1.2
+adjustment_saturation = 1.5
+
+[node name="VisualComparison" unique_id=1155957687 instance=ExtResource("1_wu5ex")]
+
+[node name="defaultScene" parent="HSplitContainer/SubViewportContainer/SubViewport" parent_id_path=PackedInt32Array(314659319) index="0" unique_id=1347612653 instance=ExtResource("2_nb32e")]
+
+[node name="WorldEnvironment" parent="HSplitContainer/SubViewportContainer/SubViewport/defaultScene" index="0" unique_id=1101120030]
+environment = SubResource("Environment_uday3")
+
+[node name="Sun" parent="HSplitContainer/SubViewportContainer/SubViewport/defaultScene" index="1" unique_id=1393562335]
+transform = Transform3D(-0.7640486, -0.23060413, 0.60253763, 0.60484827, 0.06891377, 0.7933533, -0.22447367, 0.9706045, 0.08682702, 3.531, 3.19, 0.56)
+light_color = Color(0.97, 0.86136, 0.7372, 1)
+directional_shadow_split_1 = 0.05
+directional_shadow_split_2 = 0.075
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 30.0
+sky_mode = 1
+
+[node name="Camera" parent="HSplitContainer/SubViewportContainer/SubViewport/defaultScene" index="3" unique_id=1074576640]
+transform = Transform3D(0.4322665, 0.1992729, -0.87945193, 0.008502874, 0.97433287, 0.22495103, 0.9017056, -0.10471668, 0.4194771, -1.376, 1.081, 0.403)
+fov = 60.0
+far = 1000.0
+
+[editable path="HSplitContainer/SubViewportContainer/SubViewport/defaultScene"]

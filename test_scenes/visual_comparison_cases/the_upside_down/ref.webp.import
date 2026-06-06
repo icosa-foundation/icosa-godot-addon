@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bbiiq6hyvyind"
-path="res://.godot/imported/screenshot_OpenBrush_victorious_lucial_splash.webp-18e5687ed4d7f8c1ed43c247656817a3.ctex"
+uid="uid://xfjoo5id41w1"
+path="res://.godot/imported/ref.webp-0b4e07ea46be6c5c1e38c8ba59402d08.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test_scenes/victorious_lucian_splash/screenshot_OpenBrush_victorious_lucial_splash.webp"
-dest_files=["res://.godot/imported/screenshot_OpenBrush_victorious_lucial_splash.webp-18e5687ed4d7f8c1ed43c247656817a3.ctex"]
+source_file="res://test_scenes/visual_comparison_cases/the_upside_down/ref.webp"
+dest_files=["res://.godot/imported/ref.webp-0b4e07ea46be6c5c1e38c8ba59402d08.ctex"]
 
 [params]
 
@@ -30,11 +30,11 @@ roughness/src_normal=""
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2
-process/channel_remap/alpha=8
+process/channel_remap/alpha=3
 process/fix_alpha_border=true
 process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

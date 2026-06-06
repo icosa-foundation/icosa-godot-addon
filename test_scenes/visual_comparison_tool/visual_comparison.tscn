@@ -1,10 +1,8 @@
 [gd_scene format=3 uid="uid://bd4r7gwb72wxi"]
 
-[ext_resource type="Shader" uid="uid://qoi4t1khaehx" path="res://test_scenes/victorious_lucian_splash/visual_comparison_heatmap.gdshader" id="1_2cpu2"]
-[ext_resource type="PackedScene" uid="uid://ckft8neuknrwk" path="res://test_scenes/victorious_lucian_splash/default_scene.tscn" id="1_jk7we"]
-[ext_resource type="Texture2D" uid="uid://bbiiq6hyvyind" path="res://test_scenes/victorious_lucian_splash/screenshot_OpenBrush_victorious_lucial_splash.webp" id="2_jk7we"]
-[ext_resource type="Shader" uid="uid://civ3wbq3e037y" path="res://test_scenes/victorious_lucian_splash/visual_comparison.gdshader" id="2_uday3"]
-[ext_resource type="Script" uid="uid://dpew2o2faip6k" path="res://test_scenes/victorious_lucian_splash/visual_comparison.gd" id="3_6mtyo"]
+[ext_resource type="Shader" uid="uid://qoi4t1khaehx" path="res://test_scenes/visual_comparison_tool/visual_comparison_heatmap.gdshader" id="1_2cpu2"]
+[ext_resource type="Shader" uid="uid://civ3wbq3e037y" path="res://test_scenes/visual_comparison_tool/visual_comparison.gdshader" id="2_uday3"]
+[ext_resource type="Script" uid="uid://dpew2o2faip6k" path="res://test_scenes/visual_comparison_tool/visual_comparison.gd" id="3_6mtyo"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_2cpu2"]
 shader = ExtResource("2_uday3")
@@ -58,7 +56,6 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.5
-texture = ExtResource("2_jk7we")
 expand_mode = 5
 stretch_mode = 6
 metadata/_edit_lock_ = true
@@ -82,9 +79,6 @@ handle_input_locally = false
 mesh_lod_threshold = 0.0
 size = Vector2i(1152, 648)
 render_target_update_mode = 4
-
-[node name="defaultScene" parent="SubViewportContainer/Viewport/Render/SubViewport" unique_id=1347612653 instance=ExtResource("1_jk7we")]
-metadata/_edit_lock_ = true
 
 [node name="AntiFlicker" type="TextureRect" parent="." unique_id=2084285890]
 unique_name_in_owner = true

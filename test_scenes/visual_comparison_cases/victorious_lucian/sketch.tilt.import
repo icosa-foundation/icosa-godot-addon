@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bncvx1kw5or07"
-path="res://.godot/imported/sketch.gltf-9d2c3ecd2cc30bde720c63072f7ee140.scn"
+uid="uid://1ipa510ybpds"
+path="res://.godot/imported/sketch.tilt-645fecb9008e2f4de4346ab714ae44e5.scn"
 
 [deps]
 
-source_file="res://test_scenes/victorious_lucian_splash/sketch.gltf"
-dest_files=["res://.godot/imported/sketch.gltf-9d2c3ecd2cc30bde720c63072f7ee140.scn"]
+source_file="res://test_scenes/visual_comparison_cases/victorious_lucian/sketch.tilt"
+dest_files=["res://.godot/imported/sketch.tilt-645fecb9008e2f4de4346ab714ae44e5.scn"]
 
 [params]
 
@@ -22,8 +22,8 @@ nodes/import_as_skeleton_bones=false
 nodes/use_name_suffixes=true
 nodes/use_node_type_suffixes=true
 meshes/ensure_tangents=true
-meshes/generate_lods=true
-meshes/create_shadow_meshes=true
+meshes/generate_lods=false
+meshes/create_shadow_meshes=false
 meshes/light_baking=1
 meshes/lightmap_texel_size=0.2
 meshes/force_disable_compression=false
@@ -37,15 +37,4 @@ import_script/path=""
 materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
-_subresources={
-"nodes": {
-"PATH:Camera/headLightNode": {
-"import/skip_import": true
-},
-"PATH:keyLightNode": {
-"import/skip_import": true
-}
-}
-}
-gltf/naming_version=2
-gltf/embedded_image_handling=1
+_subresources={}
