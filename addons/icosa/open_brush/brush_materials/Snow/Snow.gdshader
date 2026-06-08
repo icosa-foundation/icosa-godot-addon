@@ -8,8 +8,10 @@ uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
 uniform float u_DebugSizeMultiplier : hint_range(1.0, 100.0) = 1.25; // A bit arbitrary but 1.0 seems to be too small compared to unity rendering
 
 varying float v_fog_coord;
-
+varying float t;
+varying lowp float t2; // t modulo 1.0
 const float kRecipSquareRootOfTwo = 0.70710678;
+varying lowp float normalized_position_hash;
 
 // Given a centerpoint and vertex corner, create a camera-facing quad
 vec3 recreate_corner(vec3 center, float corner, float rotation, float size) {
@@ -40,9 +42,8 @@ void vertex() {
 
   float rotation = TANGENT.z;
 
-  vec4 custom0 = CUSTOM0;
-  float vertex_id = custom0.x;
-  vec3 center_OS = custom0.yzw;
+  float vertex_id = CUSTOM0.x;
+  vec3 center_OS = CUSTOM0.yzw;
 
   float corner = mod(vertex_id, 4.0);
   float halfSize_OS = length(VERTEX - center_OS) * kRecipSquareRootOfTwo;
@@ -50,14 +51,17 @@ void vertex() {
   vec3 basis_y = MODEL_MATRIX[1].xyz;
   float scale = max(length(basis_y), 0.0001);
 
-  // Calculate scroll animation params
-  float scrollAmount = TIME;
-  float t = mod(scrollAmount * 0.3 + COLOR.a, 1.0);
+  // normalized_position_hash is used to break up unnutural clumping of animation cycles
+  // try setting this to 0.0 and see what the difference is
+  normalized_position_hash = mod(CUSTOM0.y * 123.582872 + CUSTOM0.z * 10119.98128722 + CUSTOM0.w * 23.029220, 1.0);
+  // the per-snowflake variance in COLOR.a is magnified before modulo, which effectively turns it into a pseudo-random hash
+  t = normalized_position_hash * 7.54 + TIME * 0.3 + COLOR.a * 4292.8170029;
+  t2 = mod(t, 1.0);
 
   // Displacement in LOCAL/object space (scales with mesh automatically)
-  vec3 dispVec = (t - 0.5) * vec3(0.0, -0.03, 0.0);
-  dispVec.x += sin(t * 3.0 + TIME) * 0.005;
-  dispVec.z += cos(t * 3.0 * 0.5 + TIME) * 0.005;
+  vec3 dispVec = (t2 - 0.5) * vec3(0.0, -0.03, 0.0);
+  dispVec.x += sin(t2 * 3.0 + TIME) * 0.005;
+  dispVec.z += cos(t2 * 3.0 * 0.5 + TIME) * 0.005;
 
   // Apply displacement to center in object space BEFORE any transforms
   vec3 animated_center_OS = center_OS + dispVec;
@@ -75,6 +79,16 @@ void vertex() {
 }
 
 void fragment() {
+  ///// CYCLES
+  // every snowflake will be active for one period in CYCLES;
+  // setting this to 1 will make all snowflakes visible all the time
+  // setting it to 2 will make each snow flake actiove for 1 cycle, then off for 1 cycle, repeat.
+  int cycles = 2; 
+  bool active = mod(t, float(cycles)) <= 1.0; // (t + position_hash * 4.0) <= 1.0;
+  if ( !active ){
+     discard;
+  }
+	
   vec4 tex_color = texture(u_MainTex, UV);
   float brush_mask = tex_color.a * COLOR.a;
 
@@ -85,10 +99,11 @@ void fragment() {
   vec3 final_color = tex_color.rgb * COLOR.rgb;
   final_color = apply_fog(final_color, v_fog_coord);
 
-  // Calculate scroll animation params
-  float scrollAmount = TIME;
-  float t = mod(scrollAmount * 0.3 + COLOR.a, 1.0);
-
   ALBEDO = final_color;
-  ALPHA *= sin(t * PI);
+  
+  // debug visualization of animation time
+  // ALBEDO = mix(mix(vec3(1,0,0), vec3(0,1,0), clamp(t2 * 2.0, 0.0, 1.0)), vec3(0,0,1), clamp(t2 * 2.0 - 1.0, 0.0, 1.0));
+  
+  // smoothly fade in and out
+  ALPHA *= clamp(pow(sin(t * PI), 2.0), 0.0, 1.0);
 }
