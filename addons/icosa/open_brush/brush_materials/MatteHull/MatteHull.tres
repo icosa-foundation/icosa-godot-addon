@@ -1,9 +1,10 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://ct7q3fw4bnc35"]
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://ct7q3fw4bnc35"]
+
+[ext_resource type="Shader" uid="uid://d0bsdiffdblsd" path="res://addons/icosa/open_brush/brush_materials/_includes/DiffuseDoubleSided.gdshader" id="1"]
 
 [resource]
 resource_name = "MatteHull"
-vertex_color_use_as_albedo = true
-vertex_color_is_srgb = true
-roughness = 0.5
-emission_enabled = true
-emission_energy_multiplier = 0.5
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_Color = Color(1, 1, 1, 1)
+shader_parameter/u_Cutoff = 0.5

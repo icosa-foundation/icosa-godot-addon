@@ -217,7 +217,8 @@ func _parse_stroke(buf: StreamPeerBuffer, version: int, brush_index: Array) -> D
 				buf.get_u32()
 		fields &= fields - 1  # clear lowest set bit
 
-	stroke["brush_size"] = brush_size * brush_scale
+	stroke["brush_size"] = brush_size
+	stroke["brush_scale"] = brush_scale
 
 	var num_cp := buf.get_32()
 	if num_cp <= 0:

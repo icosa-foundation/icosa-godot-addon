@@ -8,8 +8,17 @@ extends EditorSceneFormatImporter
 ## IcosaOpenBrushGLTF._patch_import_file(). This importer is .tilt only.
 
 const _TiltReader = preload("res://addons/icosa/open_brush/open_brush_tilt_reader.gd")
+const _ConcaveHullBrush = preload("res://Scripts/Brushes/ConcaveHullBrush.gd")
+const _FlatGeometryBrush = preload("res://Scripts/Brushes/FlatGeometryBrush.gd")
+const _HullBrush = preload("res://Scripts/Brushes/HullBrush.gd")
+const _MeshData = preload("res://Scripts/Brushes/MeshData.gd")
+const _QuadStripBrushDistanceUV = preload("res://Scripts/Brushes/QuadStripBrushDistanceUV.gd")
+const _QuadStripBrushStretchUV = preload("res://Scripts/Brushes/QuadStripBrushStretchUV.gd")
+const _TrTransform = preload("res://Scripts/TrTransform.gd")
+const _UnityAssetLoader = preload("res://Scripts/UnityAssetLoader.gd")
 
 var _open_brush: IcosaOpenBrush = null
+var _brush_descriptor_cache: Dictionary = {}
 
 func _get_open_brush() -> IcosaOpenBrush:
 	if _open_brush == null:
@@ -92,20 +101,35 @@ func _build_scene(tilt_data: Dictionary) -> Node3D:
 	var ob := _get_open_brush()
 	var resolved_env_guid: String = ob.resolve_env_guid(env_preset, "")
 
-	# Group strokes by brush name so we produce one MeshInstance3D per brush type.
+	# Group most strokes by brush name so we produce one MeshInstance3D per brush type.
+	# Runtime hull strokes are kept separate in source order because coplanar hull
+	# surfaces can rely on stroke-level ordering.
 	var brush_groups: Dictionary = {}  # brush_name -> Array of stroke dicts
+	var hull_meshes: Array[MeshInstance3D] = []
+	var hull_index := 0
 	for stroke in strokes:
 		var brush_name: String = ob.resolve_brush_name(stroke.get("brush_guid", ""))
+		if _uses_runtime_hull_brush(brush_name):
+			var hull_mesh := _build_brush_mesh(brush_name, [stroke], scene_scale)
+			if hull_mesh != null:
+				hull_mesh.name = "%s_%04d" % [brush_name, hull_index]
+				hull_meshes.append(hull_mesh)
+				hull_index += 1
+			continue
 		if not brush_groups.has(brush_name):
 			brush_groups[brush_name] = []
 		brush_groups[brush_name].append(stroke)
 
-	# Build one merged MeshInstance3D per brush type.
+	# Build one merged MeshInstance3D per non-hull brush type.
 	for brush_name in brush_groups:
 		var mesh_instance := _build_brush_mesh(brush_name, brush_groups[brush_name], scene_scale)
 		if mesh_instance != null:
 			root.add_child(mesh_instance)
 			mesh_instance.owner = root
+
+	for hull_mesh in hull_meshes:
+		root.add_child(hull_mesh)
+		hull_mesh.owner = root
 
 	# Apply lights from environments.json (falls back to built-in defaults).
 	var light_params: Dictionary = ob.extract_lights_from_env(resolved_env_guid)
@@ -129,15 +153,25 @@ func _build_brush_mesh(brush_name: String, strokes: Array, scene_scale: float = 
 	if strokes.is_empty():
 		return null
 
-	var arrays := _tessellate_particle_strokes(strokes, scene_scale, brush_name) \
-		if _is_particle_brush(brush_name) else \
-		_tessellate_strokes(strokes, scene_scale, brush_name)
+	var arrays := _tessellate_runtime_flat_strokes(strokes, scene_scale, brush_name) \
+		if _uses_runtime_flat_brush(brush_name) else []
+	if arrays.is_empty() and _uses_runtime_quad_strip_brush(brush_name):
+		arrays = _tessellate_runtime_quad_strip_strokes(strokes, scene_scale, brush_name)
+	if arrays.is_empty() and _uses_runtime_hull_brush(brush_name):
+		arrays = _tessellate_runtime_hull_strokes(strokes, scene_scale, brush_name)
+	if arrays.is_empty():
+		arrays = _tessellate_particle_strokes(strokes, scene_scale, brush_name) \
+			if _is_particle_brush(brush_name) else \
+			_tessellate_strokes(strokes, scene_scale, brush_name)
 	var verts = arrays[Mesh.ARRAY_VERTEX]
 	if verts == null or (verts as PackedVector3Array).is_empty():
 		return null
 
 	var arr_mesh := ArrayMesh.new()
-	arr_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	var format_flags := 0
+	if arrays[Mesh.ARRAY_CUSTOM0] != null:
+		format_flags |= (Mesh.ARRAY_CUSTOM_RGBA_FLOAT << Mesh.ARRAY_FORMAT_CUSTOM0_SHIFT)
+	arr_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays, [], {}, format_flags)
 
 	var mat: Material = _get_open_brush().find_matching_brush_material(brush_name)
 	if mat != null:
@@ -184,15 +218,243 @@ func _is_particle_brush(brush_name: String) -> bool:
 	return false
 
 
+func _uses_runtime_flat_brush(brush_name: String) -> bool:
+	var descriptor := _load_brush_descriptor(brush_name)
+	if descriptor == null:
+		return false
+	var prefab_name := str(descriptor.prefab_fields.get("prefab_name", ""))
+	return prefab_name in ["FlatDistance", "FlatStretch"]
+
+
+func _uses_runtime_quad_strip_brush(brush_name: String) -> bool:
+	var descriptor := _load_brush_descriptor(brush_name)
+	if descriptor == null:
+		return false
+	var prefab_name := str(descriptor.prefab_fields.get("prefab_name", ""))
+	return prefab_name in ["DistanceUV", "Line"]
+
+
+func _uses_runtime_hull_brush(brush_name: String) -> bool:
+	return brush_name.ends_with("Hull")
+
+
+func _load_brush_descriptor(brush_name: String) -> BrushDescriptor:
+	if _brush_descriptor_cache.has(brush_name):
+		return _brush_descriptor_cache[brush_name]
+	var project_path := ProjectSettings.globalize_path("res://")
+	var candidates := [
+		project_path.path_join("Resources").path_join("Brushes").path_join("Basic").path_join(brush_name).path_join("%s.asset" % brush_name),
+		project_path.path_join("Resources").path_join("X").path_join("Brushes").path_join(brush_name).path_join("%s.asset" % brush_name),
+	]
+	for path in candidates:
+		var descriptor = _UnityAssetLoader.load_brush_descriptor(path)
+		if descriptor != null:
+			_brush_descriptor_cache[brush_name] = descriptor
+			return descriptor
+	_brush_descriptor_cache[brush_name] = null
+	return null
+
+
+func _tessellate_runtime_flat_strokes(strokes: Array, scene_scale: float = 1.0, brush_name: String = "") -> Array:
+	var descriptor := _load_brush_descriptor(brush_name)
+	if descriptor == null:
+		return []
+
+	var merged := _MeshData.new()
+	for stroke in strokes:
+		var control_points: Array = stroke.get("control_points", [])
+		if control_points.size() < 2:
+			continue
+
+		var first_cp: Dictionary = control_points[0]
+		var first_pos: Vector3 = first_cp.get("position", Vector3.ZERO) * scene_scale
+		var first_orientation: Quaternion = first_cp.get("orientation", Quaternion.IDENTITY)
+		var first_pressure := float(first_cp.get("pressure", 1.0))
+		var stroke_scale := float(stroke.get("brush_scale", 1.0)) * scene_scale
+
+		var brush = _FlatGeometryBrush.new()
+		brush.m_BaseSize_PS = float(stroke.get("brush_size", 0.01))
+		brush.m_Color = stroke.get("color", Color.WHITE)
+		brush.set_random_seed(int(stroke.get("seed", 0)))
+		brush.init_brush(descriptor, _TrTransform.trs(first_pos, first_orientation, stroke_scale))
+		brush.set_random_seed(int(stroke.get("seed", 0)))
+
+		for i in range(1, control_points.size()):
+			var cp: Dictionary = control_points[i]
+			var position: Vector3 = cp.get("position", Vector3.ZERO) * scene_scale
+			var orientation: Quaternion = cp.get("orientation", Quaternion.IDENTITY)
+			var pressure := float(cp.get("pressure", first_pressure))
+			brush.update_position_ls(_TrTransform.trs(position, orientation, stroke_scale), pressure)
+
+		brush.apply_changes_to_visuals()
+		brush.finalize_solitary_brush()
+		_append_mesh_data(merged, brush.mesh_data)
+
+	var arrays: Array = []
+	arrays.resize(Mesh.ARRAY_MAX)
+	if merged.vertices.is_empty() or merged.triangles.is_empty():
+		return arrays
+	arrays[Mesh.ARRAY_VERTEX] = PackedVector3Array(merged.vertices)
+	arrays[Mesh.ARRAY_INDEX] = PackedInt32Array(merged.triangles)
+	if merged.normals.size() == merged.vertices.size():
+		arrays[Mesh.ARRAY_NORMAL] = PackedVector3Array(merged.normals)
+	if merged.uv0_v2.size() == merged.vertices.size():
+		arrays[Mesh.ARRAY_TEX_UV] = PackedVector2Array(merged.uv0_v2)
+	if merged.colors.size() == merged.vertices.size():
+		arrays[Mesh.ARRAY_COLOR] = PackedColorArray(merged.colors)
+	if merged.tangents.size() == merged.vertices.size():
+		var tangents := PackedFloat32Array()
+		for tangent in merged.tangents:
+			tangents.append(tangent.x)
+			tangents.append(tangent.y)
+			tangents.append(tangent.z)
+			tangents.append(tangent.w)
+		arrays[Mesh.ARRAY_TANGENT] = tangents
+	return arrays
+
+
+func _tessellate_runtime_quad_strip_strokes(strokes: Array, scene_scale: float = 1.0, brush_name: String = "") -> Array:
+	var descriptor := _load_brush_descriptor(brush_name)
+	if descriptor == null:
+		return []
+
+	var merged := _MeshData.new()
+	var prefab_name := str(descriptor.prefab_fields.get("prefab_name", ""))
+	for stroke in strokes:
+		var control_points: Array = stroke.get("control_points", [])
+		if control_points.size() < 2:
+			continue
+
+		var first_cp: Dictionary = control_points[0]
+		var first_pos: Vector3 = first_cp.get("position", Vector3.ZERO) * scene_scale
+		var first_orientation: Quaternion = first_cp.get("orientation", Quaternion.IDENTITY)
+		var first_pressure := float(first_cp.get("pressure", 1.0))
+		var stroke_scale := float(stroke.get("brush_scale", 1.0)) * scene_scale
+
+		var brush
+		if prefab_name == "DistanceUV":
+			brush = _QuadStripBrushDistanceUV.new()
+		else:
+			brush = _QuadStripBrushStretchUV.new()
+			brush.m_StoreWidthInTexcoord0Z = bool(descriptor.prefab_fields.get("m_StoreWidthInTexcoord0Z", brush.m_StoreWidthInTexcoord0Z))
+
+		brush.m_BaseSize_PS = float(stroke.get("brush_size", 0.01))
+		brush.m_Color = stroke.get("color", Color.WHITE)
+		brush.set_random_seed(int(stroke.get("seed", 0)))
+		brush.init_brush(descriptor, _TrTransform.trs(first_pos, first_orientation, stroke_scale))
+		brush.set_random_seed(int(stroke.get("seed", 0)))
+
+		for i in range(1, control_points.size()):
+			var cp: Dictionary = control_points[i]
+			var position: Vector3 = cp.get("position", Vector3.ZERO) * scene_scale
+			var orientation: Quaternion = cp.get("orientation", Quaternion.IDENTITY)
+			var pressure := float(cp.get("pressure", first_pressure))
+			brush.update_position_ls(_TrTransform.trs(position, orientation, stroke_scale), pressure)
+
+		brush.apply_changes_to_visuals()
+		brush.finalize_solitary_brush()
+		_append_mesh_data(merged, brush.mesh_data)
+
+	return _mesh_data_to_arrays(merged)
+
+
+func _tessellate_runtime_hull_strokes(strokes: Array, scene_scale: float = 1.0, brush_name: String = "") -> Array:
+	var descriptor := _load_brush_descriptor(brush_name)
+	if descriptor == null:
+		return []
+
+	var merged := _MeshData.new()
+	for stroke in strokes:
+		var control_points: Array = stroke.get("control_points", [])
+		if control_points.size() < 2:
+			continue
+
+		var first_cp: Dictionary = control_points[0]
+		var first_pos: Vector3 = first_cp.get("position", Vector3.ZERO) * scene_scale
+		var first_orientation: Quaternion = first_cp.get("orientation", Quaternion.IDENTITY)
+		var first_pressure := float(first_cp.get("pressure", 1.0))
+		var stroke_scale := float(stroke.get("brush_scale", 1.0)) * scene_scale
+
+		var brush = _ConcaveHullBrush.new() if brush_name == "ConcaveHull" else _HullBrush.new()
+		brush.m_BaseSize_PS = float(stroke.get("brush_size", 0.01))
+		brush.m_Color = stroke.get("color", Color.WHITE)
+		brush.m_Faceted = bool(descriptor.prefab_fields.get("m_Faceted", brush.m_Faceted))
+		if brush_name != "ConcaveHull":
+			brush.m_TrackInterior = bool(descriptor.prefab_fields.get("m_TrackInterior", brush.m_TrackInterior))
+			brush.m_Simplification_PS = float(descriptor.prefab_fields.get("m_Simplification_PS", brush.m_Simplification_PS))
+			brush.m_SimplifyMode = int(descriptor.prefab_fields.get("m_SimplifyMode", brush.m_SimplifyMode))
+		else:
+			brush.m_KnotsInHull = int(descriptor.prefab_fields.get("m_KnotsInHull", brush.m_KnotsInHull))
+		brush.m_KnotConversion = int(descriptor.prefab_fields.get("m_KnotConversion", brush.m_KnotConversion))
+		brush.set_random_seed(int(stroke.get("seed", 0)))
+		brush.init_brush(descriptor, _TrTransform.trs(first_pos, first_orientation, stroke_scale))
+		brush.set_random_seed(int(stroke.get("seed", 0)))
+
+		for i in range(1, control_points.size()):
+			var cp: Dictionary = control_points[i]
+			var position: Vector3 = cp.get("position", Vector3.ZERO) * scene_scale
+			var orientation: Quaternion = cp.get("orientation", Quaternion.IDENTITY)
+			var pressure := float(cp.get("pressure", first_pressure))
+			brush.update_position_ls(_TrTransform.trs(position, orientation, stroke_scale), pressure)
+
+		brush.apply_changes_to_visuals()
+		brush.finalize_solitary_brush()
+		_append_mesh_data(merged, brush.mesh_data)
+
+	return _mesh_data_to_arrays(merged)
+
+
+func _append_mesh_data(target: MeshData, source: MeshData) -> void:
+	var vertex_offset := target.vertices.size()
+	target.vertices.append_array(source.vertices)
+	for tri in source.triangles:
+		target.triangles.append(vertex_offset + tri)
+	target.normals.append_array(source.normals)
+	target.uv0_v2.append_array(source.uv0_v2)
+	target.uv0_v3.append_array(source.uv0_v3)
+	target.colors.append_array(source.colors)
+	target.tangents.append_array(source.tangents)
+
+
+func _mesh_data_to_arrays(mesh_data: MeshData) -> Array:
+	var arrays: Array = []
+	arrays.resize(Mesh.ARRAY_MAX)
+	if mesh_data.vertices.is_empty() or mesh_data.triangles.is_empty():
+		return arrays
+	arrays[Mesh.ARRAY_VERTEX] = PackedVector3Array(mesh_data.vertices)
+	arrays[Mesh.ARRAY_INDEX] = PackedInt32Array(mesh_data.triangles)
+	if mesh_data.normals.size() == mesh_data.vertices.size():
+		arrays[Mesh.ARRAY_NORMAL] = PackedVector3Array(mesh_data.normals)
+	if mesh_data.uv0_v2.size() == mesh_data.vertices.size():
+		arrays[Mesh.ARRAY_TEX_UV] = PackedVector2Array(mesh_data.uv0_v2)
+	elif mesh_data.uv0_v3.size() == mesh_data.vertices.size():
+		var uv2 := PackedVector2Array()
+		for uv in mesh_data.uv0_v3:
+			uv2.append(Vector2(uv.x, uv.y))
+		arrays[Mesh.ARRAY_TEX_UV] = uv2
+	if mesh_data.colors.size() == mesh_data.vertices.size():
+		arrays[Mesh.ARRAY_COLOR] = PackedColorArray(mesh_data.colors)
+	if mesh_data.tangents.size() == mesh_data.vertices.size():
+		var tangents := PackedFloat32Array()
+		for tangent in mesh_data.tangents:
+			tangents.append(tangent.x)
+			tangents.append(tangent.y)
+			tangents.append(tangent.z)
+			tangents.append(tangent.w)
+		arrays[Mesh.ARRAY_TANGENT] = tangents
+	return arrays
+
+
 # ---------------------------------------------------------------------------
 # Particle tessellation — one billboard quad per control point
 # ---------------------------------------------------------------------------
 
 func _tessellate_particle_strokes(strokes: Array, scene_scale: float = 1.0, brush_name: String = "") -> Array:
 	var verts   := PackedVector3Array()
-	var normals := PackedVector3Array()
 	var colors  := PackedColorArray()
 	var uvs     := PackedVector2Array()
+	var tangents := PackedFloat32Array()
+	var custom0 := PackedFloat32Array()
 	var indices := PackedInt32Array()
 
 	# Atlas V rows for this brush (Splatter, Stars, etc. use atlas=4).
@@ -216,7 +478,7 @@ func _tessellate_particle_strokes(strokes: Array, scene_scale: float = 1.0, brus
 	for stroke in strokes:
 		var control_points: Array = stroke.get("control_points", [])
 		var color: Color = stroke.get("color", Color.WHITE)
-		var brush_size: float = stroke.get("brush_size", 0.01) * scene_scale
+		var brush_size: float = stroke.get("brush_size", 0.01) * float(stroke.get("brush_scale", 1.0)) * scene_scale
 		var half := brush_size * 0.5
 
 		for cp in control_points:
@@ -225,7 +487,6 @@ func _tessellate_particle_strokes(strokes: Array, scene_scale: float = 1.0, brus
 			# Quad spans the brush's local right and up axes.
 			var right: Vector3 = orient * Vector3(1, 0, 0)
 			var up: Vector3    = orient * Vector3(0, 1, 0)
-			var normal: Vector3 = orient * Vector3(0, 0, -1)
 
 			var base := verts.size()
 			# v0=BL, v1=TL, v2=BR, v3=TR
@@ -233,9 +494,16 @@ func _tessellate_particle_strokes(strokes: Array, scene_scale: float = 1.0, brus
 			verts.append(pos - right * half + up * half)
 			verts.append(pos + right * half - up * half)
 			verts.append(pos + right * half + up * half)
-			for _i in range(4):
-				normals.append(normal)
+			for vertex_offset in range(4):
 				colors.append(color)
+				tangents.append(0.0)
+				tangents.append(0.0)
+				tangents.append(0.0)
+				tangents.append(1.0)
+				custom0.append(float(base + vertex_offset))
+				custom0.append(pos.x)
+				custom0.append(pos.y)
+				custom0.append(pos.z)
 
 			if atlas_v > 1:
 				# Pick random quadrant offset, cycling deterministically per CP.
@@ -261,9 +529,10 @@ func _tessellate_particle_strokes(strokes: Array, scene_scale: float = 1.0, brus
 	if verts.is_empty():
 		return arrays
 	arrays[Mesh.ARRAY_VERTEX] = verts
-	arrays[Mesh.ARRAY_NORMAL] = normals
 	arrays[Mesh.ARRAY_COLOR]  = colors
 	arrays[Mesh.ARRAY_TEX_UV] = uvs
+	arrays[Mesh.ARRAY_TANGENT] = tangents
+	arrays[Mesh.ARRAY_CUSTOM0] = custom0
 	arrays[Mesh.ARRAY_INDEX]  = indices
 	return arrays
 
@@ -302,7 +571,7 @@ func _tessellate_strokes(strokes: Array, scene_scale: float = 1.0, brush_name: S
 			continue
 
 		var color: Color = stroke.get("color", Color.WHITE)
-		var brush_size: float = stroke.get("brush_size", 0.01) * scene_scale
+		var brush_size: float = stroke.get("brush_size", 0.01) * float(stroke.get("brush_scale", 1.0)) * scene_scale
 		var half := brush_size * 0.5
 
 		# Pick a random atlas row for this stroke — cycle through all rows evenly.
