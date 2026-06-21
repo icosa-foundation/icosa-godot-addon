@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://bfi1qs0exih65"]
 
-[ext_resource type="Shader" uid="uid://c4sl1ii86ukqu" path="res://addons/icosa/open_brush/brush_materials/Snow/Snow.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://d1u1d0jiqq8b8" path="res://addons/icosa/open_brush/brush_materials/Snow/Snow.gdshader" id="1"]
 [ext_resource type="Texture2D" uid="uid://bdpv4vflr32d8" path="res://addons/icosa/open_brush/brush_materials/Snow/Snow-d902ed8b-d0d1-476c-a8de-878a79e3a34c-v10.0-MainTex.png" id="2_jd2fk"]
 
 [resource]

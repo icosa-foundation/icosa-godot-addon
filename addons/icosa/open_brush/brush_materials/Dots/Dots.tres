@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://dedqdrsc0ikj5"]
 
-[ext_resource type="Shader" uid="uid://b2cok4wjb86rg" path="res://addons/icosa/open_brush/brush_materials/Dots/Dots.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://1f05e3vnds0q" path="res://addons/icosa/open_brush/brush_materials/Dots/Dots.gdshader" id="1"]
 [ext_resource type="Texture2D" uid="uid://chlbvuu2wo5ns" path="res://addons/icosa/open_brush/brush_materials/Dots/Dots-6a1cf9f9-032c-45ec-9b1d-a6680bee30f7-v10.0-MainTex.png" id="2_g4uqi"]
 
 [resource]

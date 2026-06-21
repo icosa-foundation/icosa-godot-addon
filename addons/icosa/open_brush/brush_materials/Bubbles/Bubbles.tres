@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://bc6chspt3ska6"]
 
-[ext_resource type="Shader" uid="uid://bwbl83cxj12td" path="res://addons/icosa/open_brush/brush_materials/Bubbles/Bubbles.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://cvv2b13q3mh1j" path="res://addons/icosa/open_brush/brush_materials/Bubbles/Bubbles.gdshader" id="1"]
 [ext_resource type="Texture2D" uid="uid://lo0yirnnh4rf" path="res://addons/icosa/open_brush/brush_materials/Bubbles/Bubbles-89d104cd-d012-426b-b5b3-bbaee63ac43c-v10.0-MainTex.png" id="2_477je"]
 
 [resource]
