@@ -3,8 +3,8 @@ class_name IcosaOpenBrush
 extends RefCounted
 
 ## Shared data and format-agnostic helpers for Open Brush / Tilt Brush importers.
-## Instantiated once in plugin.gd and shared between IcosaOpenBrushGLTF and
-## IcosaOpenBrushScene so material / name / environment caches are warm for both.
+## Instantiated by importers and helpers so material / name / environment caches
+## are warm across Open Brush workflows.
 
 var material_cache: Dictionary = {}
 var brush_materials: Dictionary = {}
