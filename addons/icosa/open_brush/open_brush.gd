@@ -16,19 +16,6 @@ const MATERIAL_NAME_ALIASES := {
 	"TaperedMarker_Flat": "TaperedMarkerFlat",
 }
 
-const DOUBLE_SIDED_BASE_BRUSHES := {
-	"CoarseBristles": true,
-	"DuctTape": true,
-	"Flat": true,
-	"Gouache": true,
-	"Ink": true,
-	"OilPaint": true,
-	"Paper": true,
-	"Splatter": true,
-	"ThickPaint": true,
-	"WetPaint": true,
-}
-
 # Default Open Brush light rig used when the file doesn't specify lights.
 const DEFAULT_LIGHT_0_DIRECTION := Vector3(0.0, -0.707, 0.707)
 const DEFAULT_LIGHT_0_COLOR := Color(1.0, 0.99, 0.95, 1.0)
@@ -94,7 +81,6 @@ func find_matching_brush_material(material_name: String) -> Material:
 	if brush_materials.has(material_name):
 		var loaded := load(brush_materials[material_name]) as Material
 		if loaded != null:
-			loaded = _prepare_material_for_brush(original_name, loaded)
 			material_cache[original_name] = loaded
 			return loaded
 
@@ -103,24 +89,12 @@ func find_matching_brush_material(material_name: String) -> Material:
 		if brush_name.to_lower() == lower:
 			var loaded := load(brush_materials[brush_name]) as Material
 			if loaded != null:
-				loaded = _prepare_material_for_brush(original_name, loaded)
 				material_cache[original_name] = loaded
 				return loaded
 
 	push_warning("IcosaOpenBrush: no brush material for '%s' (mapped: '%s')" % [original_name, material_name])
 	material_cache[original_name] = null
 	return null
-
-
-func _prepare_material_for_brush(brush_name: String, material: Material) -> Material:
-	if not DOUBLE_SIDED_BASE_BRUSHES.has(brush_name):
-		return material
-	if material is BaseMaterial3D:
-		var copy := material.duplicate()
-		copy.cull_mode = BaseMaterial3D.CULL_DISABLED
-		copy.resource_name = "%sDoubleSided" % brush_name
-		return copy
-	return material
 
 
 ## Resolve a brush GUID to a human-readable brush name via name_mapping.json.
