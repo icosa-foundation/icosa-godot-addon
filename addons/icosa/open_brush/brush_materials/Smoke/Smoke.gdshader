@@ -166,15 +166,15 @@ void vertex() {
   // Apply subtle curl-noise displacement in world space, then convert back to object space
   {
     vec3 center_WS = (MODEL_MATRIX * vec4(center_OS, 1.0)).xyz;
-    float noise_time = TIME * 0.05 + birthTime * 0.5;
-    vec3 noise_coord = center_WS * 0.08 + vec3(noise_time);
+    float noise_time = TIME * 0.08;
+    vec3 noise_coord = center_WS * 0.1 + vec3(noise_time);
     float curl_divisor = 30.0;
     vec3 curl_sample = vec3(
       curlX(noise_coord, curl_divisor),
       curlY(noise_coord, curl_divisor),
       curlZ(noise_coord, curl_divisor)
     );
-    float curl_strength = max(raw_scale * 0.02, 0.02);
+    float curl_strength = 0.3 * kDecimetersToWorldUnits;
     vec3 disp = curl_sample * curl_strength;
     center_WS += disp;
     center_final_OS = (inv_model_mat * vec4(center_WS, 1.0)).xyz;

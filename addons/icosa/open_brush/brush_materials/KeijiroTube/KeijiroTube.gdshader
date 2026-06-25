@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, cull_disabled;
+render_mode unshaded, blend_mix, cull_disabled;
 
 #include "res://addons/icosa/open_brush/brush_materials/_includes/fog_functions.gdshaderinc"
 #include "res://addons/icosa/open_brush/brush_materials/_includes/normal_map.gdshaderinc"
@@ -9,6 +9,7 @@ uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform vec3 u_SpecColor : source_color = vec3(0.2);
 uniform float u_Shininess : hint_range(0.0, 1.0) = 0.4;
 uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
+uniform bool u_IsNewUnityGltf = false;
 
 uniform vec4 u_ambient_light_color;
 uniform vec4 u_SceneLight_0_color;
@@ -23,13 +24,20 @@ varying float v_fog_coord;
 void vertex() {
   vec3 pos = VERTEX;
 
-  // Wave animation - requires CUSTOM0.z for radius
-  // GLTF importer maps _TEXCOORD_0 -> _CUSTOM0, accessible as CUSTOM0
   float radius = CUSTOM0.z;
+  if (u_IsNewUnityGltf && radius <= 0.000001) {
+    radius = CUSTOM1.x;
+  }
   // Unity's _Time.z = time*2, so we need TIME*2.0 in Godot
   float wave = sin(UV.x - TIME * 2.0);
   float pulse = smoothstep(0.45, 0.5, clamp(wave, 0.0, 1.0));
-  pos -= pulse * radius * NORMAL;
+  if (u_IsNewUnityGltf) {
+    float baked_wave = sin(UV.x - 2.0);
+    float baked_pulse = smoothstep(0.45, 0.5, clamp(baked_wave, 0.0, 1.0));
+    pos -= (pulse - baked_pulse) * radius * NORMAL;
+  } else {
+    pos -= pulse * radius * NORMAL;
+  }
 
   v_view_position = (MODELVIEW_MATRIX * vec4(pos, 1.0)).xyz;
   v_view_normal = normalize((MODELVIEW_MATRIX * vec4(NORMAL, 0.0)).xyz);

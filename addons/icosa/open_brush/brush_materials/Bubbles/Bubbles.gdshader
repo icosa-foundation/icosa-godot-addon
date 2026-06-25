@@ -4,10 +4,16 @@ render_mode unshaded, blend_add, cull_disabled;
 #include "res://addons/icosa/open_brush/brush_materials/_includes/fog_functions.gdshaderinc"
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
+uniform float u_ScrollRate = 0.08;
+uniform vec3 u_ScrollDistance = vec3(0.1, 0.55, 0.0);
+uniform float u_ScrollJitterIntensity = 0.04;
+uniform float u_ScrollJitterFrequency = 5.0;
+uniform float u_AnimationAmount = 1.0;
 
 varying float v_fog_coord;
 
 const float kRecipSquareRootOfTwo = 0.70710678;
+const float kDecimetersToWorldUnits = 10.0;
 
 // Given a centerpoint and vertex corner, create a camera-facing quad
 vec3 recreate_corner(vec3 center, float corner, float rotation, float size) {
@@ -41,9 +47,16 @@ void vertex() {
   vec4 custom0 = CUSTOM0;
   float vertex_id = custom0.x;
   vec3 center_OS = custom0.yzw;
-
   float corner = mod(vertex_id, 4.0);
   float halfSize_OS = length(VERTEX - center_OS) * kRecipSquareRootOfTwo;
+
+  float seed = clamp(COLOR.a, 0.0, 1.0);
+  float t01 = mod(TIME * u_ScrollRate + seed * 10.0, 1.0);
+  float phase = t01 * u_ScrollJitterFrequency + seed * 10.0 + TIME * 0.3333333;
+  vec3 displacement = u_ScrollDistance * t01;
+  displacement.x += sin(phase + center_OS.z) * u_ScrollJitterIntensity;
+  displacement.z += cos(phase * 0.7 + center_OS.x) * u_ScrollJitterIntensity;
+  center_OS += displacement * kDecimetersToWorldUnits * u_AnimationAmount;
 
   vec3 basis_y = MODEL_MATRIX[1].xyz;
   float scale = max(length(basis_y), 0.0001);

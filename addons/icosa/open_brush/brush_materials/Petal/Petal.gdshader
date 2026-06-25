@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, cull_disabled;
+render_mode unshaded, blend_mix, cull_disabled;
 
 #include "res://addons/icosa/open_brush/brush_materials/_includes/fog_functions.gdshaderinc"
 #include "res://addons/icosa/open_brush/brush_materials/_includes/surface_shader.gdshaderinc"
@@ -25,10 +25,6 @@ void vertex() {
 }
 
 void fragment() {
-  // Fade from center outward (dark to light)
-  vec4 darker_color = COLOR * 0.6;
-  vec4 finalColor = mix(COLOR, darker_color, 1.0 - UV.x);
-
   // Ambient occlusion: front faces are brighter, back faces fade with UV.x
   float fAO = FRONT_FACING ? 1.0 : 0.5 * UV.x;
 
@@ -43,13 +39,13 @@ void fragment() {
 
   vec3 light_0 = surface_shader_specular_gloss(
     normal, light_dir_0, eye_dir,
-    u_SceneLight_0_color.rgb, finalColor.rgb, u_SpecColor, u_Shininess);
+    u_SceneLight_0_color.rgb, COLOR.rgb, u_SpecColor, u_Shininess);
 
   vec3 light_1 = sh_shader_with_spec(
     normal, light_dir_1,
-    u_SceneLight_1_color.rgb, finalColor.rgb, u_SpecColor);
+    u_SceneLight_1_color.rgb, COLOR.rgb, u_SpecColor);
 
-  vec3 ambient = finalColor.rgb * u_ambient_light_color.rgb;
+  vec3 ambient = COLOR.rgb * u_ambient_light_color.rgb;
 
   vec3 color = (light_0 + light_1 + ambient) * fAO;
   vec3 final_color = apply_fog(color, v_fog_coord);
