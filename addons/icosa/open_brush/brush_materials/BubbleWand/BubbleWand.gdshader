@@ -11,6 +11,10 @@ uniform float u_ScrollRate = -0.54;
 uniform float u_ScrollJitterIntensity = 0.12;
 uniform float u_ScrollJitterFrequency = 1.0;
 uniform float u_BulgeAmount = 0.04;
+// UnityGLTF exporter v2+ bakes the static bulge; v3+ also bakes the animated noise.
+// Live strokes, .tilt imports, and legacy GLTF still need both vertex shader paths.
+uniform bool u_IsUnityGltfExporterVersion2OrNewer = false;
+uniform bool u_IsUnityGltfExporterVersion3OrNewer = false;
 
 uniform vec4 u_ambient_light_color;
 uniform vec4 u_SceneLight_0_color;
@@ -38,8 +42,20 @@ void vertex() {
   float wave = sin(UV.x * PI);
   vec3 wave_displacement = u_BulgeAmount * NORMAL * wave;
   vec3 displacement = animated_displacement(VERTEX);
-  VERTEX += wave_displacement + displacement;
-  NORMAL = normalize(NORMAL + wave_displacement * 2.5 + displacement * 2.5);
+  vec3 vertex_displacement = vec3(0.0);
+  if (!u_IsUnityGltfExporterVersion2OrNewer) {
+    vertex_displacement += wave_displacement;
+  }
+  if (!u_IsUnityGltfExporterVersion3OrNewer) {
+    vertex_displacement += displacement;
+  }
+  VERTEX += vertex_displacement;
+
+  vec3 normal_displacement = wave_displacement;
+  if (!u_IsUnityGltfExporterVersion3OrNewer) {
+    normal_displacement += displacement;
+  }
+  NORMAL = normalize(NORMAL + normal_displacement * 2.5);
 
   v_view_position = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
   v_view_normal = normalize((MODELVIEW_MATRIX * vec4(NORMAL, 0.0)).xyz);

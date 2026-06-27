@@ -70,7 +70,11 @@ float race_luminance(vec2 st) {
 }
 
 void fragment() {
-  float lum = race_luminance(v_uv);
+  vec2 st = v_uv;
+  st.x *= 5.0;
+  st *= BRUSHES_DIGITAL_ROWS;
+
+  float lum = race_luminance(st);
   vec3 rgb = lum * bloom_color(v_color.rgb, lum * u_EmissionGain);
 
   ALBEDO = rgb;

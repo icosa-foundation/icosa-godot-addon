@@ -10,7 +10,7 @@ render_mode blend_mix, cull_back;
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform vec3 u_SpecColor : source_color = vec3(0.3);
 uniform float u_Shininess : hint_range(0.0, 1.0) = 0.81;
-uniform bool u_IsNewUnityGltf = false;
+uniform bool u_IsUnityGltfExporterVersion2OrNewer = false;
 
 // Lighting
 uniform vec4 u_ambient_light_color;
@@ -42,13 +42,13 @@ void vertex() {
   float envelope = sin(mod(UV.x * 2.0, 1.0) * 3.14159);
   float lights = envelope < 0.15 ? 1.0 : 0.0;
   float radius = CUSTOM0.z;
-  if (u_IsNewUnityGltf && radius <= 0.000001) {
+  if (u_IsUnityGltfExporterVersion2OrNewer && radius <= 0.000001) {
     radius = CUSTOM1.x;
   }
   radius *= 0.9;
 
   // Displace vertices outward where lights appear
-  vec3 displaced = VERTEX + NORMAL * lights * radius;
+  vec3 displaced = u_IsUnityGltfExporterVersion2OrNewer ? VERTEX : VERTEX + NORMAL * lights * radius;
   VERTEX = displaced;
 
   // Transform to view space

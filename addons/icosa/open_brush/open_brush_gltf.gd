@@ -8,6 +8,7 @@ extends GLTFDocumentExtension
 const SOURCE_GLTF_LEGACY_OPEN_BRUSH := "GLTF_LEGACY_OPEN_BRUSH"
 const SOURCE_GLTF_NEW_UNITYGLTF := "GLTF_NEW_UNITYGLTF"
 const NEW_UNITYGLTF_GENERATOR_TOKEN := "Open Brush UnityGLTF Exporter"
+const UNITY_GLTF_EXPORTER_V3_MIN_MAJOR := 3
 const ROUTE_LOG_PREFIX := "ICOSA_GLTF_SOURCE_ROUTE"
 
 var material_cache: Dictionary = {}
@@ -792,6 +793,31 @@ func _apply_mesh_source_params(material: ShaderMaterial, source_mode: String) ->
 		material.set_shader_parameter("u_IsNewUnityGltf", source_mode == SOURCE_GLTF_NEW_UNITYGLTF)
 	if "u_IsLiveRuntime" in param_names:
 		material.set_shader_parameter("u_IsLiveRuntime", false)
+	if "u_IsUnityGltfExporterVersion2OrNewer" in param_names:
+		material.set_shader_parameter("u_IsUnityGltfExporterVersion2OrNewer", source_mode == SOURCE_GLTF_NEW_UNITYGLTF)
+	if "u_IsUnityGltfExporterVersion3OrNewer" in param_names:
+		# Exporter v3+ GLTF has fixed-time particle/noise displacement baked into vertex positions.
+		# Older GLTF, live strokes, and .tilt imports must keep the shader displacement path active.
+		material.set_shader_parameter("u_IsUnityGltfExporterVersion3OrNewer", _is_unity_gltf_exporter_version_3_or_newer(_gltf_generator))
+
+
+func _is_unity_gltf_exporter_version_3_or_newer(generator: String) -> bool:
+	if not generator.contains(NEW_UNITYGLTF_GENERATOR_TOKEN):
+		return false
+	var exporter_version := _parse_unity_gltf_exporter_version(generator)
+	if exporter_version < 0:
+		return false
+	return exporter_version >= UNITY_GLTF_EXPORTER_V3_MIN_MAJOR
+
+
+func _parse_unity_gltf_exporter_version(generator: String) -> int:
+	var regex := RegEx.new()
+	if regex.compile("Open Brush UnityGLTF Exporter\\s+([0-9]+)(?:\\.[0-9]+(?:\\.[0-9]+)?)?") != OK:
+		return -1
+	var match := regex.search(generator)
+	if match == null:
+		return -1
+	return match.get_string(1).to_int()
 
 
 # ---------------------------------------------------------------------------

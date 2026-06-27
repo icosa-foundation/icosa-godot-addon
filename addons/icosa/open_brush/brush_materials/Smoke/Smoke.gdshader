@@ -6,6 +6,9 @@ render_mode blend_mix, depth_draw_opaque, cull_disabled, unshaded;
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform vec4 u_TintColor : source_color = vec4(0.5, 0.5, 0.5, 0.5);
 uniform float u_ScrollRate = 1.0;
+// UnityGLTF exporter v3+ has already baked the animated curl displacement.
+// Live strokes, .tilt imports, and legacy GLTF still need this shader path.
+uniform bool u_IsUnityGltfExporterVersion3OrNewer = false;
 
 varying vec4 v_color;
 varying float v_fog_coord;
@@ -163,8 +166,9 @@ void vertex() {
   vec3 center_final_OS = center_OS;
   mat4 inv_model_mat = inverse(MODEL_MATRIX);
 
-  // Apply subtle curl-noise displacement in world space, then convert back to object space
-  {
+  // Apply subtle curl-noise displacement in world space, then convert back to object space.
+  // Do not apply it again for v3+ UnityGLTF exports where the baker already moved the particles.
+  if (!u_IsUnityGltfExporterVersion3OrNewer) {
     vec3 center_WS = (MODEL_MATRIX * vec4(center_OS, 1.0)).xyz;
     float noise_time = TIME * 0.08;
     vec3 noise_coord = center_WS * 0.1 + vec3(noise_time);
