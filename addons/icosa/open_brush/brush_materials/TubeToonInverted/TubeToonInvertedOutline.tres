@@ -1,7 +1,8 @@
-[gd_resource type="ShaderMaterial" format=3]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://dpjnfwwo0awxq"]
 
-[ext_resource type="Shader" path="res://addons/icosa/open_brush/brush_materials/TubeToonInverted/TubeToonInvertedOutline.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://bsr85d1khxabf" path="res://addons/icosa/open_brush/brush_materials/TubeToonInverted/TubeToonInverted.gdshader" id="1"]
 
 [resource]
 resource_name = "TubeToonInvertedOutline"
+render_priority = 0
 shader = ExtResource("1")
