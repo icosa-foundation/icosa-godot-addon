@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://dg73pp0xdbayt"]
+
+[ext_resource type="PackedScene" uid="uid://bd4r7gwb72wxi" path="res://test_scenes/visual_comparison_tool/visual_comparison.tscn" id="1_h6gcm"]
+[ext_resource type="PackedScene" uid="uid://cbfrgefkysdo4" path="res://test_scenes/visual_comparison_cases/alphaclip_aa/alphaclip_aa_scene.tscn" id="2_jgrxe"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_jgrxe"]
+viewport_path = NodePath("SubViewportContainer/Viewport")
+
+[node name="VisualComparison" unique_id=1155957687 instance=ExtResource("1_h6gcm")]
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer/Viewport/Reference" parent_id_path=PackedInt32Array(1235481503) index="0" unique_id=1577698936]
+handle_input_locally = false
+msaa_3d = 3
+mesh_lod_threshold = 0.0
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="Node" parent="SubViewportContainer/Viewport/Reference/SubViewport" index="0" unique_id=113671535 instance=ExtResource("2_jgrxe")]
+
+[node name="SubViewport" parent="SubViewportContainer/Viewport/Render" parent_id_path=PackedInt32Array(1933957529) index="0" unique_id=314659319]
+msaa_3d = 3
+
+[node name="Node" parent="SubViewportContainer/Viewport/Render/SubViewport" index="0" unique_id=1295670399 instance=ExtResource("2_jgrxe")]
+
+[node name="HeatMapFilter" parent="." index="2" unique_id=1092785372]
+texture = SubResource("ViewportTexture_jgrxe")
