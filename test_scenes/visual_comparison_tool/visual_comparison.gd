@@ -1,5 +1,13 @@
 extends Control
 
+enum DisplayMode {
+	REFERENCE,
+	RESULT,
+	AVERAGE,
+	DIFFERENCE,
+	DIFFERENCE_HEATMAP,
+}
+
 @export var viewport: SubViewport
 @export var reference: Control
 @export var render: Control
@@ -207,3 +215,15 @@ func _on_mode_selector_item_focused(index: int) -> void:
 	#%AntiFlicker.hide()
 	#hide()
 	#%PreviewPanel.hide()
+
+
+func _on_screenshot_pressed() -> void:
+	var mode = render.get_instance_shader_parameter(&"display_mode")
+	render.set_instance_shader_parameter(&"display_mode", DisplayMode.RESULT)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var img = viewport.get_texture().get_image()
+	render.set_instance_shader_parameter(&"display_mode", mode)
+	var filename = "user://%s.webp" % Time.get_datetime_string_from_system()
+	img.save_webp(filename , false, 1.0)
+	OS.shell_open(ProjectSettings.globalize_path(filename))
