@@ -2,18 +2,22 @@
 
 [ext_resource type="Texture2D" uid="uid://yfqc543458jp" path="res://addons/icosa/open_brush/brush_materials/CoarseBristles/CoarseBristles-1161af82-50cf-47db-9706-0c3576d43c43-v10.0-MainTex.png" id="1"]
 
+[sub_resource type="GDScript" id="GDScript_u0r8n"]
+
 [resource]
 resource_name = "CoarseBristlesSingleSided"
 transparency = 2
-alpha_scissor_threshold = 0.0
-alpha_antialiasing_mode = 2
-alpha_antialiasing_edge = 0.4
+alpha_scissor_threshold = 0.25
+alpha_antialiasing_mode = 0
 cull_mode = 2
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
 albedo_texture = ExtResource("1")
 roughness = 0.5
+script = SubResource("GDScript_u0r8n")
 metadata/alphaclip_noaa_alpha_scissor_threshold = 0.25
-metadata/alphaclip_aa::_alpha_antialiasing_mode = 2
 metadata/alphaclip_aa_alpha_scissor_threshold = 0.0
 metadata/alphaclip_aa_alpha_antialiasing_edge = 0.4
+metadata/alphaclip_aa_mode = 2
+metadata/alphaclip_aa_scissor_threshold = 0.0
+metadata/alphaclip_aa_scissor_edge = 0.4
