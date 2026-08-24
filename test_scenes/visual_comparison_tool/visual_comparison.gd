@@ -22,10 +22,7 @@ var metrics_previous: Dictionary
 
 var img2_previous: Image
 
-#
-#func _ready() -> void:
-	#set_process($CheckBox.button_pressed)
-	#
+
 func _ready() -> void:
 	render.set_instance_shader_parameter(&"display_mode", %ModeSelector.selected) # initialize
 	anti_flicker.set_instance_shader_parameter(&"display_mode", %ModeSelector.selected) # initialize
@@ -52,7 +49,6 @@ func push_neutral():
 
 func compare(resolution: int, blur: float):
 	var antiflicker_img = viewport.get_texture().get_image() # capture current render
-	#antiflicker_img.generate_mipmaps()
 	%AntiFlicker.texture = ImageTexture.create_from_image(antiflicker_img)
 	%AntiFlicker.show()
 	await get_tree().process_frame
@@ -61,8 +57,6 @@ func compare(resolution: int, blur: float):
 	
 	# grab render image
 	render.set_instance_shader_parameter(&"display_mode", 1) # show render
-	#anti_flicker.set_instance_shader_parameter(&"display_mode", 1) # show render
-	#viewport_container.set_instance_shader_parameter(&"display_mode", 1) # show render
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var img2 = viewport.get_texture().get_image() # capture render
@@ -72,13 +66,10 @@ func compare(resolution: int, blur: float):
 	# compare to previous render to see if there's a point to doing more work
 	var metrics_to_prev = img2.compute_image_metrics(img2_previous, false)
 	
-	#print()
 	if metrics_to_prev["mean_squared"] < 0.05:
 		# the render has not changed since last frame,
 		# there's no point in updating the comparison data, we'll only loose sight of trends (improvements, declines)
 		render.set_instance_shader_parameter(&"display_mode", previous_display_mode)
-		#anti_flicker.set_instance_shader_parameter(&"display_mode", previous_display_mode)
-		#print("No change")
 		return
 	
 	# save for later so we can compare next time
@@ -86,13 +77,11 @@ func compare(resolution: int, blur: float):
 	
 	# grab reference image
 	render.set_instance_shader_parameter(&"display_mode", 0) # show reference
-	#anti_flicker.set_instance_shader_parameter(&"display_mode", 0) # show reference
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var img1 = viewport.get_texture().get_image() # capture reference
 	
 	render.set_instance_shader_parameter(&"display_mode", previous_display_mode) # restore user set value
-	#anti_flicker.set_instance_shader_parameter(&"display_mode", previous_display_mode) # restore user set value
 	# in theory trilinear resize should generate missing mipmaps anyway, but the results from this are smoother
 	img1.generate_mipmaps()
 	img1.resize(resolution, resolution, Image.INTERPOLATE_TRILINEAR)
@@ -104,10 +93,6 @@ func compare(resolution: int, blur: float):
 	
 	label.clear()
 	var metrics = img1.compute_image_metrics(img2, false)
-	
-	#if metrics_previous.hash() == metrics.hash():
-		#print("No change!")
-		#return
 	
 	# first run only
 	if metrics_previous.is_empty():
@@ -127,7 +112,6 @@ func compare(resolution: int, blur: float):
 			label.append_text("%2.1f" % metrics_previous[i])
 			label.pop()
 			label.pop()
-			#label.push_cell()
 			label.append_text("   ")
 			label.push_bold()
 			label.push_mono()
@@ -162,22 +146,12 @@ func compare(resolution: int, blur: float):
 		label.pop()
 		label.pop()
 	label.pop() # table
-	
-	#reference.show()
-	#render.show()
-	#render.modulate = Color(1, 1, 1, 0.5)
-	
 	metrics_previous = metrics
 	%AntiFlicker.hide()
 
 
-
 func _on_button_pressed() -> void:
 	compare(resolution_spin_box.value, blur_spin_box.value)
-	
-
-#func _process(_delta) -> void:
-	#compare()
 
 
 func _on_check_box_toggled(toggled_on: bool) -> void:
@@ -190,15 +164,14 @@ func _on_check_box_toggled(toggled_on: bool) -> void:
 func _on_timer_timeout() -> void:
 	compare(resolution_spin_box.value, blur_spin_box.value)
 
+
 func _on_mode_selector_mouse_exited() -> void:
 	show()
 
 
 func _on_mode_selector_item_selected(index: int) -> void:
 	render.set_instance_shader_parameter(&"display_mode", index)
-	#anti_flicker.set_instance_shader_parameter(&"display_mode", index)
 	%HeatMapFilter.visible = index == 4;
-	
 	%AntiFlicker.hide()
 	%PreviewPanel.hide()
 	show()
@@ -210,11 +183,7 @@ func _on_auto_freq_value_changed(value: float) -> void:
 
 func _on_mode_selector_item_focused(index: int) -> void:
 	render.set_instance_shader_parameter(&"display_mode", index)
-	#anti_flicker.set_instance_shader_parameter(&"display_mode", index)
 	%HeatMapFilter.visible = index == 4;
-	#%AntiFlicker.hide()
-	#hide()
-	#%PreviewPanel.hide()
 
 
 func _on_screenshot_pressed() -> void:
