@@ -5,8 +5,9 @@
 [resource]
 resource_name = "Marker"
 transparency = 2
-alpha_scissor_threshold = 0.067
-alpha_antialiasing_mode = 0
+alpha_scissor_threshold = 0.0
+alpha_antialiasing_mode = 2
+alpha_antialiasing_edge = 0.15
 cull_mode = 2
 shading_mode = 0
 vertex_color_use_as_albedo = true

@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, cull_disabled;
+render_mode blend_mix, cull_disabled, alpha_to_coverage_and_one;
 
 // Include shared functions
 #include "res://addons/icosa/open_brush/brush_materials/_includes/fog_functions.gdshaderinc"
@@ -10,7 +10,7 @@ render_mode blend_mix, cull_disabled;
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform vec3 u_SpecColor : source_color = vec3(0.235);
 uniform float u_Shininess : hint_range(0.0, 1.0) = 0.4;
-uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
+uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.45;
 
 // Lighting
 uniform vec4 u_ambient_light_color;
@@ -70,10 +70,7 @@ void fragment() {
   final_color = apply_fog(final_color, v_fog_coord);
 
   ALBEDO = final_color;
-  ALPHA = 1.0;
-
-  // Alpha cutoff must come last to ensure perturb_normal is called uniformly
-  if (tex_color.a <= u_Cutoff) {
-    discard;
-  }
+  ALPHA_ANTIALIASING_EDGE = u_Cutoff;
+  ALPHA_SCISSOR_THRESHOLD = 0.0;
+  ALPHA = tex_color.a;
 }

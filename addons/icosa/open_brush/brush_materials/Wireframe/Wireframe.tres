@@ -6,3 +6,4 @@
 resource_name = "Wireframe"
 render_priority = 0
 shader = ExtResource("1")
+shader_parameter/anti_aliasing_strength = 1.0

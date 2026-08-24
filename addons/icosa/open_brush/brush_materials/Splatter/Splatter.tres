@@ -5,8 +5,9 @@
 [resource]
 resource_name = "SplatterSingleSided"
 transparency = 2
-alpha_scissor_threshold = 0.2
-alpha_antialiasing_mode = 0
+alpha_scissor_threshold = 0.068
+alpha_antialiasing_mode = 2
+alpha_antialiasing_edge = 0.66
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
 albedo_texture = ExtResource("1")
