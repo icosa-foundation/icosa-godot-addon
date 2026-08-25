@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, cull_disabled;
+render_mode blend_mix, cull_disabled, alpha_to_coverage_and_one;
 
 #include "res://addons/icosa/open_brush/brush_materials/_includes/fog_functions.gdshaderinc"
 #include "res://addons/icosa/open_brush/brush_materials/_includes/normal_map.gdshaderinc"
@@ -44,12 +44,9 @@ void fragment() {
   // Surface properties
   vec3 albedo = mainTex.rgb * COLOR.rgb;
   vec3 specularColor = u_SpecColor * animatedSpec;
-  float alpha = mainTex.a * COLOR.a;
-
-  // Alpha test
-  if (alpha <= u_Cutoff) {
-    discard;
-  }
+  ALPHA = mainTex.a * COLOR.a;
+  ALPHA_SCISSOR_THRESHOLD = 0.0;
+  ALPHA_ANTIALIASING_EDGE = u_Cutoff;
 
   // Compute perturbed normal
   vec3 perturbed_normal = perturb_normal(v_view_position, v_view_normal, UV, 0.0015, FRONT_FACING);
@@ -73,5 +70,4 @@ void fragment() {
   final_color = apply_fog(final_color, v_fog_coord);
 
   ALBEDO = final_color;
-  ALPHA = alpha;
 }
