@@ -10,9 +10,6 @@ uniform float u_ScrollJitterIntensity = 0.2;
 uniform float u_ScrollJitterFrequency = 5.0;
 uniform float u_SpreadRate = 1.25;
 uniform float u_Opacity = 1.0;
-// UnityGLTF exporter v3+ has already baked the animated particle-center offset.
-// Live strokes, .tilt imports, and legacy GLTF still need this shader path.
-uniform bool u_IsUnityGltfExporterVersion3OrNewer = false;
 
 varying vec3 v_color;
 varying float v_fog_coord;
@@ -63,9 +60,7 @@ void vertex() {
   float half_size_OS = length(VERTEX - center_OS) * kRecipSquareRootOfTwo;
 
   float spread = spread_progress(birth_time, u_SpreadRate);
-  if (!u_IsUnityGltfExporterVersion3OrNewer) {
-    center_OS += compute_displacement(center_OS, seed, t01) * spread;
-  }
+  center_OS += compute_displacement(center_OS, seed, t01) * spread;
 
   vec3 basis_y = MODEL_MATRIX[1].xyz;
   float scale = max(length(basis_y), 0.0001);

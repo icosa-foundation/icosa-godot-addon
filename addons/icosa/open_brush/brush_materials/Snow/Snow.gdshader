@@ -6,9 +6,6 @@ render_mode unshaded, blend_add, cull_disabled;
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
 uniform float u_DebugSizeMultiplier : hint_range(1.0, 100.0) = 1.25; // A bit arbitrary but 1.0 seems to be too small compared to unity rendering
-// UnityGLTF exporter v3+ has already baked the animated snowflake center offset.
-// Live strokes, .tilt imports, and legacy GLTF still need this shader path.
-uniform bool u_IsUnityGltfExporterVersion3OrNewer = false;
 
 varying float v_fog_coord;
 varying float t;
@@ -67,10 +64,7 @@ void vertex() {
   dispVec.z += cos(t2 * 3.0 * 0.5 + TIME) * 0.005;
 
   // Apply displacement to center in object space BEFORE any transforms
-  vec3 animated_center_OS = center_OS;
-  if (!u_IsUnityGltfExporterVersion3OrNewer) {
-    animated_center_OS += dispVec;
-  }
+  vec3 animated_center_OS = center_OS + dispVec;
 
   mat4 modelview_mat = VIEW_MATRIX * MODEL_MATRIX;
   mat4 inv_modelview_mat = inverse(modelview_mat);

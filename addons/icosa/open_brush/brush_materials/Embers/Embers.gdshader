@@ -7,9 +7,6 @@ uniform float u_ScrollRate : hint_range(0.0, 5.0) = 0.3;
 uniform vec3 u_ScrollDistance = vec3(0.0, 3.0, 0.0);
 uniform float u_ScrollJitterIntensity : hint_range(0.0, 2.0) = 1.0;
 uniform float u_ScrollJitterFrequency : hint_range(0.0, 20.0) = 3.0;
-// UnityGLTF exporter v3+ has already baked the animated particle-center offset.
-// Live strokes, .tilt imports, and legacy GLTF still need this shader path.
-uniform bool u_IsUnityGltfExporterVersion3OrNewer = false;
 
 varying vec4 v_color;
 
@@ -61,10 +58,7 @@ void vertex() {
   float jitter_z = cos(t * u_ScrollJitterFrequency + particle_id * 100.0 + time_y + center_OS.x) * u_ScrollJitterIntensity * kDecimetersToWorldUnits;
 
   vec3 disp_local = (scroll_local + vec3(jitter_x, jitter_y, jitter_z));
-  vec3 center_final_OS = center_OS;
-  if (!u_IsUnityGltfExporterVersion3OrNewer) {
-    center_final_OS += disp_local;
-  }
+  vec3 center_final_OS = center_OS + disp_local;
 
   vec3 center_view = (modelview_mat * vec4(center_final_OS, 1.0)).xyz;
   vec3 vertex_view = recreate_corner(center_view, corner, rotation, halfSize_OS * scale);
