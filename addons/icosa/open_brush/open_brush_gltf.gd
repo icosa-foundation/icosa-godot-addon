@@ -108,10 +108,13 @@ func _import_post_parse(gltf_state: GLTFState) -> Error:
 	if print_time:
 		print("[IcosaOpenBrushGLTF] preflight→post_parse: %.2f s" % ((Time.get_ticks_msec() - _import_start_ms) / 1000.0))
 	var t := Time.get_ticks_msec()
+	# UnityGLTF no longer needs legacy wide-UV remapping, but particle brushes still
+	# store billboard centers in NORMAL and our shaders consume them from CUSTOM0.
+	_pack_particle_billboard_data(gltf_state)
 	if _mesh_source_mode == SOURCE_GLTF_LEGACY_OPEN_BRUSH:
-		_add_custom_data_to_brushes(gltf_state, gltf_json)
-		if print_time:
-			print("[IcosaOpenBrushGLTF] _add_custom_data_to_brushes: %.2f s" % ((Time.get_ticks_msec() - t) / 1000.0))
+		_pack_legacy_ribbon_custom_data(gltf_state, gltf_json)
+	if print_time:
+		print("[IcosaOpenBrushGLTF] custom data packing: %.2f s" % ((Time.get_ticks_msec() - t) / 1000.0))
 	return OK
 
 
@@ -518,32 +521,31 @@ func _scan_directory_for_materials(dir_path: String) -> void:
 
 
 
-func _add_custom_data_to_brushes(gltf_state: GLTFState, gltf_json: Dictionary) -> void:
+func _pack_particle_billboard_data(gltf_state: GLTFState) -> void:
+	_pack_custom_data_to_brushes(gltf_state, {}, "particle")
+
+
+func _pack_legacy_ribbon_custom_data(gltf_state: GLTFState, gltf_json: Dictionary) -> void:
+	_pack_custom_data_to_brushes(gltf_state, gltf_json, "ribbon")
+
+
+func _pack_custom_data_to_brushes(gltf_state: GLTFState, gltf_json: Dictionary, target_brush_type: String) -> void:
 	var meshes := gltf_state.get_meshes()
 
 	for mesh_idx in range(meshes.size()):
 		var mesh = meshes[mesh_idx]
 		var importer_mesh: ImporterMesh = mesh.mesh
 
-		# Detect brush type by material name
-		var brush_type := ""
+		var handles_target_brush_type := false
 		for surface_idx in range(importer_mesh.get_surface_count()):
 			var mat := importer_mesh.get_surface_material(surface_idx)
 			if mat != null:
-				var mat_name := mat.resource_name
-				if (mat_name.contains("Smoke") or mat_name.contains("Bubbles") or
-						mat_name.contains("Dots") or mat_name.contains("Snow") or
-						mat_name.contains("Stars") or mat_name.contains("Embers")):
-					brush_type = "particle"
-					break
-				elif (mat_name.contains("Electricity") or
-						mat_name.contains("DoubleTaperedMarker") or
-						mat_name.contains("DoubleTaperedFlat") or
-						mat_name.contains("HyperGrid")):
-					brush_type = "ribbon"
+				var brush_type := _custom_data_brush_type_for_material(mat.resource_name)
+				if brush_type == target_brush_type:
+					handles_target_brush_type = true
 					break
 
-		if brush_type == "":
+		if not handles_target_brush_type:
 			continue
 
 		# Collect all surface data
@@ -555,7 +557,7 @@ func _add_custom_data_to_brushes(gltf_state: GLTFState, gltf_json: Dictionary) -
 			var custom0 := PackedFloat32Array()
 			custom0.resize(vertex_count * 4)
 
-			if brush_type == "particle":
+			if target_brush_type == "particle":
 				var centers = arrays[Mesh.ARRAY_NORMAL]
 				if centers == null:
 					centers = PackedVector3Array()
@@ -573,6 +575,27 @@ func _add_custom_data_to_brushes(gltf_state: GLTFState, gltf_json: Dictionary) -
 				arrays[Mesh.ARRAY_NORMAL] = null
 
 				var tangents = arrays[Mesh.ARRAY_TANGENT]
+				var particle_data = arrays[Mesh.ARRAY_TEX_UV2]
+				if (_mesh_source_mode == SOURCE_GLTF_NEW_UNITYGLTF and tangents == null and
+						particle_data is PackedVector2Array and particle_data.size() == vertex_count):
+					# UnityGLTF v2 splits the source mesh's wide UV0 into TEXCOORD_0.xy
+					# and TEXCOORD_1.xy. Normalize uv.z (rotation) to TANGENT.z and
+					# uv.w (birth time) to UV2.x for the shared particle shaders.
+					var new_tangents := PackedFloat32Array()
+					var new_uv2 := PackedVector2Array()
+					new_tangents.resize(vertex_count * 4)
+					new_uv2.resize(vertex_count)
+					for i in range(vertex_count):
+						var base := i * 4
+						var packed_uv: Vector2 = particle_data[i]
+						new_tangents[base + 0] = 0.0
+						new_tangents[base + 1] = 0.0
+						new_tangents[base + 2] = packed_uv.x
+						new_tangents[base + 3] = 1.0
+						new_uv2[i] = Vector2(packed_uv.y, packed_uv.x)
+					arrays[Mesh.ARRAY_TANGENT] = new_tangents
+					arrays[Mesh.ARRAY_TEX_UV2] = new_uv2
+					tangents = new_tangents
 				if tangents != null and tangents.size() >= 4:
 					var tx: float = tangents[0]
 					var ty: float = tangents[1]
@@ -587,7 +610,7 @@ func _add_custom_data_to_brushes(gltf_state: GLTFState, gltf_json: Dictionary) -
 							new_tangents[base + 3] = 1.0
 						arrays[Mesh.ARRAY_TANGENT] = new_tangents
 
-			elif brush_type == "ribbon":
+			elif target_brush_type == "ribbon":
 				var ribbon_offsets := _extract_tb_unity_texcoord1(gltf_state, gltf_json, mesh_idx, surface_idx)
 
 				for i in range(vertex_count):
@@ -652,6 +675,36 @@ func _add_custom_data_to_brushes(gltf_state: GLTFState, gltf_json: Dictionary) -
 			)
 
 		mesh.mesh = new_mesh
+
+
+func _custom_data_brush_type_for_material(material_name: String) -> String:
+	var brush_name := _brush_name_from_material_name(material_name)
+	if (brush_name.contains("Smoke") or brush_name.contains("Bubbles") or
+			brush_name.contains("Dots") or brush_name.contains("Snow") or
+			brush_name.contains("Stars") or brush_name.contains("Embers")):
+		return "particle"
+	if (brush_name.contains("Electricity") or
+			brush_name.contains("DoubleTaperedMarker") or
+			brush_name.contains("DoubleTaperedFlat") or
+			brush_name.contains("HyperGrid")):
+		return "ribbon"
+	return ""
+
+
+func _brush_name_from_material_name(material_name: String) -> String:
+	var brush_name := material_name
+	if material_name.begins_with("material_"):
+		var parts := material_name.substr(9).split("-")
+		if parts.size() >= 5:
+			var guid := "-".join(parts.slice(parts.size() - 5, parts.size()))
+			brush_name = name_mapping.get(guid, material_name)
+	elif material_name.begins_with("brush_"):
+		brush_name = material_name.substr(6)
+	elif material_name.begins_with("ob-"):
+		brush_name = material_name.substr(3)
+	if brush_name == "RisingBubbles":
+		return "Rising Bubbles"
+	return brush_name
 
 
 func _extract_tb_unity_texcoord1(gltf_state: GLTFState, gltf_json: Dictionary, mesh_idx: int, surface_idx: int) -> PackedVector3Array:
@@ -735,16 +788,7 @@ func _apply_materials_to_importer_scene(node: Node, gltf_state: GLTFState) -> vo
 
 func _find_matching_brush_material(material_name: String, source_mode: String = SOURCE_GLTF_LEGACY_OPEN_BRUSH) -> Material:
 	var original_name := material_name
-
-	if material_name.begins_with("material_"):
-		var parts := material_name.substr(9).split("-")
-		if parts.size() >= 5:
-			var guid := "-".join(parts.slice(parts.size() - 5, parts.size()))
-			material_name = name_mapping.get(guid, material_name)
-	elif material_name.begins_with("brush_"):
-		material_name = material_name.substr(6)
-	elif material_name.begins_with("ob-"):
-		material_name = material_name.substr(3)
+	material_name = _brush_name_from_material_name(material_name)
 
 	var cache_key := "%s:%s" % [source_mode, original_name]
 	if material_cache.has(cache_key):
@@ -794,7 +838,17 @@ func _apply_mesh_source_params(material: ShaderMaterial, source_mode: String) ->
 		material.set_shader_parameter("u_IsLiveRuntime", false)
 	if "u_IsUnityGltfExporterVersion2OrNewer" in param_names:
 		material.set_shader_parameter("u_IsUnityGltfExporterVersion2OrNewer", source_mode == SOURCE_GLTF_NEW_UNITYGLTF)
-
+	if "u_SmokeDisplacementParticleScale" in param_names:
+		# The current web Smoke material does not provide the scroll/jitter uniforms, so those
+		# shader uniforms resolve to zero there. Keep GLTF import on the same contract and scale
+		# curl motion in the shader by particle size instead of by exporter/source type.
+		if "u_ScrollRate" in param_names:
+			material.set_shader_parameter("u_ScrollRate", 0.0)
+		if "u_ScrollJitterIntensity" in param_names:
+			material.set_shader_parameter("u_ScrollJitterIntensity", 0.0)
+		if "u_ScrollJitterFrequency" in param_names:
+			material.set_shader_parameter("u_ScrollJitterFrequency", 0.0)
+		material.set_shader_parameter("u_SmokeDisplacementParticleScale", 1.0)
 
 # ---------------------------------------------------------------------------
 # Vertex attribute remapping
@@ -820,7 +874,7 @@ func _map_custom_attributes_to_standard_slots(gltf_json: Dictionary) -> void:
 			if primitive.has("material"):
 				var mat_index: int = primitive["material"]
 				if mat_index < materials.size() and materials[mat_index] is Dictionary:
-					material_name = materials[mat_index].get("name", "")
+					material_name = _brush_name_from_material_name(materials[mat_index].get("name", ""))
 
 			var is_particle_brush: bool = (
 				material_name.contains("Smoke") or material_name.contains("Bubbles") or

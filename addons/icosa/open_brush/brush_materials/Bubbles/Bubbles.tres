@@ -11,3 +11,7 @@ shader_parameter/u_fogColor = Color(1, 1, 1, 1)
 shader_parameter/u_fogDensity = 0.0
 shader_parameter/u_MainTex = ExtResource("2_477je")
 shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_ScrollRate = 0.5
+shader_parameter/u_ScrollJitterIntensity = 0.02
+shader_parameter/u_ScrollJitterFrequency = 0.2
+shader_parameter/u_BubblesDisplacementParticleScale = 1.0

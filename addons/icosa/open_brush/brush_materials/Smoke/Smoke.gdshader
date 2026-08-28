@@ -5,7 +5,10 @@ render_mode blend_mix, depth_draw_opaque, cull_disabled, unshaded;
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform vec4 u_TintColor : source_color = vec4(0.5, 0.5, 0.5, 0.5);
-uniform float u_ScrollRate = 1.0;
+uniform float u_ScrollRate = 0.0;
+uniform float u_ScrollJitterIntensity = 0.0;
+uniform float u_ScrollJitterFrequency = 0.0;
+uniform float u_SmokeDisplacementParticleScale = 1.0;
 
 varying vec4 v_color;
 varying float v_fog_coord;
@@ -15,92 +18,101 @@ varying vec2 v_uv_base;
 const float kRecipSquareRootOfTwo = 0.70710678;
 const float kDecimetersToWorldUnits = 10.0;
 
-// Simplex noise functions for curl noise
-vec3 mod289_3(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-vec4 mod289_4(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-vec4 permute(vec4 x) { return mod289_4(((x * 34.0) + 1.0) * x); }
-vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+vec3 mod289_v3(vec3 x) {
+  return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
 
-float snoise(vec3 v) {
-  const vec2 C = vec2(1.0/6.0, 1.0/3.0);
-  const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+vec2 mod289_v2(vec2 x) {
+  return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
 
-  vec3 i = floor(v + dot(v, C.yyy));
-  vec3 x0 = v - i + dot(i, C.xxx);
+vec3 permute_v3(vec3 x) {
+  return mod289_v3(((x * 34.0) + 1.0) * x);
+}
 
-  vec3 g = step(x0.yzx, x0.xyz);
-  vec3 l = 1.0 - g;
-  vec3 i1 = min(g.xyz, l.zxy);
-  vec3 i2 = max(g.xyz, l.zxy);
+float snoise2D(vec2 v) {
+  const vec4 C = vec4(0.211324865405187,
+                      0.366025403784439,
+                     -0.577350269189626,
+                      0.024390243902439);
 
-  vec3 x1 = x0 - i1 + C.xxx;
-  vec3 x2 = x0 - i2 + C.yyy;
-  vec3 x3 = x0 - D.yyy;
+  vec2 i = floor(v + dot(v, C.yy));
+  vec2 x0 = v - i + dot(i, C.xx);
 
-  i = mod289_3(i);
-  vec4 p = permute(permute(permute(
-    i.z + vec4(0.0, i1.z, i2.z, 1.0))
-    + i.y + vec4(0.0, i1.y, i2.y, 1.0))
-    + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+  vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+  vec4 x12 = x0.xyxy + C.xxzz;
+  x12.xy -= i1;
 
-  float n_ = 0.142857142857;
-  vec3 ns = n_ * D.wyz - D.xzx;
+  i = mod289_v2(i);
+  vec3 p = permute_v3(permute_v3(i.y + vec3(0.0, i1.y, 1.0))
+                                + i.x + vec3(0.0, i1.x, 1.0));
 
-  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
-
-  vec4 x_ = floor(j * ns.z);
-  vec4 y_ = floor(j - 7.0 * x_);
-
-  vec4 x = x_ * ns.x + ns.yyyy;
-  vec4 y = y_ * ns.x + ns.yyyy;
-  vec4 h = 1.0 - abs(x) - abs(y);
-
-  vec4 b0 = vec4(x.xy, y.xy);
-  vec4 b1 = vec4(x.zw, y.zw);
-
-  vec4 s0 = floor(b0) * 2.0 + 1.0;
-  vec4 s1 = floor(b1) * 2.0 + 1.0;
-  vec4 sh = -step(h, vec4(0.0));
-
-  vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
-  vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
-
-  vec3 p0 = vec3(a0.xy, h.x);
-  vec3 p1 = vec3(a0.zw, h.y);
-  vec3 p2 = vec3(a1.xy, h.z);
-  vec3 p3 = vec3(a1.zw, h.w);
-
-  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
-  p0 *= norm.x;
-  p1 *= norm.y;
-  p2 *= norm.z;
-  p3 *= norm.w;
-
-  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+  vec3 m = max(0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), 0.0);
   m = m * m;
-  return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+  m = m * m;
+
+  vec3 x = 2.0 * fract(p * C.www) - 1.0;
+  vec3 h = abs(x) - 0.5;
+  vec3 ox = floor(x + 0.5);
+  vec3 a0 = x - ox;
+
+  m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
+
+  vec3 g;
+  g.x = a0.x * x0.x + h.x * x0.y;
+  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+  return 130.0 * dot(m, g);
 }
 
-// Curl noise components
-float curlX(vec3 p, float d) {
-  float eps = 0.0001;
-  float n1 = snoise(p + vec3(0.0, eps, 0.0));
-  float n2 = snoise(p - vec3(0.0, eps, 0.0));
-  return (n1 - n2) / (2.0 * eps) / d;
+vec3 snoise3D(vec3 v) {
+  return vec3(
+    snoise2D(vec2(v.x, v.y)),
+    snoise2D(vec2(v.y, v.z)),
+    snoise2D(vec2(v.z, v.x))
+  );
 }
 
-float curlY(vec3 p, float d) {
-  float eps = 0.0001;
-  float n1 = snoise(p + vec3(eps, 0.0, 0.0));
-  float n2 = snoise(p - vec3(eps, 0.0, 0.0));
-  return (n1 - n2) / (2.0 * eps) / d;
+float curlX(vec3 v, float d) {
+  return (
+    (snoise3D(vec3(v.x, v.y + d, v.z)).z - snoise3D(vec3(v.x, v.y - d, v.z)).z)
+   -(snoise3D(vec3(v.x, v.y, v.z + d)).y - snoise3D(vec3(v.x, v.y, v.z - d)).y)
+  ) / 2.0 / d;
 }
 
-float curlZ(vec3 p, float d) {
-  float eps = 0.0001;
-  float n1 = snoise(p + vec3(0.0, 0.0, eps));
-  float n2 = snoise(p - vec3(0.0, 0.0, eps));
-  return (n1 - n2) / (2.0 * eps) / d;
+float curlY(vec3 v, float d) {
+  return (
+    (snoise3D(vec3(v.x, v.y, v.z + d)).x - snoise3D(vec3(v.x, v.y, v.z - d)).x)
+   -(snoise3D(vec3(v.x + d, v.y, v.z)).z - snoise3D(vec3(v.x - d, v.y, v.z)).z)
+  ) / 2.0 / d;
+}
+
+float curlZ(vec3 v, float d) {
+  return (
+    (snoise3D(vec3(v.x + d, v.y, v.z)).y - snoise3D(vec3(v.x - d, v.y, v.z)).y)
+   -(snoise3D(vec3(v.x, v.y + d, v.z)).x - snoise3D(vec3(v.x, v.y - d, v.z)).x)
+  ) / 2.0 / d;
+}
+
+vec3 compute_smoke_displacement_ws(vec3 seed_decimeters, float time_offset) {
+  float t = TIME * u_ScrollRate + time_offset;
+  vec3 jitter = vec3(
+    sin(t + TIME + seed_decimeters.z * u_ScrollJitterFrequency),
+    cos(t * 1.2 + TIME + seed_decimeters.x * u_ScrollJitterFrequency),
+    cos(t + TIME + seed_decimeters.x * u_ScrollJitterFrequency)
+  ) * u_ScrollJitterIntensity;
+
+  // WebGL uses Unity _Time.x * 2.0. Godot TIME is equivalent to _Time.y,
+  // so TIME * 0.1 matches elapsedTime / 20 * 2.
+  vec3 noise_coord = (seed_decimeters + jitter) * 0.05 + vec3(TIME * 0.1);
+  float curl_divisor = 30.0;
+  vec3 curl_sample = vec3(
+    curlX(noise_coord, curl_divisor),
+    curlY(noise_coord, curl_divisor),
+    curlZ(noise_coord, curl_divisor)
+  ) * 15.0;
+
+  // The web shader samples in decimeters and scales the displacement back to world units.
+  return (jitter + curl_sample) * 0.1;
 }
 
 // Billboard particle recreation (matching Three.js recreateCorner)
@@ -138,8 +150,6 @@ void vertex() {
   // CUSTOM0.yzw → particle center (object space)
 
   float rotation = TANGENT.z;   // Rotation angle
-  float birthTime = UV2.x;      // Birth time
-
   vec4 custom0 = CUSTOM0;
   float vertex_id = custom0.x;
   vec3 center_OS = custom0.yzw; // Particle center
@@ -163,22 +173,15 @@ void vertex() {
   vec3 center_final_OS = center_OS;
   mat4 inv_model_mat = inverse(MODEL_MATRIX);
 
-  // Apply subtle curl-noise displacement in world space, then convert back to object space
-  {
-    vec3 center_WS = (MODEL_MATRIX * vec4(center_OS, 1.0)).xyz;
-    float noise_time = TIME * 0.08;
-    vec3 noise_coord = center_WS * 0.1 + vec3(noise_time);
-    float curl_divisor = 30.0;
-    vec3 curl_sample = vec3(
-      curlX(noise_coord, curl_divisor),
-      curlY(noise_coord, curl_divisor),
-      curlZ(noise_coord, curl_divisor)
-    );
-    float curl_strength = 0.3 * kDecimetersToWorldUnits;
-    vec3 disp = curl_sample * curl_strength;
-    center_WS += disp;
-    center_final_OS = (inv_model_mat * vec4(center_WS, 1.0)).xyz;
-  }
+  // Apply curl-noise displacement in world space, then convert back to object space.
+  vec3 center_WS = (MODEL_MATRIX * vec4(center_OS, 1.0)).xyz;
+  vec3 seed_decimeters = center_WS * kDecimetersToWorldUnits;
+  // Legacy and UnityGLTF files can arrive at very different coordinate scales.
+  // Scale world-space curl by the rendered particle size so Smoke motion stays
+  // visually comparable without branching on exporter type.
+  float halfSize_WS = max(halfSize_OS * scale, 0.0001);
+  center_WS += compute_smoke_displacement_ws(seed_decimeters, 1.0) * halfSize_WS * u_SmokeDisplacementParticleScale;
+  center_final_OS = (inv_model_mat * vec4(center_WS, 1.0)).xyz;
 
   // Calculate modelview matrix (Godot doesn't provide MODELVIEW_MATRIX)
   mat4 modelview_mat = VIEW_MATRIX * MODEL_MATRIX;
