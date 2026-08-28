@@ -19,7 +19,8 @@ A Godot 4.7+ plugin that lets you browse the [Icosa Gallery](https://icosa.galle
 ### Godot Editor
 If you have Godot Editor open, go to the AssetLib and search "icosa", download and install the addon and enable it.
 
-### Otherwise..
+### Manual installation
+
 1. Download or clone this repository.
 2. Copy the `addons/icosa` folder into your project's `res://addons` directory if it is not already there.
 3. Open your project in the Godot Editor.
@@ -42,9 +43,45 @@ If you have Godot Editor open, go to the AssetLib and search "icosa", download a
 
 See the [Open Brush support documentation](addons/icosa/open_brush/README.md) for supported exporters, material handling, and limitations.
 
-## Building & Contributing
+## Developer onboarding
 
-Open the repository as a Godot project to iterate on the UI scenes (`browser.tscn`, `search.tscn`, etc.) and scripts under `addons/icosa`. Contributions are welcome via pull requests.
+### Repository structure
+
+1. `addons/icosa/plugin.gd` registers the editor interface and glTF import extensions.
+2. `addons/icosa/browser/` contains the gallery browser, search, account, and download workflow.
+3. `addons/icosa/open_brush/` contains Open Brush material mapping, import handling, shaders, and brush resources.
+4. `test_scenes/visual_comparison_tool/` provides the reusable visual comparison interface.
+5. `test_scenes/visual_comparison_cases/` contains focused scenes and reference images for visual checks.
+
+### Local development
+
+1. Install Godot 4.7 or newer and clone the repository.
+2. Open the repository root as a Godot project:
+
+   ```sh
+   godot4 -e .
+   ```
+
+3. Make addon changes under `addons/icosa/`. Keep reusable test scenes under `test_scenes/`.
+4. Run an editor initialization check to catch GDScript parse errors and plugin startup failures:
+
+   ```sh
+   godot4 --headless --editor --path . --quit
+   ```
+
+   If your Godot executable has a different name, substitute it for `godot4`.
+
+### Visual validation
+
+1. Use `test_scenes/visual_comparison_cases/alphaclip_aa/alphaclip_aa_visual_comparison.tscn` for alpha-clip and alpha-to-coverage changes.
+2. Use `test_scenes/visual_comparison_cases/victorious_lucian/lucian_victorious_visual_comparison.tscn` for a checked-in legacy Tilt Brush glTF case.
+3. For shader or material changes, include before-and-after screenshots or a short capture with the contribution.
+
+There is no formal unit-test suite. The headless editor check and relevant visual comparison scenes are the expected minimum validation.
+
+## Packaging and contributing
+
+Package the addon by archiving the `addons/icosa` directory while preserving its path. Keep commits focused, avoid unrelated refactors, and describe any migration or reimport steps. Contributions are welcome via pull requests.
 
 ## License
 
