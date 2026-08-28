@@ -115,12 +115,7 @@ func clear_saved_token():
 	access_token = ""
 
 func get_default_downloads_path() -> String:
-	if Engine.is_editor_hint():
-		# In editor - use a folder in the project root
-		return "res://Downloads"
-	else:
-		# In running project - use user:// directory
-		return "user://Downloads"
+	return IcosaDownload.get_default_download_directory()
 
 func save_downloads_path():
 	if !downloads_path.is_empty():
@@ -144,6 +139,7 @@ func _ready():
 	setup_tabs()
 	load_token()
 	load_downloads_path()
+	download_queue.download_directory = downloads_path
 
 	# Update downloads path UI
 	%DownloadsPath.text = downloads_path
@@ -477,7 +473,8 @@ func _on_settings_window_canceled():
 
 
 func _on_downloads_path_dialog_dir_selected(dir: String):
-	downloads_path = dir
+	downloads_path = dir.trim_suffix("/")
+	download_queue.download_directory = downloads_path
 	%DownloadsPath.text = downloads_path
 	save_downloads_path()
 
@@ -488,4 +485,6 @@ func _on_select_downloads_path_pressed():
 		downloads_dialog.popup_centered_ratio(0.7)
 
 func _on_downloads_path_text_changed(new_text: String):
-	downloads_path = new_text
+	downloads_path = new_text.strip_edges().trim_suffix("/")
+	download_queue.download_directory = downloads_path
+	save_downloads_path()

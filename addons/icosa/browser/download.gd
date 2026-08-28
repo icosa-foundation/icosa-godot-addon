@@ -30,10 +30,21 @@ var session_start_time: float = 0.0  # When user clicked download button (from q
 var retry_count = 0  # Track retry attempts for current file
 const MAX_RETRIES = 3  # Maximum number of retries per file
 
-@onready var root_directory = "res://" if Engine.is_editor_hint() else "user://"
+var download_directory := ""
+
+
+static func get_default_download_directory() -> String:
+	var setting_name := "icosa/downloads/local_download_path" if Engine.is_editor_hint() else "icosa/downloads/runtime_download_path"
+	var fallback := "res://icosa_downloads" if Engine.is_editor_hint() else "user://icosa_downloads"
+	var configured_path := String(ProjectSettings.get_setting(setting_name, fallback)).strip_edges()
+	return fallback if configured_path.is_empty() else configured_path.trim_suffix("/")
 
 
 func _ready():
+	if download_directory.is_empty():
+		download_directory = get_default_download_directory()
+	download_directory = download_directory.trim_suffix("/")
+
 	add_child(bytes_ticker)
 	# This must be 0 for 302 redirects!
 	max_redirects = 0
@@ -43,10 +54,11 @@ func _ready():
 	# Cleanup when node is freed
 	tree_exited.connect(func(): bytes_ticker.stop())
 
-	# Create downloads directory if it doesn't exist
-	var dir = DirAccess.open(root_directory)
-	if not dir.dir_exists("icosa_downloads"):
-		dir.make_dir("icosa_downloads")
+	# Create the configured downloads directory if it doesn't exist.
+	if not DirAccess.dir_exists_absolute(download_directory):
+		var error := DirAccess.make_dir_recursive_absolute(download_directory)
+		if error != OK:
+			push_error("Could not create downloads directory: %s" % download_directory)
 
 
 func start():
@@ -185,12 +197,15 @@ func start_next_download():
 	asset_path = sanitized_name + "_" + asset_id
 
 
-	var dir = DirAccess.open(root_directory + "icosa_downloads")
-	if not dir.dir_exists(asset_path):
-		dir.make_dir(asset_path)
+	var asset_directory := download_directory.path_join(asset_path)
+	if not DirAccess.dir_exists_absolute(asset_directory):
+		var error := DirAccess.make_dir_recursive_absolute(asset_directory)
+		if error != OK:
+			download_failed.emit("Could not create download directory: %s" % asset_directory)
+			return
 
 	# Store the download file path and set it for streaming download
-	pending_download_file = root_directory + "icosa_downloads/" + asset_path + "/" + final_filename
+	pending_download_file = asset_directory.path_join(final_filename)
 	download_file = pending_download_file
 
 	# Reset content length for new download

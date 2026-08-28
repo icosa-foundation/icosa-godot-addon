@@ -16,6 +16,7 @@ var completed_files = 0
 var total_bytes_to_download = 0  # Total size of all files
 var completed_bytes = 0  # Bytes downloaded so far
 var download_session_start_time: float = 0.0  # When user clicked download button
+var download_directory := ""
 
 signal download_progress(current_bytes: int, total_bytes: int, asset_name: String, filename: String)
 signal file_downloaded(asset_name: String, path: String)
@@ -76,6 +77,7 @@ func _process_queue():
 
 	# Create a new download instance
 	current_download = IcosaDownload.new()
+	current_download.download_directory = download_directory
 	add_child(current_download)
 
 	current_download.url_queue = urls

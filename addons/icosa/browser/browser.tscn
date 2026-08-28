@@ -162,7 +162,7 @@ text = "Downloads Path:"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-text = "res://Downloads"
+text = "res://icosa_downloads"
 
 [node name="DownloadsPathDialog" type="FileDialog" parent="SettingsWindow/TabContainer/Downloads/MarginContainer/VBoxContainer/DownloadsPath/DownloadsPath" unique_id=1196023893]
 unique_name_in_owner = true
