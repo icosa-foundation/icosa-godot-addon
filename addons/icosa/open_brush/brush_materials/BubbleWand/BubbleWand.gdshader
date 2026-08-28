@@ -7,6 +7,13 @@ uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform vec3 u_SpecColor : source_color = vec3(0.6);
 uniform float u_Shininess : hint_range(0.0, 1.0) = 0.9;
 uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
+uniform float u_ScrollRate = -0.54;
+uniform float u_ScrollJitterIntensity = 0.12;
+uniform float u_ScrollJitterFrequency = 1.0;
+uniform float u_BulgeAmount = 0.04;
+// UnityGLTF exporter v2+ bakes the static bulge.
+// Live strokes, .tilt imports, and legacy GLTF still need the bulge shader path.
+uniform bool u_IsUnityGltfExporterVersion2OrNewer = false;
 
 uniform vec4 u_ambient_light_color;
 uniform vec4 u_SceneLight_0_color;
@@ -18,7 +25,31 @@ varying vec3 v_view_position;
 varying vec3 v_view_normal;
 varying float v_fog_coord;
 
+const float kDecimetersToWorldUnits = 0.1;
+
+vec3 animated_displacement(vec3 pos) {
+  float t = TIME * u_ScrollRate;
+  vec3 wave = vec3(
+    sin(t + TIME + pos.z * u_ScrollJitterFrequency),
+    cos(t * 1.2 + TIME + pos.x * u_ScrollJitterFrequency),
+    cos(t + TIME + pos.x * u_ScrollJitterFrequency)
+  );
+  return wave * u_ScrollJitterIntensity * kDecimetersToWorldUnits;
+}
+
 void vertex() {
+  float wave = sin(UV.x * PI);
+  vec3 wave_displacement = u_BulgeAmount * NORMAL * wave;
+  vec3 displacement = animated_displacement(VERTEX);
+  vec3 vertex_displacement = displacement;
+  if (!u_IsUnityGltfExporterVersion2OrNewer) {
+    vertex_displacement += wave_displacement;
+  }
+  VERTEX += vertex_displacement;
+
+  vec3 normal_displacement = wave_displacement + displacement;
+  NORMAL = normalize(NORMAL + normal_displacement * 2.5);
+
   v_view_position = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
   v_view_normal = normalize((MODELVIEW_MATRIX * vec4(NORMAL, 0.0)).xyz);
   v_fog_coord = v_view_position.z;

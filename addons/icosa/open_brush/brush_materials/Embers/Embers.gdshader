@@ -3,10 +3,10 @@ render_mode unshaded, blend_add, depth_draw_opaque, cull_disabled;
 
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform vec4 u_TintColor : source_color = vec4(1.0);
-uniform float u_ScrollRate : hint_range(0.0, 5.0) = 0.3;
-uniform vec3 u_ScrollDistance = vec3(0.0, 3.0, 0.0);
-uniform float u_ScrollJitterIntensity : hint_range(0.0, 2.0) = 1.0;
-uniform float u_ScrollJitterFrequency : hint_range(0.0, 20.0) = 3.0;
+uniform float u_ScrollRate : hint_range(0.0, 5.0) = 0.6;
+uniform vec3 u_ScrollDistance = vec3(-0.2, 0.6, 0.0);
+uniform float u_ScrollJitterIntensity : hint_range(0.0, 2.0) = 0.03;
+uniform float u_ScrollJitterFrequency : hint_range(0.0, 20.0) = 5.0;
 
 varying vec4 v_color;
 

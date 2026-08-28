@@ -1,68 +1,38 @@
 shader_type spatial;
-render_mode blend_mix, cull_back;
+render_mode unshaded, cull_back, depth_draw_opaque;
 
-// Include shared functions
 #include "res://addons/icosa/open_brush/brush_materials/_includes/fog_functions.gdshaderinc"
-#include "res://addons/icosa/open_brush/brush_materials/_includes/normal_map.gdshaderinc"
-#include "res://addons/icosa/open_brush/brush_materials/_includes/surface_shader.gdshaderinc"
 
-// Material properties
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
-uniform vec3 u_SpecColor : source_color = vec3(0.235);
-uniform float u_Shininess : hint_range(0.0, 1.0) = 0.4;
-uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
+uniform vec4 u_TintColor : source_color = vec4(1.0);
+uniform float u_QuantizeRate = 5.0;
 
-// Lighting
-uniform vec4 u_ambient_light_color;
-uniform vec4 u_SceneLight_0_color;
-uniform vec4 u_SceneLight_1_color;
-uniform vec3 u_SceneLight_0_direction;
-uniform vec3 u_SceneLight_1_direction;
-
-// Varyings
-varying vec3 v_view_position;
-varying vec3 v_view_normal;
+varying vec4 v_color;
+varying vec2 v_uv;
 varying float v_fog_coord;
 
 void vertex() {
-  // Transform to view space for lighting calculations
-  v_view_position = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
-  v_view_normal = normalize((MODELVIEW_MATRIX * vec4(NORMAL, 0.0)).xyz);
-  v_fog_coord = v_view_position.z;
+  vec4 world_pos = MODEL_MATRIX * vec4(VERTEX, 1.0);
+  float birth_time = CUSTOM1.w;
+  float lifetime = TIME - birth_time;
+  float phase = mod(lifetime, 1.0);
+  float pulse = pow(phase, 3.0);
+
+  world_pos.xyz = ceil(world_pos.xyz * u_QuantizeRate) / u_QuantizeRate;
+  world_pos.xyz += normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz) * pulse * 0.1;
+
+  mat4 inv_model = inverse(MODEL_MATRIX);
+  VERTEX = (inv_model * world_pos).xyz;
+
+  v_color = vec4(2.0 * COLOR.rgb * pulse, COLOR.a);
+  v_uv = UV;
+  v_fog_coord = (VIEW_MATRIX * world_pos).z;
 }
 
 void fragment() {
-  // Sample textures
-  vec4 tex_color = texture(u_MainTex, UV);
-  float brush_mask = tex_color.a * COLOR.a;
-
-  // Alpha cutoff
-  if (brush_mask <= u_Cutoff) {
-    discard;
-  }
-
-  // Compute perturbed normal
-  vec3 perturbed_normal = perturb_normal(v_view_position, v_view_normal, UV, 0.0015, FRONT_FACING);
-
-  // Always use front-facing normal for double-sided
-  perturbed_normal.z *= mix(-1.0, 1.0, float(FRONT_FACING));
-
-  // Lighting
-  vec3 eye_dir = -normalize(v_view_position);
-  vec3 light_dir_0 = normalize(u_SceneLight_0_direction);
-  vec3 light_dir_1 = normalize(u_SceneLight_1_direction);
-
-  vec3 light_0 = surface_shader_specular_gloss(
-    perturbed_normal, light_dir_0, eye_dir,
-    u_SceneLight_0_color.rgb, COLOR.rgb, u_SpecColor, u_Shininess);
-
-  vec3 light_1 = sh_shader_with_spec(
-    perturbed_normal, light_dir_1,
-    u_SceneLight_1_color.rgb, COLOR.rgb, u_SpecColor);
-
-  vec3 ambient = COLOR.rgb * u_ambient_light_color.rgb;
-
-  vec3 final_color = light_0 + light_1 + ambient;
+  vec4 tex_color = texture(u_MainTex, v_uv);
+  vec4 color = v_color * u_TintColor * tex_color;
+  vec3 final_color = color.rgb * max(color.a, tex_color.a);
   final_color = apply_fog(final_color, v_fog_coord);
 
   ALBEDO = final_color;

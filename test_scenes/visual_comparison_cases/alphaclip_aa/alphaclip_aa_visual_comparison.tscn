@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://dg73pp0xdbayt"]
+
+[ext_resource type="PackedScene" uid="uid://bd4r7gwb72wxi" path="res://test_scenes/visual_comparison_tool/visual_comparison.tscn" id="1_h6gcm"]
+[ext_resource type="PackedScene" uid="uid://cbfrgefkysdo4" path="res://test_scenes/visual_comparison_cases/alphaclip_aa/alphaclip_aa_scene.tscn" id="2_jgrxe"]
+[ext_resource type="Texture2D" uid="uid://brsvuubw7yonm" path="res://test_scenes/visual_comparison_cases/alphaclip_aa/ground_truth_best_case_aa.webp" id="2_pi582"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_pi582"]
+viewport_path = NodePath("SubViewportContainer/Viewport")
+
+[node name="VisualComparison" unique_id=1155957687 instance=ExtResource("1_h6gcm")]
+
+[node name="Viewport" parent="SubViewportContainer" parent_id_path=PackedInt32Array(1143641616) index="0" unique_id=1043398115]
+anisotropic_filtering_level = 4
+canvas_item_default_texture_filter = 0
+positional_shadow_atlas_size = 0
+
+[node name="Reference" parent="SubViewportContainer/Viewport" index="0" unique_id=1235481503]
+offset_top = 0.0
+offset_bottom = 0.5065918
+texture = ExtResource("2_pi582")
+
+[node name="SubViewport" parent="SubViewportContainer/Viewport/Render" parent_id_path=PackedInt32Array(1933957529) index="0" unique_id=314659319]
+msaa_3d = 3
+
+[node name="Node" parent="SubViewportContainer/Viewport/Render/SubViewport" index="0" unique_id=1295670399 instance=ExtResource("2_jgrxe")]
+
+[node name="Reference" type="TextureRect" parent="SubViewportContainer/Viewport/Render" parent_id_path=PackedInt32Array(1933957529) index="1" unique_id=1596807341]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+texture = ExtResource("2_pi582")
+expand_mode = 5
+stretch_mode = 6
+metadata/_edit_lock_ = true
+
+[node name="HeatMapFilter" parent="." index="2" unique_id=1092785372]
+texture = SubResource("ViewportTexture_pi582")
+
+[node name="AutoCheckBox" parent="ControlPanel" parent_id_path=PackedInt32Array(2096250504) index="4" unique_id=1411619452]
+button_pressed = false
+
+[node name="ResolutionSpinBox" parent="ControlPanel" parent_id_path=PackedInt32Array(2096250504) index="5" unique_id=329204591]
+value = 1024.0

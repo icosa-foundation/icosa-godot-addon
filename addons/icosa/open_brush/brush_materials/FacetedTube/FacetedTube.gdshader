@@ -21,6 +21,6 @@ void fragment() {
   color += mix(vec3(0.0), u_ColorY, n.y);
   color += mix(vec3(0.0), u_ColorZ, n.z);
 
-  ALBEDO = color * COLOR.rgb;
-  ALPHA = 1.0;
+  ALBEDO = color;
+  ALPHA = COLOR.a;
 }

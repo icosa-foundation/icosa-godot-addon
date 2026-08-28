@@ -41,7 +41,6 @@ grow_vertical = 2
 [node name="Viewport" type="SubViewport" parent="SubViewportContainer" unique_id=1043398115]
 unique_name_in_owner = true
 handle_input_locally = false
-msaa_2d = 2
 canvas_item_default_texture_filter = 2
 size = Vector2i(1152, 648)
 render_target_update_mode = 4
@@ -109,15 +108,10 @@ texture = SubResource("ViewportTexture_2cpu2")
 
 [node name="PreviewPanel" type="Panel" parent="." unique_id=86704273]
 unique_name_in_owner = true
-anchors_preset = 6
+anchors_preset = 11
 anchor_left = 1.0
-anchor_top = 0.5
 anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -129.0
-offset_top = -2.0
-offset_right = -129.0
-offset_bottom = -2.0
+anchor_bottom = 1.0
 grow_horizontal = 0
 grow_vertical = 2
 size_flags_horizontal = 4
@@ -125,11 +119,13 @@ size_flags_vertical = 4
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PreviewPanel" unique_id=1008253329]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 11
+anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 2
+grow_horizontal = 0
 grow_vertical = 2
+alignment = 2
 
 [node name="Img1" type="TextureRect" parent="PreviewPanel/VBoxContainer" unique_id=570300969]
 unique_name_in_owner = true
@@ -200,7 +196,7 @@ autowrap_trim_flags = 0
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="Button" type="Button" parent="ControlPanel" unique_id=2101849920]
+[node name="CompareButton" type="Button" parent="ControlPanel" unique_id=2101849920]
 layout_mode = 0
 offset_left = 14.0
 offset_top = 16.0
@@ -208,6 +204,14 @@ offset_right = 128.0
 offset_bottom = 66.0
 text = "Compare
 "
+
+[node name="ScreenshotButton" type="Button" parent="ControlPanel" unique_id=869118113]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 72.0
+offset_right = 129.0
+offset_bottom = 122.0
+text = "Screenshot"
 
 [node name="Timer" type="Timer" parent="ControlPanel" unique_id=1435681955]
 unique_name_in_owner = true
@@ -281,7 +285,8 @@ text = "blur"
 [connection signal="item_focused" from="ModeSelector" to="ControlPanel" method="_on_mode_selector_item_focused"]
 [connection signal="item_selected" from="ModeSelector" to="ControlPanel" method="_on_mode_selector_item_selected"]
 [connection signal="mouse_exited" from="ModeSelector" to="ControlPanel" method="_on_mode_selector_mouse_exited"]
-[connection signal="pressed" from="ControlPanel/Button" to="ControlPanel" method="_on_button_pressed"]
+[connection signal="pressed" from="ControlPanel/CompareButton" to="ControlPanel" method="_on_button_pressed"]
+[connection signal="pressed" from="ControlPanel/ScreenshotButton" to="ControlPanel" method="_on_screenshot_pressed"]
 [connection signal="timeout" from="ControlPanel/Timer" to="ControlPanel" method="_on_timer_timeout"]
 [connection signal="toggled" from="ControlPanel/AutoCheckBox" to="ControlPanel" method="_on_check_box_toggled"]
 [connection signal="value_changed" from="ControlPanel/AutoCheckBox/AutoFreq" to="ControlPanel" method="_on_auto_freq_value_changed"]

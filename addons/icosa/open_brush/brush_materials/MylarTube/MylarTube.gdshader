@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, cull_back;
+render_mode unshaded, blend_mix, cull_back;
 
 #include "res://addons/icosa/open_brush/brush_materials/_includes/fog_functions.gdshaderinc"
 #include "res://addons/icosa/open_brush/brush_materials/_includes/surface_shader.gdshaderinc"
@@ -8,6 +8,7 @@ uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform vec3 u_SpecColor : source_color = vec3(0.5, 0.5, 0.5);
 uniform float u_Shininess : hint_range(0.0, 1.0) = 0.078125;
 uniform float u_SqueezeAmount : hint_range(0.0, 1.0) = 0.825;
+uniform bool u_IsUnityGltfExporterVersion2OrNewer = false;
 
 uniform vec4 u_ambient_light_color;
 uniform vec4 u_SceneLight_0_color;
@@ -21,14 +22,15 @@ varying vec3 v_world_normal;
 varying float v_fog_coord;
 
 void vertex() {
-  // Radius stored in texcoord0.z (vec4)
-  // GLTF importer maps _TEXCOORD_0 -> _CUSTOM0, accessible as CUSTOM0
   float radius = CUSTOM0.z;
+  if (u_IsUnityGltfExporterVersion2OrNewer && radius <= 0.000001) {
+    radius = CUSTOM1.x;
+  }
 
   // Squeeze displacement
   float squeeze = sin(UV.x * 3.14159);
   vec3 squeeze_displacement = radius * NORMAL * squeeze;
-  vec3 displaced_vertex = VERTEX - squeeze_displacement * u_SqueezeAmount;
+  vec3 displaced_vertex = u_IsUnityGltfExporterVersion2OrNewer ? VERTEX : VERTEX - squeeze_displacement * u_SqueezeAmount;
 
   // Perturb normal
   vec3 perturbed_normal = normalize(NORMAL + squeeze_displacement * 2.5);

@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, depth_draw_always, cull_disabled;
+render_mode unshaded, depth_draw_always, cull_disabled, alpha_to_coverage_and_one;
 
 #include "res://addons/icosa/open_brush/brush_materials/_includes/fog_functions.gdshaderinc"
 
@@ -15,12 +15,10 @@ void vertex() {
 void fragment() {
   vec4 tex = texture(u_MainTex, UV) * COLOR;
 
-  if (tex.a <= u_Cutoff) {
-    discard;
-  }
-
   vec3 final_color = apply_fog(tex.rgb, v_fog_coord);
 
   ALBEDO = final_color;
-  ALPHA = 1.0;
+  ALPHA = tex.a;
+  ALPHA_ANTIALIASING_EDGE = u_Cutoff;
+  ALPHA_SCISSOR_THRESHOLD = 0.0;
 }

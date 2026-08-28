@@ -3,13 +3,18 @@ class_name IcosaOpenBrush
 extends RefCounted
 
 ## Shared data and format-agnostic helpers for Open Brush / Tilt Brush importers.
-## Instantiated once in plugin.gd and shared between IcosaOpenBrushGLTF and
-## IcosaOpenBrushScene so material / name / environment caches are warm for both.
+## Instantiated by importers and helpers so material / name / environment caches
+## are warm across Open Brush workflows.
 
 var material_cache: Dictionary = {}
 var brush_materials: Dictionary = {}
 var name_mapping: Dictionary = {}
 var environment_data: Dictionary = {}
+
+const MATERIAL_NAME_ALIASES := {
+	"3D Printing Brush": "Square3DPrintBrush",
+	"TaperedMarker_Flat": "TaperedMarkerFlat",
+}
 
 # Default Open Brush light rig used when the file doesn't specify lights.
 const DEFAULT_LIGHT_0_DIRECTION := Vector3(0.0, -0.707, 0.707)
@@ -70,6 +75,8 @@ func find_matching_brush_material(material_name: String) -> Material:
 
 	if material_cache.has(original_name):
 		return material_cache[original_name]
+
+	material_name = MATERIAL_NAME_ALIASES.get(material_name, material_name)
 
 	if brush_materials.has(material_name):
 		var loaded := load(brush_materials[material_name]) as Material

@@ -1,14 +1,18 @@
-[gd_resource type="StandardMaterial3D" load_steps=3 format=3 uid="uid://2qldlfcfq82t"]
+[gd_resource type="ShaderMaterial" load_steps=4 format=3 uid="uid://2qldlfcfq82t"]
 
-[ext_resource type="Texture2D" uid="uid://8dm0fps5k7ma" path="res://addons/icosa/open_brush/brush_materials/Muscle/Muscle-f28c395c-a57d-464b-8f0b-558c59478fa3-v10.0-MainTex.png" id="1"]
-[ext_resource type="Texture2D" uid="uid://dwrkvlt2gvueu" path="res://addons/icosa/open_brush/brush_materials/Muscle/Muscle-f28c395c-a57d-464b-8f0b-558c59478fa3-v10.0-BumpMap.png" id="2"]
+[ext_resource type="Shader" path="res://addons/icosa/open_brush/brush_materials/_includes/tube_bump_lit.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://8dm0fps5k7ma" path="res://addons/icosa/open_brush/brush_materials/Muscle/Muscle-f28c395c-a57d-464b-8f0b-558c59478fa3-v10.0-MainTex.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://dwrkvlt2gvueu" path="res://addons/icosa/open_brush/brush_materials/Muscle/Muscle-f28c395c-a57d-464b-8f0b-558c59478fa3-v10.0-BumpMap.png" id="3"]
 
 [resource]
 resource_name = "Muscle"
-transparency = 1
-specular_mode = 1
-vertex_color_use_as_albedo = true
-albedo_texture = ExtResource("1")
-roughness = 0.695
-normal_enabled = true
-normal_texture = ExtResource("2")
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/u_MainTex = ExtResource("2")
+shader_parameter/u_BumpMap = ExtResource("3")
+shader_parameter/u_MainTex_ST = Vector4(0.25, 1, 0, 0)
+shader_parameter/u_SpecColor = Color(0.08088237, 0.08088237, 0.08088237, 1)
+shader_parameter/u_Shininess = 0.57
+shader_parameter/u_Cutoff = 0.3
+shader_parameter/u_fogColor = Color(1, 1, 1, 1)
+shader_parameter/u_fogDensity = 0.0

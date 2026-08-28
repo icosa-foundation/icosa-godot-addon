@@ -6,6 +6,7 @@ render_mode unshaded, blend_add, cull_disabled;
 uniform sampler2D u_MainTex : source_color, filter_linear_mipmap;
 uniform float u_Opacity : hint_range(0.0, 1.0) = 1;
 uniform float u_Cutoff : hint_range(0.0, 1.0) = 0.5;
+uniform float u_Feather : hint_range(0.0, 8.0) = 1.0;
 
 varying float v_fog_coord;
 
@@ -18,10 +19,6 @@ void fragment() {
   float brush_mask = texture(u_MainTex, UV).a;
   brush_mask *= COLOR.a;
 
-  if (brush_mask <= u_Cutoff) {
-    discard;
-  }
-
   ALBEDO = COLOR.rgb;
-  ALPHA = 1.0;
+  ALPHA = smoothstep(u_Cutoff - length(fwidth(UV) * u_Feather), u_Cutoff + length(fwidth(UV) * u_Feather), brush_mask) * u_Opacity;
 }

@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" load_steps=0 format=3]
 
-[ext_resource type="Shader" uid="uid://b2571nj38djeh" path="res://addons/icosa/open_brush/brush_materials/Electricity/Electricity.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://bopco1j0w6wjh" path="res://addons/icosa/open_brush/brush_materials/Electricity/Electricity.gdshader" id="1"]
 
 [resource]
 resource_name = "Electricity"

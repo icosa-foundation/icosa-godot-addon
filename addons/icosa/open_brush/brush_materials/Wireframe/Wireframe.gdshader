@@ -1,17 +1,16 @@
 shader_type spatial;
 render_mode unshaded, blend_mix, cull_disabled;
 
+uniform float anti_aliasing_strength = 1.0;
+
 void fragment() {
-  // Wrap UVs into [0,1] to match Unity behavior
-  vec2 uv = fract(UV);
-
-  // Edge mask in UV space: two lines across center forming a grid
-  float w = 0.0;
-  w = (abs(uv.x - 0.5) > 0.45) ? 1.0 : 0.0;
-  w += (abs(uv.y - 0.5) > 0.45) ? 1.0 : 0.0;
-
-  vec4 final_color = COLOR * w;
-
-  ALBEDO = final_color.rgb;
-  ALPHA = final_color.a;
+	float w = 0.0;
+	float q = 0.0;
+	vec2 f = fwidth(UV) * 4.0 * anti_aliasing_strength; // anti-aliasing edge
+	w = smoothstep(0.5 - f.x, 0.5 + f.x, abs(UV.x - 0.5) * 4.0 - 1.3); // horizontal lines
+	q = smoothstep(0.5 - f.y, 0.5 + f.y, abs(UV.y - 0.5) * 4.0 - 1.3); // vertical lines
+	ALPHA = abs(q - w) * 2.0; // XOR effect
+	ALPHA_ANTIALIASING_EDGE = 1.0;
+	ALPHA_SCISSOR_THRESHOLD = 0.0;
+	ALBEDO = COLOR.rgb;
 }

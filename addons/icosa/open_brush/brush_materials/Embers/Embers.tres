@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://b01ogc4uoglto"]
 
-[ext_resource type="Shader" uid="uid://30e7rnk8rj2q" path="res://addons/icosa/open_brush/brush_materials/Embers/Embers.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://bkwefhmt5o7m5" path="res://addons/icosa/open_brush/brush_materials/Embers/Embers.gdshader" id="1"]
 [ext_resource type="Texture2D" uid="uid://1ntw5364cyi0" path="res://addons/icosa/open_brush/brush_materials/Embers/Embers-02ffb866-7fb2-4d15-b761-1012cefb1360-v10.0-MainTex.png" id="2_w2uab"]
 
 [resource]
@@ -9,7 +9,7 @@ render_priority = 0
 shader = ExtResource("1")
 shader_parameter/u_MainTex = ExtResource("2_w2uab")
 shader_parameter/u_TintColor = Color(1, 1, 1, 1)
-shader_parameter/u_ScrollRate = 0.3
-shader_parameter/u_ScrollDistance = Vector3(0, 3, 0)
-shader_parameter/u_ScrollJitterIntensity = 0.50000002375
-shader_parameter/u_ScrollJitterFrequency = 3.0
+shader_parameter/u_ScrollRate = 0.6
+shader_parameter/u_ScrollDistance = Vector3(-0.2, 0.6, 0)
+shader_parameter/u_ScrollJitterIntensity = 0.03
+shader_parameter/u_ScrollJitterFrequency = 5.0

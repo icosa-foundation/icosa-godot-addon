@@ -3,6 +3,8 @@ render_mode unshaded, blend_add, cull_disabled;
 
 uniform float u_Opacity : hint_range(0.0, 1.0) = 1.0;
 
+varying vec3 v_color_data;
+
 // From ColorSpace.cginc - hue06_to_base_rgb function
 vec3 hue06_to_base_rgb(float hue06) {
   float r = -1.0 + abs(hue06 - 3.0);
@@ -23,17 +25,19 @@ vec3 cy_to_rgb(vec3 base_rgb, float chroma, float luma) {
   return (base_rgb - rgb_luma) * chroma + luma;
 }
 
-void fragment() {
-  // Slice uses CUSTOM0 for color space data: (chroma, luma, hue_position)
-  // GLTF importer maps _TEXCOORD_0 -> _CUSTOM0, accessible as CUSTOM0
-  vec3 color_data = CUSTOM0.xyz;
+void vertex() {
+  // Slice uses CUSTOM0 for color space data: (chroma, luma, hue_position).
+  // MeshData maps UV0.z into CUSTOM0 for wide texcoord preservation.
+  v_color_data = CUSTOM0.xyz;
+}
 
+void fragment() {
   // Calculate hue: mod(z * 5, 6)
-  float hue = mod(color_data.z * 5.0, 6.0);
+  float hue = mod(v_color_data.z * 5.0, 6.0);
   vec3 base_rgb = hue06_to_base_rgb(hue);
 
   // cy_to_rgb(base_rgb, chroma, luma)
-  vec3 finalColor = cy_to_rgb(base_rgb, color_data.x, color_data.y);
+  vec3 finalColor = cy_to_rgb(base_rgb, v_color_data.x, v_color_data.y);
 
   ALBEDO = clamp(finalColor, 0.0, 1.0);
   ALPHA = u_Opacity;

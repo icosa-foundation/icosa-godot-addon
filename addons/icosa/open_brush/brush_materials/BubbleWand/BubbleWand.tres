@@ -13,3 +13,7 @@ shader_parameter/u_MainTex = ExtResource("2_ti0l4")
 shader_parameter/u_SpecColor = Color(0.235, 0.235, 0.235, 1)
 shader_parameter/u_Shininess = 0.4
 shader_parameter/u_Cutoff = 0.5
+shader_parameter/u_ScrollRate = -0.54
+shader_parameter/u_ScrollJitterIntensity = 0.12
+shader_parameter/u_ScrollJitterFrequency = 1.0
+shader_parameter/u_BulgeAmount = 0.04
