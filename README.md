@@ -1,6 +1,6 @@
 ﻿# Icosa Gallery - Godot Addon
 
-A Godot 4.5+ plugin that lets you browse the [Icosa Gallery](https://icosa.gallery), a gallery of curated 3D assets, download ready-to-use glTF meshes without leaving the editor.
+A Godot 4.7+ plugin that lets you browse the [Icosa Gallery](https://icosa.gallery), a gallery of curated 3D assets, and download ready-to-use glTF meshes without leaving the editor.
 
 ![browser2.png](docs/images/browser2.png)
 ![browser1.png](docs/images/browser1.png)
@@ -8,11 +8,11 @@ A Godot 4.5+ plugin that lets you browse the [Icosa Gallery](https://icosa.galle
 
 ## Features
 
-- **Asset browser** – Search Icosa's catalog, with tabs!
-- **Account login** – Sign in with a device code to fetch your user profile, personal and liked assets so you can re-import anything from your Icosa library.
-- **GLTF and OBJ Downloads** – Queue asset files for download, save them into per-asset folders, and track progress for every file in the bundle, including textures referenced by the glTF.
-- **Runtime support** - Embed the browser in your project to allow users of your game or app to download and instantiate Icosa assets at runtime. 
-- **Open Brush Material replacement** – Imported models are derived from Open Brush sketches have their materials remapped with custom shaders.
+1. **Asset browser** – Search Icosa's catalog in multiple tabs.
+2. **Account login** – Sign in with a device code to access your profile, personal uploads, and liked assets.
+3. **glTF and OBJ downloads** – Queue asset files, save them in per-asset folders, and track every file in the bundle, including textures referenced by glTF files.
+4. **Runtime support** – Embed the browser in a project so users can download and instantiate Icosa assets at runtime.
+5. **Open Brush material replacement** – Remap materials from legacy Tilt Brush/Open Brush glTF files and Open Brush UnityGLTF v2 exports to Godot brush shaders.
 
 ## Installation
 
@@ -30,17 +30,17 @@ If you have Godot Editor open, go to the AssetLib and search "icosa", download a
 1. After enabling the plugin, switch to the **Icosa Gallery** main screen tab that appears alongside the 3D, 2D, and Script at the top of Godot Editor.
 2. Use the **Search** tab to look for assets. Apply filters such as curated assets, formats, triangle count, and ordering to refine results.
 3. Click a thumbnail to open it in its own tab, or open multiple search tabs or asset previews as needed.
-4. Select an asset to queue downloads; files are saved under `res://addons/icosa_downloads/{asset_name}_{asset_id}` by default, so referenced textures stay linked in the glTF. This can be changed in the settings menu.
+4. Select an asset to queue downloads. In the editor, files are saved under `res://icosa_downloads/{asset_name}_{asset_id}` by default; runtime downloads use `user://icosa_downloads/{asset_name}_{asset_id}`. Change the destination in **Settings > Downloads**. Project-wide defaults are available under `icosa/downloads` in Project Settings.
 5. Sign in through the **Login** tab to sync your Icosa account securely in a web browser. Enter the device code in a browser, then return to Godot to fetch your profile, personal uploads, and liked assets.
 
 ## Hardcoded filters
 
 1. By default, public assets are only returned if they have Creative Commons licenses that allow remixing.
-2. The Icosa Gallery HTTP API recommends which formats are most suitable for each format. If it suggests multiple formats, we pick the first one but prefer **glTF 2.0** over OBJ and FBX.
+2. When the Icosa Gallery API marks a supported format as preferred, the addon downloads it. Otherwise, it chooses **glTF 2.0**, then falls back to OBJ. FBX and direct `.tilt` downloads are not supported.
 
-## Roadmap
+## Open Brush support
 
-Open brush support: [see here](addons/icosa/open_brush/README.md)
+See the [Open Brush support documentation](addons/icosa/open_brush/README.md) for supported exporters, material handling, and limitations.
 
 ## Building & Contributing
 
