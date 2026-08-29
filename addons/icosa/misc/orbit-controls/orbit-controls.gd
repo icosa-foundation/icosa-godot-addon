@@ -163,6 +163,7 @@ var valid: bool = false
 func _get_configuration_warnings():
 	if not _camera:
 		return ["Please assign a camera to orbit with in the inspector."]
+	return []
 	
 func _ready() -> void:
 	
